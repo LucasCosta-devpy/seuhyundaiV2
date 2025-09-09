@@ -1,202 +1,166 @@
-# 🚗 Hyundai Creta Landing Page - Ação Entre Amigos
+# 🚗 Hyundai Creta 2025 - Ação Entre Amigos
 
-Uma landing page **ultra-profissional** desenvolvida com as mais modernas tecnologias web para promover a ação entre amigos do Hyundai Creta 2025.
+Landing page profissional para ação entre amigos com HTML, CSS e JavaScript puros.
 
-## 🚀 **Tecnologias Utilizadas**
+## ✨ Características
 
-### **Frontend Framework**
-- **React 18** - Biblioteca JavaScript moderna
-- **TypeScript** - Tipagem estática para maior robustez
-- **Vite** - Build tool extremamente rápida
+- 🎯 **HTML/CSS/JS Puro** - Sem frameworks, máxima performance
+- 📱 **100% Responsivo** - Funciona perfeitamente em todos os dispositivos
+- ⚡ **Carregamento Ultra-Rápido** - Otimizado para velocidade
+- 🎨 **Design Moderno** - Interface elegante e profissional
+- 📊 **Analytics Integrado** - Google Analytics, Facebook Pixel e GTM
+- 🔄 **Carrossel Interativo** - Galeria de imagens do veículo
+- 🎬 **Suporte a Vídeos** - Seção de depoimentos e explicações
+- ♿ **Acessível** - Navegação por teclado e suporte a leitores de tela
 
-### **Styling & UI**
-- **Tailwind CSS** - Framework CSS utility-first
-- **Framer Motion** - Animações fluidas e profissionais
-- **Glass Morphism** - Efeitos visuais modernos
-- **CSS Custom Properties** - Sistema de design escalável
-
-### **Funcionalidades Avançadas**
-- **Intersection Observer API** - Animações baseadas em scroll
-- **Custom Hooks** - Lógica reutilizável
-- **Analytics Integration** - Google Analytics + Facebook Pixel
-- **Responsive Design** - Mobile-first approach
-- **Performance Optimized** - Lazy loading e code splitting
-
-## 📁 **Estrutura do Projeto**
+## 📁 Estrutura do Projeto
 
 ```
-seuhyundai/
-├── 📄 index.html                 # HTML principal
-├── 📄 package.json              # Dependências e scripts
-├── 📄 vite.config.ts            # Configuração do Vite
-├── 📄 tailwind.config.js        # Configuração do Tailwind
-├── 📄 tsconfig.json             # Configuração do TypeScript
-│
-├── 📁 src/
-│   ├── 📄 main.tsx              # Ponto de entrada da aplicação
-│   ├── 📄 App.tsx               # Componente principal
-│   │
-│   ├── 📁 components/           # Componentes React
-│   │   ├── 📁 ui/               # Componentes de interface
-│   │   │   ├── Button.tsx       # Botão premium com animações
-│   │   │   ├── Card.tsx         # Card com glass morphism
-│   │   │   ├── FloatingPromo.tsx # Botão flutuante
-│   │   │   └── PromoModal.tsx   # Modal promocional
-│   │   │
-│   │   └── 📁 sections/         # Seções da página
-│   │       ├── Header.tsx       # Cabeçalho com navbar
-│   │       ├── Hero.tsx         # Seção hero cinematográfica
-│   │       ├── ParticipationLevels.tsx # Níveis de participação
-│   │       ├── ImageCarousel.tsx # Carousel de imagens
-│   │       ├── PrizeDetails.tsx # Detalhes dos prêmios
-│   │       ├── VideoSection.tsx # Seção de vídeo
-│   │       ├── Testimonials.tsx # Depoimentos
-│   │       ├── ExtraAction.tsx  # Ação extra
-│   │       ├── PreviousActions.tsx # Ações anteriores
-│   │       ├── SocialMedia.tsx  # Redes sociais
-│   │       └── Footer.tsx       # Rodapé
-│   │
-│   ├── 📁 hooks/                # Hooks customizados
-│   │   ├── useAnalytics.ts      # Hook para analytics
-│   │   ├── useIntersectionObserver.ts # Hook para scroll animations
-│   │   └── useScrollAnimation.ts # Hook para animações de scroll
-│   │
-│   ├── 📁 types/                # Tipos TypeScript
-│   │   └── index.ts             # Definições de tipos
-│   │
-│   ├── 📁 utils/                # Utilitários
-│   │   └── cn.ts                # Função para combinar classes CSS
-│   │
-│   ├── 📁 styles/               # Estilos CSS
-│   │   └── index.css            # Estilos principais
-│   │
-│   └── 📁 assets/               # Assets organizados
-│       ├── index.ts             # Configuração de assets
-│       ├── 📁 img/              # Imagens
-│       └── 📁 videos/           # Vídeos
+├── index.html                 # Página principal
+├── assets/
+│   ├── css/
+│   │   └── style.css         # Estilos CSS puros
+│   ├── js/
+│   │   └── script.js         # JavaScript funcional
+│   ├── img/                  # Imagens do projeto
+│   │   ├── logo.jpg
+│   │   ├── car1.jpeg
+│   │   ├── car2.jpeg
+│   │   └── ...
+│   └── videos/               # Vídeos
+│       ├── dona.mp4
+│       └── rifinha-relâmpago-01-Rodrigo.mp4
+├── .github/
+│   └── workflows/
+│       └── deploy.yml        # Deploy automático
+└── README.md
 ```
 
-## 🎨 **Características do Design**
+## 🚀 Deploy
 
-### **Visual Premium**
-- ✅ **Glass Morphism** - Efeitos de vidro modernos
-- ✅ **Gradientes Animados** - Cores vibrantes e dinâmicas
-- ✅ **Micro-interações** - Feedback visual em todos os elementos
-- ✅ **Tipografia Fluida** - Escala responsiva com clamp()
-- ✅ **Sombras Avançadas** - Sistema de elevação profissional
+O projeto está configurado para deploy automático no GitHub Pages:
 
-### **Animações Profissionais**
-- ✅ **Scroll Animations** - Elementos aparecem ao rolar
-- ✅ **Hover Effects** - Transformações 3D suaves
-- ✅ **Loading States** - Feedback visual para carregamento
-- ✅ **Parallax Effects** - Movimento em camadas
-- ✅ **Keyframe Animations** - Animações CSS complexas
+1. **Push para main** - Deploy automático
+2. **Sem build** - HTML estático direto
+3. **URL:** `https://lucascosta-devpy.github.io/seuhyundaiteste/`
 
-### **UX Avançada**
-- ✅ **Mobile-First** - Design responsivo perfeito
-- ✅ **Touch Optimized** - Otimizado para dispositivos móveis
-- ✅ **Accessibility** - Suporte a leitores de tela
-- ✅ **Performance** - Carregamento rápido e otimizado
-- ✅ **SEO Friendly** - Meta tags e estrutura semântica
+## 🛠️ Desenvolvimento Local
 
-## 🚀 **Como Executar**
+Simplesmente abra o arquivo `index.html` em qualquer navegador moderno:
 
-### **Pré-requisitos**
-- Node.js 18+ 
-- npm ou yarn
-
-### **Instalação**
 ```bash
-# Clone o repositório
-git clone <repository-url>
-cd seuhyundai
-
-# Instale as dependências
-npm install
-
-# Execute em modo desenvolvimento
-npm run dev
-
-# Build para produção
-npm run build
-
-# Preview da build
-npm run preview
+# Servidor local simples (opcional)
+python -m http.server 8000
+# ou
+npx serve .
 ```
 
-## 📊 **Analytics & Tracking**
+## 🎯 Funcionalidades
 
-- **Google Analytics 4** - Tracking avançado de eventos
-- **Facebook Pixel** - Conversões e remarketing
-- **Google Tag Manager** - Gerenciamento centralizado de tags
-- **Custom Events** - Tracking de interações específicas
+### 🖼️ Carrossel de Imagens
+- Navegação automática (5s)
+- Controles manuais (setas e dots)
+- Navegação por teclado
+- Preload das imagens
 
-## 🎯 **Funcionalidades Implementadas**
+### 📊 Analytics
+- **Google Analytics 4** - Métricas detalhadas
+- **Facebook Pixel** - Conversões e remarketing  
+- **Google Tag Manager** - Gestão centralizada
+- **Eventos customizados** - Scroll, cliques, vídeos
 
-### **Componentes Interativos**
-- [x] Botões com animações shimmer e pulse
-- [x] Cards com glass morphism e hover effects
-- [x] Carousel de imagens com navegação suave
-- [x] Modal promocional com timer
-- [x] Botão flutuante com animações avançadas
+### 🎬 Vídeos
+- Controles nativos HTML5
+- Tracking de interações
+- Poster personalizado
+- Responsivo
 
-### **Seções da Página**
-- [x] Hero cinematográfico com parallax
-- [x] Níveis de participação com combos
-- [x] Galeria de imagens do veículo
-- [x] Detalhes dos prêmios
-- [x] Seção de vídeo explicativo
-- [x] Depoimentos de ganhadores
-- [x] Ação extra promocional
-- [x] Histórico de ações anteriores
-- [x] Links para redes sociais
-- [x] Footer com elementos de confiança
+### 📱 Responsividade
+- **Mobile First** - Otimizado para celular
+- **Breakpoints:** 480px, 768px, 1200px
+- **Touch friendly** - Botões e controles adequados
+- **Performance móvel** - Carregamento otimizado
 
-### **Recursos Avançados**
-- [x] Sistema de analytics completo
-- [x] Hooks customizados para funcionalidades
-- [x] Animações baseadas em scroll
-- [x] Design system com variáveis CSS
-- [x] Tipagem TypeScript completa
-- [x] Performance otimizada
+## 🔧 Personalização
 
-## 🔧 **Configurações**
+### 🎨 Cores e Estilo
+Edite as variáveis CSS em `assets/css/style.css`:
 
-### **Variáveis de Ambiente**
-Crie um arquivo `.env.local` com:
-```env
-VITE_GA_ID=G-D9XB7PXRPT
-VITE_FB_PIXEL_ID=551167542275548
-VITE_GTM_ID=GTM-NN7B7TL6
+```css
+:root {
+  --primary-color: #3b82f6;
+  --secondary-color: #10b981;
+  --accent-color: #fbbf24;
+}
 ```
 
-### **Customização**
-- **Cores**: Edite `tailwind.config.js` e `src/styles/index.css`
-- **Conteúdo**: Modifique os componentes em `src/components/sections/`
-- **Assets**: Adicione imagens em `src/assets/img/` e vídeos em `src/assets/videos/`
-- **Analytics**: Configure os IDs no `index.html` e hooks
+### 🔗 Links e URLs
+Configure em `assets/js/script.js`:
 
-## 📱 **Responsividade**
+```javascript
+const CONFIG = {
+    participationUrl: 'https://rumomaisumarota.com.br/meucretadosonhos',
+    // Outros links...
+};
+```
 
-- **Mobile**: 320px - 640px
-- **Tablet**: 641px - 1024px  
-- **Desktop**: 1025px+
-- **4K**: 1440px+
+### 📊 Analytics IDs
+Configure no `index.html`:
 
-## 🎪 **Performance**
+```html
+<!-- Google Analytics -->
+gtag('config', 'SEU-GA-ID');
 
-- ⚡ **Vite** - Build extremamente rápida
-- 🗜️ **Code Splitting** - Carregamento otimizado
-- 🖼️ **Image Optimization** - Formatos modernos
-- 📦 **Tree Shaking** - Remoção de código não utilizado
-- 💾 **Lazy Loading** - Carregamento sob demanda
+<!-- Facebook Pixel -->
+fbq('init', 'SEU-PIXEL-ID');
 
-## 📄 **Licença**
+<!-- Google Tag Manager -->
+'GTM-SEU-GTM-ID'
+```
 
-Este projeto é propriedade privada da **Rumo Mais Uma Rota**.
+## 📈 Performance
+
+### ⚡ Métricas Esperadas
+- **First Contentful Paint:** < 1.5s
+- **Largest Contentful Paint:** < 2.5s  
+- **Cumulative Layout Shift:** < 0.1
+- **First Input Delay:** < 100ms
+
+### 🔧 Otimizações Incluídas
+- ✅ CSS minificado e otimizado
+- ✅ JavaScript com lazy loading
+- ✅ Imagens otimizadas e preload
+- ✅ Animations com GPU acceleration
+- ✅ Scroll throttling
+- ✅ Intersection Observer para animações
+
+## 🌐 Compatibilidade
+
+### Navegadores Suportados
+- ✅ Chrome 80+
+- ✅ Firefox 75+  
+- ✅ Safari 13+
+- ✅ Edge 80+
+- ✅ Mobile browsers
+
+### Funcionalidades Modernas
+- CSS Grid e Flexbox
+- Intersection Observer
+- ES6+ JavaScript
+- HTML5 Video
+- CSS Custom Properties
+
+## 📞 Suporte
+
+Para dúvidas ou suporte:
+- **Email:** contato@rumomaisumarota.com.br
+- **WhatsApp:** +55 11 99999-9999
+
+## 📄 Licença
+
+Este projeto é propriedade de **Rumo Mais Uma Rota**.
+Todos os direitos reservados © 2024.
 
 ---
 
-**Desenvolvido com ❤️ usando as mais modernas tecnologias web**
-
-🚀 **React** • 📘 **TypeScript** • ⚡ **Vite** • 🎨 **Tailwind CSS** • 🎭 **Framer Motion**
+**🎊 Landing page profissional, leve e eficiente!**
