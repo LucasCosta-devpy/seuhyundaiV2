@@ -80,12 +80,12 @@ const Footer = () => {
           className="flex justify-center items-center gap-8 mb-12"
         >
           <img 
-            src="/src/assets/img/Selo_de_Garantia_de_7_Dias_PNG_Transparente_Sem_Fundo.png" 
+            src="/assets/img/Selo_de_Garantia_de_7_Dias_PNG_Transparente_Sem_Fundo.png" 
             alt="Garantia de 7 dias" 
             className="h-12 w-auto opacity-80 hover:opacity-100 transition-opacity"
           />
           <img 
-            src="/src/assets/img/selo_caixa.png" 
+            src="/assets/img/selo_caixa.png" 
             alt="Sorteio pela Loteria Federal" 
             className="h-12 w-auto opacity-80 hover:opacity-100 transition-opacity"
           />
@@ -97,7 +97,7 @@ const Footer = () => {
           <div className="text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
               <img 
-                src="/src/assets/img/logo.jpg" 
+                src="/assets/img/logo.jpg" 
                 alt="Rumo Mais Uma Rota" 
                 className="w-12 h-12 rounded-xl"
               />

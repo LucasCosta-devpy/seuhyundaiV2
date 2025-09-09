@@ -71,7 +71,7 @@ const Header = () => {
             className="flex items-center gap-3"
           >
             <img 
-              src="/src/assets/img/logo.jpg" 
+              src="/assets/img/logo.jpg" 
               alt="Rumo Mais Uma Rota" 
               className="w-12 h-12 rounded-xl shadow-md"
             />

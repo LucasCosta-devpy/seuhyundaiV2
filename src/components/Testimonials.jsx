@@ -18,13 +18,13 @@ const Testimonials = () => {
     // Analytics tracking
     if (typeof gtag !== 'undefined') {
       gtag('event', 'video_start', { 
-        video_src: '/src/assets/videos/rifinha-relâmpago-01-Rodrigo.mp4',
+        video_src: '/assets/videos/rifinha-relâmpago-01-Rodrigo.mp4',
         video_title: 'Depoimento de Ganhador'
       })
     }
     if (typeof fbq !== 'undefined') {
       fbq('trackCustom', 'VideoStart', { 
-        video_src: '/src/assets/videos/rifinha-relâmpago-01-Rodrigo.mp4',
+        video_src: '/assets/videos/rifinha-relâmpago-01-Rodrigo.mp4',
         video_title: 'Depoimento de Ganhador'
       })
     }
@@ -96,13 +96,13 @@ const Testimonials = () => {
             <div className="relative">
               <video
                 className="w-full h-auto object-contain"
-                poster="/src/assets/img/carro.png"
+                poster="/assets/img/carro.png"
                 controls={isPlaying}
                 muted={isMuted}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
               >
-                <source src="/src/assets/videos/rifinha-relâmpago-01-Rodrigo.mp4" type="video/mp4" />
+                <source src="/assets/videos/rifinha-relâmpago-01-Rodrigo.mp4" type="video/mp4" />
                 Seu navegador não suporta vídeo HTML5.
               </video>
 

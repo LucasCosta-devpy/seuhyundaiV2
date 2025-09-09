@@ -18,13 +18,13 @@ const VideoSection = () => {
     // Analytics tracking
     if (typeof gtag !== 'undefined') {
       gtag('event', 'video_start', { 
-        video_src: '/src/assets/videos/dona.mp4',
+        video_src: '/assets/videos/dona.mp4',
         video_title: 'Vídeo Explicativo da Ação'
       })
     }
     if (typeof fbq !== 'undefined') {
       fbq('trackCustom', 'VideoStart', { 
-        video_src: '/src/assets/videos/dona.mp4',
+        video_src: '/assets/videos/dona.mp4',
         video_title: 'Vídeo Explicativo da Ação'
       })
     }
@@ -92,13 +92,13 @@ const VideoSection = () => {
             <div className="relative">
               <video
                 className="w-full h-auto object-contain"
-                poster="/src/assets/img/carro.png"
+                poster="/assets/img/carro.png"
                 controls={isPlaying}
                 muted={isMuted}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
               >
-                <source src="/src/assets/videos/dona.mp4" type="video/mp4" />
+                <source src="/assets/videos/dona.mp4" type="video/mp4" />
                 Seu navegador não suporta vídeo HTML5.
               </video>
 

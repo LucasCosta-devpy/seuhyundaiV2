@@ -13,13 +13,13 @@ const CarGallery = () => {
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
 
   const carImages = [
-    '/src/assets/img/car1.jpeg',
-    '/src/assets/img/car2.jpeg',
-    '/src/assets/img/car3.jpeg',
-    '/src/assets/img/car4.jpeg',
-    '/src/assets/img/car 5.jpeg',
-    '/src/assets/img/car 6.jpeg',
-    '/src/assets/img/carro.png'
+    '/assets/img/car1.jpeg',
+    '/assets/img/car2.jpeg',
+    '/assets/img/car3.jpeg',
+    '/assets/img/car4.jpeg',
+    '/assets/img/car 5.jpeg',
+    '/assets/img/car 6.jpeg',
+    '/assets/img/carro.png'
   ]
 
   const nextSlide = () => {
