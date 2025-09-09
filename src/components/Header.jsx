@@ -74,6 +74,10 @@ const Header = () => {
               src="/assets/img/logo.jpg" 
               alt="Rumo Mais Uma Rota" 
               className="w-12 h-12 rounded-xl shadow-md"
+              onError={(e) => {
+                console.error('Erro ao carregar logo:', e.target.src)
+                e.target.style.display = 'none'
+              }}
             />
             <span className="text-lg font-bold gradient-text">
               Ação entre amigos
