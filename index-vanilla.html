@@ -1,23 +1,28 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🚗 Ação Entre Amigos - Hyundai Creta 2025 | Rumo Mais Uma Rota</title>
     <meta name="description" content="🎯 Participe da ação entre amigos e concorra a um Hyundai Creta Limited Turbo 2025 + iPhone 16 Pro Max + R$ 5.000! Apenas R$ 15 por bilhete. Sorteio garantido!">
     <meta name="keywords" content="ação entre amigos, hyundai creta, sorteio, carro, iphone, prêmio, rifa">
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/jpg" href="/seuhyundaiteste/img/logo.jpg">
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpg" href="/seuhyundaiteste/img/logo.jpg">
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Custom Styles -->
     <style>
+        /* Custom animations and effects */
         @keyframes shimmer {
             0% { background-position: -200% center; }
             100% { background-position: 200% center; }
@@ -34,8 +39,14 @@
         }
         
         @keyframes slideInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         @keyframes fadeIn {
@@ -49,10 +60,21 @@
             animation: shimmer 2s infinite;
         }
         
-        .pulse-glow { animation: pulse-glow 2s infinite; }
-        .float-animation { animation: float 3s ease-in-out infinite; }
-        .slide-in-up { animation: slideInUp 0.6s ease-out forwards; }
-        .fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .slide-in-up {
+            animation: slideInUp 0.6s ease-out forwards;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
         
         .glass-morphism {
             background: rgba(255, 255, 255, 0.1);
@@ -67,13 +89,35 @@
             background-clip: text;
         }
         
-        .carousel-container { position: relative; overflow: hidden; }
-        .carousel-track { display: flex; transition: transform 0.5s ease-in-out; }
-        .carousel-slide { min-width: 100%; flex-shrink: 0; }
+        .hidden { display: none; }
+        .block { display: block; }
         
+        /* Carousel styles */
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+        
+        .carousel-slide {
+            min-width: 100%;
+            flex-shrink: 0;
+        }
+        
+        /* Modal styles */
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+        }
+        
+        /* Responsive video */
         .video-responsive {
             position: relative;
-            padding-bottom: 56.25%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
             height: 0;
             overflow: hidden;
         }
@@ -87,30 +131,44 @@
         }
     </style>
     
-    <!-- Analytics -->
+    <!-- Analytics Scripts -->
     <script>
-        // Meta Pixel
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      const _pid = [54,51,51,53,49,55,54,51,57,52,50,50,55,55,48].map(c=>String.fromCharCode(c)).join('');
-      fbq('init', _pid);
-      fbq('track', 'PageView');
-    
-        // Google Analytics
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-D9XB7PXRPT');
+        // Meta Pixel Code
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        const _pid = [54,51,51,53,49,55,54,51,57,52,50,50,55,55,48].map(c=>String.fromCharCode(c)).join('');
+        fbq('init', _pid);
+        fbq('track', 'PageView');
     </script>
+    
+    <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-D9XB7PXRPT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-D9XB7PXRPT');
+    </script>
+    
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NN7B7TL6');</script>
 </head>
 <body class="min-h-screen bg-slate-900 text-white overflow-x-hidden">
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NN7B7TL6" 
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    
     <!-- Background -->
     <div class="fixed inset-0 -z-10 bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900"></div>
     
@@ -118,29 +176,35 @@
     <header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent py-4">
         <div class="container mx-auto px-4 lg:px-8">
             <nav class="flex items-center justify-between">
+                <!-- Brand/Logo -->
                 <div class="flex items-center space-x-3">
                     <div class="relative">
                         <img src="/seuhyundaiteste/img/logo.jpg" alt="Rumo Mais Uma Rota" 
                              class="w-12 h-12 rounded-xl shadow-lg border-2 border-white/20">
                         <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl"></div>
                     </div>
+                    
                     <div class="hidden sm:block">
                         <span class="gradient-text px-3 py-1.5 rounded-full text-sm font-bold pulse-glow">
                             🚀 Ação entre amigos
                         </span>
                     </div>
                 </div>
+
+                <!-- CTA Button -->
                 <button id="headerCTA" class="btn-shimmer pulse-glow bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 px-6 py-3 rounded-full font-bold uppercase tracking-wide hover:scale-105 transition-transform">
                     🎯 Participar
                 </button>
             </nav>
         </div>
+        
+        <!-- Scroll progress bar -->
         <div id="scrollProgress" class="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500" style="width: 0%"></div>
     </header>
 
-    <!-- Main -->
+    <!-- Main Content -->
     <main>
-        <!-- Hero -->
+        <!-- Hero Section -->
         <section class="relative min-h-screen flex items-center justify-center px-4 pt-20">
             <div class="container mx-auto text-center">
                 <div class="slide-in-up">
@@ -160,6 +224,7 @@
                             <span class="text-2xl font-bold text-amber-400">Apenas R$ 15</span>
                             <span class="text-gray-300 ml-2">por bilhete</span>
                         </div>
+                        
                         <div class="glass-morphism px-6 py-3 rounded-full">
                             <span class="text-green-400 font-bold">✅ Sorteio Garantido</span>
                         </div>
@@ -170,6 +235,7 @@
                     </button>
                 </div>
                 
+                <!-- Hero Image -->
                 <div class="mt-12 fade-in">
                     <img src="/seuhyundaiteste/img/carro.png" alt="Hyundai Creta 2025" 
                          class="w-full max-w-4xl mx-auto drop-shadow-2xl float-animation">
@@ -185,17 +251,19 @@
                 </h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <!-- Bronze -->
                     <div class="glass-morphism p-6 rounded-2xl text-center hover:scale-105 transition-transform">
                         <div class="text-6xl mb-4">🥉</div>
                         <h3 class="text-2xl font-bold mb-4 text-amber-600">Bronze</h3>
                         <div class="text-3xl font-bold mb-2">1 Bilhete</div>
                         <div class="text-xl text-gray-300 mb-4">R$ 15,00</div>
-                        <button class="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-full font-bold transition-colors cta-button">
+                        <button class="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-full font-bold transition-colors">
                             Escolher Bronze
                         </button>
                     </div>
                     
-                    <div class="glass-morphism p-6 rounded-2xl text-center hover:scale-105 transition-transform border-2 border-amber-400 relative">
+                    <!-- Prata -->
+                    <div class="glass-morphism p-6 rounded-2xl text-center hover:scale-105 transition-transform border-2 border-amber-400">
                         <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
                             <span class="bg-amber-400 text-slate-900 px-4 py-1 rounded-full text-sm font-bold">MAIS POPULAR</span>
                         </div>
@@ -204,18 +272,19 @@
                         <div class="text-3xl font-bold mb-2">5 Bilhetes</div>
                         <div class="text-xl text-gray-300 mb-4">R$ 60,00</div>
                         <div class="text-sm text-green-400 mb-4">Economize R$ 15!</div>
-                        <button class="w-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 py-3 rounded-full font-bold transition-colors cta-button">
+                        <button class="w-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 py-3 rounded-full font-bold transition-colors">
                             Escolher Prata
                         </button>
                     </div>
                     
+                    <!-- Ouro -->
                     <div class="glass-morphism p-6 rounded-2xl text-center hover:scale-105 transition-transform">
                         <div class="text-6xl mb-4">🥇</div>
                         <h3 class="text-2xl font-bold mb-4 text-amber-400">Ouro</h3>
                         <div class="text-3xl font-bold mb-2">10 Bilhetes</div>
                         <div class="text-xl text-gray-300 mb-4">R$ 100,00</div>
                         <div class="text-sm text-green-400 mb-4">Economize R$ 50!</div>
-                        <button class="w-full bg-amber-400 hover:bg-amber-500 text-slate-900 py-3 rounded-full font-bold transition-colors cta-button">
+                        <button class="w-full bg-amber-400 hover:bg-amber-500 text-slate-900 py-3 rounded-full font-bold transition-colors">
                             Escolher Ouro
                         </button>
                     </div>
@@ -223,7 +292,7 @@
             </div>
         </section>
 
-        <!-- Carousel -->
+        <!-- Image Carousel -->
         <section class="py-16 px-4">
             <div class="container mx-auto">
                 <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">
@@ -246,9 +315,15 @@
                         </div>
                     </div>
                     
-                    <button id="prevBtn" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors">←</button>
-                    <button id="nextBtn" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors">→</button>
+                    <!-- Carousel Controls -->
+                    <button id="prevBtn" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors">
+                        ←
+                    </button>
+                    <button id="nextBtn" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors">
+                        →
+                    </button>
                     
+                    <!-- Carousel Indicators -->
                     <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
                         <button class="carousel-indicator w-3 h-3 rounded-full bg-white/50 hover:bg-white transition-colors" data-slide="0"></button>
                         <button class="carousel-indicator w-3 h-3 rounded-full bg-white/50 hover:bg-white transition-colors" data-slide="1"></button>
@@ -259,7 +334,7 @@
             </div>
         </section>
 
-        <!-- Video -->
+        <!-- Video Section -->
         <section class="py-16 px-4">
             <div class="container mx-auto">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -276,7 +351,7 @@
                     </div>
                     
                     <div class="video-responsive rounded-2xl overflow-hidden">
-                        <video poster="/seuhyundaiteste/img/carro.png" controls>
+                        <video id="explanationVideo" poster="/seuhyundaiteste/img/carro.png" controls>
                             <source src="/seuhyundaiteste/videos/dona.mp4" type="video/mp4">
                             Seu navegador não suporta o elemento de vídeo.
                         </video>
@@ -294,7 +369,9 @@
                     <a href="#" class="text-2xl hover:scale-110 transition-transform">💬</a>
                 </div>
                 
-                <p class="text-gray-400 mb-4">© 2024 Rumo Mais Uma Rota. Todos os direitos reservados.</p>
+                <p class="text-gray-400 mb-4">
+                    © 2024 Rumo Mais Uma Rota. Todos os direitos reservados.
+                </p>
                 
                 <div class="flex justify-center items-center space-x-4">
                     <img src="/seuhyundaiteste/img/selo_caixa.png" alt="Selo Caixa" class="h-12">
@@ -311,18 +388,20 @@
             const header = document.getElementById('header');
             const scrollProgress = document.getElementById('scrollProgress');
             
+            // Header background
             if (window.scrollY > 50) {
                 header.className = 'fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-slate-900/80 backdrop-blur-xl border-b border-white/10 py-3';
             } else {
                 header.className = 'fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent py-4';
             }
             
+            // Progress bar
             const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
             const progress = scrollHeight > 0 ? (window.scrollY / scrollHeight) * 100 : 0;
             scrollProgress.style.width = progress + '%';
         });
         
-        // Carousel
+        // Carousel functionality
         let currentSlide = 0;
         const slides = document.querySelectorAll('.carousel-slide');
         const indicators = document.querySelectorAll('.carousel-indicator');
@@ -347,6 +426,7 @@
             updateCarousel();
         }
         
+        // Carousel controls
         document.getElementById('nextBtn').addEventListener('click', nextSlide);
         document.getElementById('prevBtn').addEventListener('click', prevSlide);
         
@@ -357,16 +437,24 @@
             });
         });
         
+        // Auto-play carousel
         setInterval(nextSlide, 5000);
         
-        // CTA actions
+        // CTA button actions
         function handleCTAClick() {
+            // Track analytics
             if (typeof gtag !== 'undefined') {
-                gtag('event', 'click', { event_category: 'CTA', event_label: 'participation' });
+                gtag('event', 'click', {
+                    event_category: 'CTA',
+                    event_label: 'participation'
+                });
             }
+            
             if (typeof fbq !== 'undefined') {
                 fbq('track', 'Lead');
             }
+            
+            // Open participation link
             window.open('https://rumomaisumarota.com.br/meucretadosonhos', '_blank', 'noopener,noreferrer');
         }
         
@@ -374,30 +462,52 @@
         document.getElementById('mainCTA').addEventListener('click', handleCTAClick);
         document.getElementById('videoCTA').addEventListener('click', handleCTAClick);
         
-        document.querySelectorAll('.cta-button').forEach(button => {
-            button.addEventListener('click', handleCTAClick);
+        // Smooth scroll for internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
         });
         
-        // Animations
+        // Initialize animations on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('fade-in');
                 }
             });
-        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        }, observerOptions);
         
+        // Observe all sections for animations
         document.querySelectorAll('section').forEach(section => {
             observer.observe(section);
         });
         
         // Preload images
-        ['/seuhyundaiteste/img/car1.jpeg', '/seuhyundaiteste/img/car2.jpeg', '/seuhyundaiteste/img/car3.jpeg', '/seuhyundaiteste/img/car4.jpeg', '/seuhyundaiteste/img/carro.png', '/seuhyundaiteste/img/logo.jpg'].forEach(src => {
+        const imagesToPreload = [
+            '/seuhyundaiteste/img/car1.jpeg',
+            '/seuhyundaiteste/img/car2.jpeg',
+            '/seuhyundaiteste/img/car3.jpeg',
+            '/seuhyundaiteste/img/car4.jpeg',
+            '/seuhyundaiteste/img/carro.png',
+            '/seuhyundaiteste/img/logo.jpg'
+        ];
+        
+        imagesToPreload.forEach(src => {
             const img = new Image();
             img.src = src;
         });
         
         console.log('🚀 Landing page carregada com sucesso!');
     </script>
-  </body>
+</body>
 </html>
