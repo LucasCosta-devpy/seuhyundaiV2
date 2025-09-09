@@ -153,7 +153,7 @@ const PromoModal = () => {
               >
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <Gift className="w-6 h-6 text-yellow-300" />
-                  <span className="text-xl font-bold">25 RIFAS por apenas R$ 6,00!</span>
+                  <span className="text-xl font-bold">25 AÇÕES por apenas R$ 6,00!</span>
                 </div>
                 <p className="text-green-100 text-sm">
                   Aproveite esta oferta imperdível por tempo limitado!

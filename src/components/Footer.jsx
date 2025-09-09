@@ -1,6 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Shield, CheckCircle, Clock, Lock } from 'lucide-react'
+import { Shield, CheckCircle, Clock, Lock, ArrowUp } from 'lucide-react'
 
 const Footer = () => {
   const handleCTAClick = () => {
@@ -15,6 +15,10 @@ const Footer = () => {
     window.open('https://rumomaisumarota.com.br/meucretadosonhos', '_blank', 'noopener')
   }
 
+  const handleBackToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
     <footer className="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-16">
       <div className="container mx-auto px-4">
@@ -26,8 +30,8 @@ const Footer = () => {
           viewport={{ once: true }}
           className="mb-12"
         >
-          <div className="card bg-white/10 backdrop-blur-sm border border-white/20 p-8 rounded-2xl">
-            <div className="flex flex-wrap justify-center items-center gap-8">
+          <div className="card bg-white/10 backdrop-blur-sm border border-white/20 p-4 md:p-6 lg:p-8 rounded-2xl">
+            <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 lg:gap-8">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center">
                   <Shield className="w-6 h-6 text-green-400" />
@@ -104,7 +108,7 @@ const Footer = () => {
               <span className="text-xl font-bold">Rumo Mais Uma Rota</span>
             </div>
             <p className="text-gray-300 mb-4">
-              Ações entre amigos transparentes e confiáveis. Participe e tenha a chance de ganhar prêmios incríveis!
+              Ações entre amigos transparentes e confiáveis. Participe e tenha a chance de conquistar recompensas incríveis!
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -120,7 +124,7 @@ const Footer = () => {
           <div className="text-center">
             <h3 className="text-lg font-semibold mb-4">Links Rápidos</h3>
             <ul className="space-y-2">
-              <li><a href="#premio" className="text-gray-300 hover:text-white transition-colors">Prêmios</a></li>
+              <li><a href="#premio" className="text-gray-300 hover:text-white transition-colors">Recompensas</a></li>
               <li><a href="#participacao" className="text-gray-300 hover:text-white transition-colors">Participação</a></li>
               <li><a href="#depoimentos" className="text-gray-300 hover:text-white transition-colors">Depoimentos</a></li>
               <li><a href="#redes" className="text-gray-300 hover:text-white transition-colors">Redes Sociais</a></li>
@@ -158,9 +162,46 @@ const Footer = () => {
             </a>{' '}
             clicando em "Participar".
           </p>
+          <div className="flex flex-wrap justify-center gap-4 text-xs text-gray-500 mb-4">
+            <a 
+              href="https://rumomaisumarota.com.br/termos-de-uso" 
+              target="_blank" 
+              rel="noopener"
+              className="hover:text-primary-400 transition-colors"
+            >
+              Termos de Uso
+            </a>
+            <span>•</span>
+            <a 
+              href="https://rumomaisumarota.com.br/politica-de-privacidade" 
+              target="_blank" 
+              rel="noopener"
+              className="hover:text-primary-400 transition-colors"
+            >
+              Política de Privacidade
+            </a>
+          </div>
           <p className="text-gray-500 text-xs">
             © 2025 Rumo Mais Uma Rota. Todos os direitos reservados.
           </p>
+        </motion.div>
+
+        {/* Back to Top Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="flex justify-end mt-8"
+        >
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleBackToTop}
+            className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+          >
+            <ArrowUp className="w-4 h-4" />
+            Voltar ao topo
+          </motion.button>
         </motion.div>
       </div>
     </footer>

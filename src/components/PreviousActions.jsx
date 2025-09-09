@@ -12,11 +12,11 @@ const PreviousActions = () => {
   const previousActions = [
     {
       id: 1,
-      title: "Ação Relâmpago - Concorreu a bilhetes na ação principal",
-      status: "SORTEADA",
+      title: "Ação Relâmpago - Concorreu a cotas na ação principal",
+      status: "FINALIZADA",
       value: "R$ 3,00",
       winner: "Rodrigo G.",
-      winnerRole: "Ganhador da ação relâmpago",
+      winnerRole: "Contemplado da ação relâmpago",
       topBuyer: "Lucas C.",
       topBuyerRole: "Maior comprador da ação relâmpago",
       date: "17/08/2024 12:00",
@@ -67,7 +67,7 @@ const PreviousActions = () => {
             variants={itemVariants}
             className="text-xl text-gray-600 max-w-3xl mx-auto"
           >
-            Veja algumas ações que já foram sorteadas e seus ganhadores!
+            Veja algumas ações que já foram finalizadas e seus contemplados!
           </motion.p>
         </motion.div>
 

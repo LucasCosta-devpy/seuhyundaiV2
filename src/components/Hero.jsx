@@ -12,7 +12,11 @@ const Hero = () => {
       fbq('track', 'Lead', { content_name: 'hero_cta' })
     }
     
-    window.open('https://rumomaisumarota.com.br/meucretadosonhos', '_blank', 'noopener')
+    // Scroll para a seção de participação
+    const participationSection = document.getElementById('participacao')
+    if (participationSection) {
+      participationSection.scrollIntoView({ behavior: 'smooth' })
+    }
   }
 
   const containerVariants = {
@@ -95,7 +99,7 @@ const Hero = () => {
         {/* Main Title */}
         <motion.h1
           variants={itemVariants}
-          className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 md:mb-6 leading-tight px-2"
         >
           Entre nessa{' '}
           <span className="gradient-text bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
@@ -108,9 +112,9 @@ const Hero = () => {
         {/* Subtitle */}
         <motion.p
           variants={itemVariants}
-          className="text-xl md:text-2xl text-gray-200 mb-12 max-w-4xl mx-auto leading-relaxed"
+          className="text-lg sm:text-xl md:text-2xl text-gray-200 mb-8 md:mb-12 max-w-4xl mx-auto leading-relaxed px-4"
         >
-          Adquira sua cota e acelere rumo à sorte! 🚗✨
+          Adquira sua cota e acelere rumo à oportunidade! 🚗✨
         </motion.p>
 
         {/* CTA Button */}
@@ -136,7 +140,7 @@ const Hero = () => {
             }
           }}
           onClick={handleCTAClick}
-          className="btn-secondary text-lg px-12 py-6 mb-12 pulse-glow relative overflow-hidden"
+          className="btn-secondary text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6 mb-8 md:mb-12 pulse-glow relative overflow-hidden mx-4"
         >
           {/* Animated background effect */}
           <motion.div
@@ -157,7 +161,7 @@ const Hero = () => {
         {/* Trust Indicators */}
         <motion.div
           variants={itemVariants}
-          className="flex flex-wrap justify-center items-center gap-8 text-sm text-gray-300"
+          className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 md:gap-8 text-xs sm:text-sm text-gray-300 px-4"
         >
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-green-400" />
@@ -171,6 +175,16 @@ const Hero = () => {
             <Zap className="w-5 h-5 text-blue-400" />
             <span>Garantia de 7 dias</span>
           </div>
+        </motion.div>
+
+        {/* Scroll Hint */}
+        <motion.div
+          variants={itemVariants}
+          className="mt-8 text-center"
+        >
+          <p className="text-sm text-gray-400 animate-pulse">
+            📜 Role a página para ver mais informações
+          </p>
         </motion.div>
       </motion.div>
 

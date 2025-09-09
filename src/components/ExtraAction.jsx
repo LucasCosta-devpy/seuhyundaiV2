@@ -73,7 +73,7 @@ const ExtraAction = () => {
             variants={itemVariants}
             className="text-xl text-gray-600 max-w-3xl mx-auto"
           >
-            Ações extras para ganhar mais bilhetes na ação principal do Creta!
+            Ações extras para conquistar mais cotas na ação principal do Creta!
           </motion.p>
         </motion.div>
 
@@ -105,7 +105,7 @@ const ExtraAction = () => {
 
             {/* Title */}
             <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 text-center">
-              Ação Extra - Escolha seu número e concorra a 10 bilhetes na ação principal!
+              Ação Extra - Escolha seu número e concorra a 10 cotas na ação principal!
             </h3>
 
             {/* Details */}
@@ -115,7 +115,7 @@ const ExtraAction = () => {
                   <Gift className="w-6 h-6 text-orange-600" />
                   <div>
                     <span className="font-semibold text-gray-800">Prêmio:</span>
-                    <span className="text-gray-700 ml-2">Concorra a 10 bilhetes extras para o Creta</span>
+                    <span className="text-gray-700 ml-2">Concorra a 10 cotas extras para o Creta</span>
                   </div>
                 </div>
                 
@@ -185,7 +185,7 @@ const ExtraAction = () => {
               </div>
               <div className="text-center">
                 <div className="text-2xl mb-2">🏆</div>
-                <p className="text-sm text-gray-600">10 bilhetes extras garantidos</p>
+                <p className="text-sm text-gray-600">10 cotas extras garantidas</p>
               </div>
               <div className="text-center">
                 <div className="text-2xl mb-2">⚡</div>
@@ -206,8 +206,8 @@ const ExtraAction = () => {
                 💡 Como funciona?
               </h4>
               <p className="text-blue-700">
-                Compre seu número na ação extra por apenas R$ 6,00 e concorra a 10 bilhetes extras 
-                na ação principal do Creta. Quanto mais bilhetes você tiver, maior sua chance de ganhar!
+                Compre seu número na ação extra por apenas R$ 6,00 e concorra a 10 cotas extras 
+                na ação principal do Creta. Quanto mais cotas você tiver, maior sua chance de conquistar!
               </p>
             </div>
           </motion.div>

@@ -24,7 +24,11 @@ const Header = () => {
       fbq('track', 'Lead', { content_name: 'header_cta' })
     }
     
-    window.open('https://rumomaisumarota.com.br/meucretadosonhos', '_blank', 'noopener')
+    // Scroll para a seção de participação
+    const participationSection = document.getElementById('participacao')
+    if (participationSection) {
+      participationSection.scrollIntoView({ behavior: 'smooth' })
+    }
   }
 
   const handleExtraActionClick = () => {
@@ -64,22 +68,22 @@ const Header = () => {
       }`}
     >
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="flex items-center gap-3"
+            className="flex items-center gap-2 md:gap-3"
           >
             <img 
               src="/assets/img/logo.jpg" 
               alt="Rumo Mais Uma Rota" 
-              className="w-12 h-12 rounded-xl shadow-md"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-xl shadow-md"
               onError={(e) => {
                 console.error('Erro ao carregar logo:', e.target.src)
                 e.target.style.display = 'none'
               }}
             />
-            <span className="text-lg font-bold gradient-text">
+            <span className="text-sm md:text-lg font-bold gradient-text hidden sm:block">
               Ação entre amigos
             </span>
           </motion.div>
@@ -87,13 +91,16 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
             <a href="#premio" className="text-gray-700 hover:text-primary-600 transition-colors">
-              Prêmio
+              Recompensa
             </a>
             <a href="#participacao" className="text-gray-700 hover:text-primary-600 transition-colors">
               Participação
             </a>
             <a href="#depoimentos" className="text-gray-700 hover:text-primary-600 transition-colors">
               Depoimentos
+            </a>
+            <a href="#informacoes" className="text-gray-700 hover:text-primary-600 transition-colors">
+              Informações
             </a>
             <a href="#redes" className="text-gray-700 hover:text-primary-600 transition-colors">
               Redes Sociais
@@ -143,7 +150,7 @@ const Header = () => {
               className="text-gray-700 hover:text-primary-600 transition-colors py-2"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Prêmio
+              Recompensa
             </a>
             <a 
               href="#participacao" 
@@ -158,6 +165,13 @@ const Header = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Depoimentos
+            </a>
+            <a 
+              href="#informacoes" 
+              className="text-gray-700 hover:text-primary-600 transition-colors py-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Informações
             </a>
             <a 
               href="#redes" 

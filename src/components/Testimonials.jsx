@@ -67,12 +67,15 @@ const Testimonials = () => {
           animate={inView ? "visible" : "hidden"}
           className="mb-16"
         >
-          <div className="relative bg-black rounded-3xl overflow-hidden shadow-2xl max-w-2xl mx-auto">
+          <div className="relative bg-black rounded-3xl overflow-hidden shadow-2xl max-w-xl mx-auto">
             <video
               className="w-full h-auto"
               poster="/assets/img/carro.png"
               controls
               preload="metadata"
+              playsInline
+              webkit-playsinline="true"
+              style={{ maxHeight: '350px' }}
             >
               <source src="/assets/videos/rifinha-relâmpago-01-Rodrigo.mp4" type="video/mp4" />
               Seu navegador não suporta vídeo HTML5.
@@ -140,36 +143,6 @@ const Testimonials = () => {
           </motion.div>
         )}
 
-        {/* Trust Indicators */}
-        <motion.div
-          variants={itemVariants}
-          initial="hidden"
-          animate={inView ? "visible" : "hidden"}
-          className="mt-16 text-center"
-        >
-          <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-8 border border-green-200">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">
-              Mais de 1000 participantes satisfeitos
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Nossa comunidade cresce a cada dia com participantes que confiam em nosso processo transparente
-            </p>
-            <div className="flex flex-wrap justify-center gap-8 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span>100% Transparente</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                <span>Suporte 24/7</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                <span>Pagamento Seguro</span>
-              </div>
-            </div>
-          </div>
-        </motion.div>
       </div>
     </section>
   )

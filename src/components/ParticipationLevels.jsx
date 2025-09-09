@@ -149,7 +149,7 @@ const ParticipationLevels = () => {
             variants={itemVariants}
             className="text-xl text-gray-600 max-w-3xl mx-auto"
           >
-            Escolha o combo ideal para você e aumente suas chances de ganhar!
+            Escolha o combo ideal para você e aumente suas chances de conquistar!
           </motion.p>
         </motion.div>
 
@@ -157,7 +157,7 @@ const ParticipationLevels = () => {
           variants={containerVariants}
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6"
         >
           {combos.map((combo) => {
             const IconComponent = combo.icon
@@ -166,7 +166,7 @@ const ParticipationLevels = () => {
                 key={combo.id}
                 variants={itemVariants}
                 whileHover={{ scale: 1.05, y: -10 }}
-                className={`relative card p-6 text-center ${
+                className={`relative card p-4 md:p-6 text-center ${
                   combo.popular ? 'ring-2 ring-primary-500 shadow-2xl' : ''
                 }`}
               >
@@ -181,7 +181,7 @@ const ParticipationLevels = () => {
                 <div className="mb-4">
                   <IconComponent className="w-12 h-12 mx-auto text-primary-500 mb-3" />
                   <h3 className="text-2xl font-bold text-gray-800">
-                    {combo.tickets} {combo.tickets === 1 ? 'Bilhete' : 'Bilhetes'}
+                    {combo.tickets} {combo.tickets === 1 ? 'Cota' : 'Cotas'}
                   </h3>
                 </div>
 
@@ -198,7 +198,7 @@ const ParticipationLevels = () => {
                     R$ {combo.currentPrice.toFixed(2)}
                   </div>
                   <div className="text-sm text-gray-500 mt-1">
-                    {combo.tickets > 1 ? `R$ ${(combo.currentPrice / combo.tickets).toFixed(2)} por bilhete` : ''}
+                    {combo.tickets > 1 ? `R$ ${(combo.currentPrice / combo.tickets).toFixed(2)} por cota` : ''}
                   </div>
                 </div>
 
@@ -212,7 +212,7 @@ const ParticipationLevels = () => {
                       : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 hover:from-primary-100 hover:to-primary-200 hover:text-primary-800'
                   }`}
                 >
-                  Escolher {combo.tickets} Bilhete{combo.tickets > 1 ? 's' : ''}
+                  Escolher {combo.tickets} Cota{combo.tickets > 1 ? 's' : ''}
                 </motion.button>
 
                 {combo.tickets > 1 && (
@@ -238,7 +238,7 @@ const ParticipationLevels = () => {
               🎯 Ou escolha sua quantidade personalizada
             </h3>
             <p className="text-gray-600 mb-6 text-center">
-              Digite quantos bilhetes você deseja
+              Digite quantas cotas você deseja
             </p>
             
             <div className="max-w-md mx-auto">
@@ -271,7 +271,7 @@ const ParticipationLevels = () => {
                   className="mt-4 text-center"
                 >
                   <p className="text-sm text-gray-600">
-                    Você está comprando <strong>{customQuantity} bilhete{parseInt(customQuantity) > 1 ? 's' : ''}</strong>
+                    Você está comprando <strong>{customQuantity} cota{parseInt(customQuantity) > 1 ? 's' : ''}</strong>
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
                     Preço final será calculado no checkout
@@ -289,7 +289,7 @@ const ParticipationLevels = () => {
           className="text-center mt-12"
         >
           <p className="text-gray-600">
-            💡 <strong>Dica:</strong> Quanto mais bilhetes você comprar, maior sua chance de ganhar!
+            💡 <strong>Dica:</strong> Quanto mais cotas você comprar, maior sua chance de conquistar!
           </p>
         </motion.div>
       </div>

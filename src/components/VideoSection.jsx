@@ -62,12 +62,15 @@ const VideoSection = () => {
           animate={inView ? "visible" : "hidden"}
           className="relative"
         >
-          <div className="relative bg-black rounded-3xl overflow-hidden shadow-2xl max-w-3xl mx-auto">
+          <div className="relative bg-black rounded-3xl overflow-hidden shadow-2xl max-w-2xl mx-auto">
             <video
               className="w-full h-auto"
               poster="/assets/img/carro.png"
               controls
               preload="metadata"
+              playsInline
+              webkit-playsinline="true"
+              style={{ maxHeight: '400px' }}
             >
               <source src="/assets/videos/dona.mp4" type="video/mp4" />
               Seu navegador não suporta vídeo HTML5.

@@ -18,7 +18,7 @@ const SocialMedia = () => {
       color: "from-pink-500 to-purple-600",
       bgColor: "from-pink-50 to-purple-50",
       borderColor: "border-pink-200",
-      description: "Siga para novidades e sorteios",
+      description: "Siga para novidades e ações",
       cta: "Seguir"
     },
     {
@@ -172,10 +172,6 @@ const SocialMedia = () => {
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
                 <span>Comunidade Ativa</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span>Suporte 24/7</span>
               </div>
             </div>
           </div>

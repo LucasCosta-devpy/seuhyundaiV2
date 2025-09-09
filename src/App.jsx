@@ -9,6 +9,7 @@ import CarGallery from './components/CarGallery'
 import PrizeDetails from './components/PrizeDetails'
 import VideoSection from './components/VideoSection'
 import Testimonials from './components/Testimonials'
+import ImportantInfo from './components/ImportantInfo'
 import ExtraAction from './components/ExtraAction'
 import PreviousActions from './components/PreviousActions'
 import SocialMedia from './components/SocialMedia'
@@ -36,6 +37,7 @@ function App() {
             <PrizeDetails />
             <VideoSection />
             <Testimonials />
+            <ImportantInfo />
             <ExtraAction />
             <PreviousActions />
             <SocialMedia />

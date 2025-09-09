@@ -153,7 +153,7 @@ const PrizeDetails = () => {
           </div>
           
           <p className="text-lg text-purple-700 mb-4">
-            Quem acumular mais bilhetes terá como recompensa um{' '}
+            Quem acumular mais cotas terá como recompensa um{' '}
             <strong>iPhone 16 Pro Max 256GB</strong>
           </p>
           
