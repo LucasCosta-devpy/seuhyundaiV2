@@ -2,33 +2,55 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/jpg" href="/src/assets/img/logo.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hyundai Creta 2025 - Ação Entre Amigos</title>
-    <meta name="description" content="Participe da ação entre amigos e concorra a um Hyundai Creta 2025! Sorteio com garantia de 7 dias." />
-    <meta name="keywords" content="Hyundai Creta, ação entre amigos, sorteio, carro, 2025" />
+    <title>Ação entre amigos — Rumo Mais Uma Rota</title>
+    <meta name="description" content="Participe desta ação entre amigos e tenha a chance de receber um grande prêmio. Alternativa em valor disponível por transferência." />
     
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://seuhyundaiteste.netlify.app/" />
-    <meta property="og:title" content="Hyundai Creta 2025 - Ação Entre Amigos" />
-    <meta property="og:description" content="Participe da ação entre amigos e concorra a um Hyundai Creta 2025! Sorteio com garantia de 7 dias." />
-    <meta property="og:image" content="/img/logo.jpg" />
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://seuhyundaiteste.netlify.app/" />
-    <meta property="twitter:title" content="Hyundai Creta 2025 - Ação Entre Amigos" />
-    <meta property="twitter:description" content="Participe da ação entre amigos e concorra a um Hyundai Creta 2025! Sorteio com garantia de 7 dias." />
-    <meta property="twitter:image" content="/img/logo.jpg" />
-
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Meta Pixel Code -->
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      const _pid = [54,51,51,53,49,55,54,51,57,52,50,50,55,55,48].map(c=>String.fromCharCode(c)).join('');
+      fbq('init', _pid);
+      fbq('track', 'PageView');
+    </script>
+    <!-- End Meta Pixel Code -->
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-D9XB7PXRPT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-D9XB7PXRPT');
+    </script>
+    
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NN7B7TL6');</script>
+    <!-- End Google Tag Manager -->
   </head>
   <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NN7B7TL6" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

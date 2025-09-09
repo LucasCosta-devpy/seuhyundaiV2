@@ -1,166 +1,149 @@
-# 🚗 Hyundai Creta 2025 - Ação Entre Amigos
+# 🚗 Ação entre Amigos - Rumo Mais Uma Rota
 
-Landing page profissional para ação entre amigos com HTML, CSS e JavaScript puros.
+Um site moderno e profissional para ações entre amigos, desenvolvido com React e tecnologias de ponta.
 
 ## ✨ Características
 
-- 🎯 **HTML/CSS/JS Puro** - Sem frameworks, máxima performance
-- 📱 **100% Responsivo** - Funciona perfeitamente em todos os dispositivos
-- ⚡ **Carregamento Ultra-Rápido** - Otimizado para velocidade
-- 🎨 **Design Moderno** - Interface elegante e profissional
-- 📊 **Analytics Integrado** - Google Analytics, Facebook Pixel e GTM
-- 🔄 **Carrossel Interativo** - Galeria de imagens do veículo
-- 🎬 **Suporte a Vídeos** - Seção de depoimentos e explicações
-- ♿ **Acessível** - Navegação por teclado e suporte a leitores de tela
+- **React 18** com Vite para desenvolvimento rápido
+- **Tailwind CSS** para estilização moderna e responsiva
+- **Framer Motion** para animações suaves e profissionais
+- **Design responsivo** otimizado para todos os dispositivos
+- **Performance otimizada** com lazy loading e code splitting
+- **Analytics integrado** (Google Analytics, Facebook Pixel)
+- **SEO otimizado** com meta tags e estrutura semântica
+
+## 🚀 Tecnologias Utilizadas
+
+- **Frontend**: React 18, Vite
+- **Estilização**: Tailwind CSS, CSS Custom Properties
+- **Animações**: Framer Motion
+- **Ícones**: Lucide React
+- **Analytics**: Google Analytics, Facebook Pixel
+- **Deploy**: GitHub Pages
+
+## 📦 Instalação
+
+1. Clone o repositório:
+```bash
+git clone https://github.com/seu-usuario/seuhyundaiteste.git
+cd seuhyundaiteste
+```
+
+2. Instale as dependências:
+```bash
+npm install
+```
+
+3. Execute o projeto em modo de desenvolvimento:
+```bash
+npm run dev
+```
+
+4. Acesse `http://localhost:3000` no seu navegador
+
+## 🏗️ Scripts Disponíveis
+
+- `npm run dev` - Inicia o servidor de desenvolvimento
+- `npm run build` - Cria a build de produção
+- `npm run preview` - Visualiza a build de produção
+- `npm run lint` - Executa o linter
 
 ## 📁 Estrutura do Projeto
 
 ```
-├── index.html                 # Página principal
-├── assets/
-│   ├── css/
-│   │   └── style.css         # Estilos CSS puros
-│   ├── js/
-│   │   └── script.js         # JavaScript funcional
-│   ├── img/                  # Imagens do projeto
-│   │   ├── logo.jpg
-│   │   ├── car1.jpeg
-│   │   ├── car2.jpeg
-│   │   └── ...
-│   └── videos/               # Vídeos
-│       ├── dona.mp4
-│       └── rifinha-relâmpago-01-Rodrigo.mp4
-├── .github/
-│   └── workflows/
-│       └── deploy.yml        # Deploy automático
-└── README.md
+src/
+├── components/          # Componentes React
+│   ├── Header.jsx      # Cabeçalho com navegação
+│   ├── Hero.jsx        # Seção principal
+│   ├── CarGallery.jsx  # Galeria de imagens
+│   ├── PrizeDetails.jsx # Detalhes dos prêmios
+│   └── ...
+├── assets/             # Imagens e vídeos
+│   ├── img/           # Imagens do projeto
+│   └── videos/        # Vídeos do projeto
+├── styles/            # Estilos globais
+│   └── index.css      # CSS principal com Tailwind
+├── hooks/             # Custom hooks
+├── utils/             # Funções utilitárias
+└── App.jsx            # Componente principal
 ```
+
+## 🎨 Componentes Principais
+
+### Header
+- Navegação responsiva
+- Logo e branding
+- CTA principal
+- Menu mobile
+
+### Hero
+- Seção principal com call-to-action
+- Animações de entrada
+- Background com imagem do carro
+- Indicadores de confiança
+
+### CarGallery
+- Carrossel de imagens
+- Navegação por setas e dots
+- Auto-play com pausa no hover
+- Contador de imagens
+
+### PrizeDetails
+- Detalhes dos prêmios
+- Cards com informações
+- Alternativas em dinheiro
+- Bônus especial
+
+### VideoSection
+- Player de vídeo customizado
+- Controles personalizados
+- Analytics de reprodução
+- Informações sobre o vídeo
+
+## 🔧 Configuração
+
+### Analytics
+O projeto inclui integração com:
+- Google Analytics (gtag)
+- Facebook Pixel
+- Google Tag Manager
+
+### SEO
+- Meta tags otimizadas
+- Estrutura semântica
+- Open Graph tags
+- Schema markup
+
+## 📱 Responsividade
+
+O site é totalmente responsivo com breakpoints:
+- Mobile: < 640px
+- Tablet: 640px - 1024px
+- Desktop: > 1024px
 
 ## 🚀 Deploy
 
-O projeto está configurado para deploy automático no GitHub Pages:
+Para fazer deploy no GitHub Pages:
 
-1. **Push para main** - Deploy automático
-2. **Sem build** - HTML estático direto
-3. **URL:** `https://lucascosta-devpy.github.io/seuhyundaiteste/`
-
-## 🛠️ Desenvolvimento Local
-
-Simplesmente abra o arquivo `index.html` em qualquer navegador moderno:
-
+1. Faça build do projeto:
 ```bash
-# Servidor local simples (opcional)
-python -m http.server 8000
-# ou
-npx serve .
+npm run build
 ```
 
-## 🎯 Funcionalidades
+2. Configure o GitHub Pages para servir a pasta `dist`
 
-### 🖼️ Carrossel de Imagens
-- Navegação automática (5s)
-- Controles manuais (setas e dots)
-- Navegação por teclado
-- Preload das imagens
-
-### 📊 Analytics
-- **Google Analytics 4** - Métricas detalhadas
-- **Facebook Pixel** - Conversões e remarketing  
-- **Google Tag Manager** - Gestão centralizada
-- **Eventos customizados** - Scroll, cliques, vídeos
-
-### 🎬 Vídeos
-- Controles nativos HTML5
-- Tracking de interações
-- Poster personalizado
-- Responsivo
-
-### 📱 Responsividade
-- **Mobile First** - Otimizado para celular
-- **Breakpoints:** 480px, 768px, 1200px
-- **Touch friendly** - Botões e controles adequados
-- **Performance móvel** - Carregamento otimizado
-
-## 🔧 Personalização
-
-### 🎨 Cores e Estilo
-Edite as variáveis CSS em `assets/css/style.css`:
-
-```css
-:root {
-  --primary-color: #3b82f6;
-  --secondary-color: #10b981;
-  --accent-color: #fbbf24;
-}
-```
-
-### 🔗 Links e URLs
-Configure em `assets/js/script.js`:
-
-```javascript
-const CONFIG = {
-    participationUrl: 'https://rumomaisumarota.com.br/meucretadosonhos',
-    // Outros links...
-};
-```
-
-### 📊 Analytics IDs
-Configure no `index.html`:
-
-```html
-<!-- Google Analytics -->
-gtag('config', 'SEU-GA-ID');
-
-<!-- Facebook Pixel -->
-fbq('init', 'SEU-PIXEL-ID');
-
-<!-- Google Tag Manager -->
-'GTM-SEU-GTM-ID'
-```
-
-## 📈 Performance
-
-### ⚡ Métricas Esperadas
-- **First Contentful Paint:** < 1.5s
-- **Largest Contentful Paint:** < 2.5s  
-- **Cumulative Layout Shift:** < 0.1
-- **First Input Delay:** < 100ms
-
-### 🔧 Otimizações Incluídas
-- ✅ CSS minificado e otimizado
-- ✅ JavaScript com lazy loading
-- ✅ Imagens otimizadas e preload
-- ✅ Animations com GPU acceleration
-- ✅ Scroll throttling
-- ✅ Intersection Observer para animações
-
-## 🌐 Compatibilidade
-
-### Navegadores Suportados
-- ✅ Chrome 80+
-- ✅ Firefox 75+  
-- ✅ Safari 13+
-- ✅ Edge 80+
-- ✅ Mobile browsers
-
-### Funcionalidades Modernas
-- CSS Grid e Flexbox
-- Intersection Observer
-- ES6+ JavaScript
-- HTML5 Video
-- CSS Custom Properties
-
-## 📞 Suporte
-
-Para dúvidas ou suporte:
-- **Email:** contato@rumomaisumarota.com.br
-- **WhatsApp:** +55 11 99999-9999
+3. O site estará disponível em `https://seu-usuario.github.io/seuhyundaiteste`
 
 ## 📄 Licença
 
-Este projeto é propriedade de **Rumo Mais Uma Rota**.
-Todos os direitos reservados © 2024.
+Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
 
----
+## 🤝 Contribuição
 
-**🎊 Landing page profissional, leve e eficiente!**
+Contribuições são bem-vindas! Por favor, abra uma issue ou pull request.
+
+## 📞 Contato
+
+- Email: contato@rumomaisumarota.com
+- Website: https://rumomaisumarota.com.br
+- Instagram: @rumomaisumarota
