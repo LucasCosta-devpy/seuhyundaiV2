@@ -4,30 +4,30 @@
 
 // Imagens do carousel do carro
 export const carImages = [
-  '/img/car1.jpeg',
-  '/img/car2.jpeg',
-  '/img/car3.jpeg',
-  '/img/car4.jpeg',
-  '/img/car 5.jpeg',
-  '/img/car 6.jpeg',
-  '/img/carro.png',
+  '/seuhyundaiteste/img/car1.jpeg',
+  '/seuhyundaiteste/img/car2.jpeg',
+  '/seuhyundaiteste/img/car3.jpeg',
+  '/seuhyundaiteste/img/car4.jpeg',
+  '/seuhyundaiteste/img/car 5.jpeg',
+  '/seuhyundaiteste/img/car 6.jpeg',
+  '/seuhyundaiteste/img/carro.png',
 ]
 
 // Imagens de interface
 export const interfaceImages = {
-  logo: '/img/logo.jpg',
-  heroBg: '/img/carro.png',
-  instagramIcon: '/img/icone-do-instagram.png',
-  tiktokIcon: '/img/10464230.png',
-  whatsappIcon: '/img/whatsapp_12635043.png',
-  guaranteeSeal: '/img/Selo_de_Garantia_de_7_Dias_PNG_Transparente_Sem_Fundo.png',
-  lotteryBox: '/img/selo_caixa.png',
+  logo: '/seuhyundaiteste/img/logo.jpg',
+  heroBg: '/seuhyundaiteste/img/carro.png',
+  instagramIcon: '/seuhyundaiteste/img/icone-do-instagram.png',
+  tiktokIcon: '/seuhyundaiteste/img/10464230.png',
+  whatsappIcon: '/seuhyundaiteste/img/whatsapp_12635043.png',
+  guaranteeSeal: '/seuhyundaiteste/img/Selo_de_Garantia_de_7_Dias_PNG_Transparente_Sem_Fundo.png',
+  lotteryBox: '/seuhyundaiteste/img/selo_caixa.png',
 }
 
 // Vídeos
 export const videos = {
-  explanation: '/videos/dona.mp4',
-  testimonial: '/videos/rifinha-relâmpago-01-Rodrigo.mp4',
+  explanation: '/seuhyundaiteste/videos/dona.mp4',
+  testimonial: '/seuhyundaiteste/videos/rifinha-relâmpago-01-Rodrigo.mp4',
 }
 
 // Configuração de assets por tipo
