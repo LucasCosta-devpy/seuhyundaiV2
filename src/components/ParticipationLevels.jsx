@@ -238,7 +238,7 @@ const ParticipationLevels = () => {
               🎯 Ou escolha sua quantidade personalizada
             </h3>
             <p className="text-gray-600 mb-6 text-center">
-              Digite quantos bilhetes você deseja comprar
+              Digite quantos bilhetes você deseja
             </p>
             
             <div className="max-w-md mx-auto">
