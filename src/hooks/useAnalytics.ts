@@ -24,10 +24,16 @@ export const useAnalytics = () => {
     // Implementar analytics aqui se necessário
   }, [])
 
+  const trackModalEvent = useCallback((action: string, modalId?: string) => {
+    console.log('Modal Event:', { action, modalId })
+    // Implementar analytics aqui se necessário
+  }, [])
+
   return {
     trackCTAClick,
     trackVideoEvent,
     trackPurchaseIntent,
     trackSocialClick,
+    trackModalEvent,
   }
 }

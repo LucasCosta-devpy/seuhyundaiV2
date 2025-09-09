@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Button from '../ui/Button'
 import { useAnalytics } from '../../hooks/useAnalytics'
-import { useScrollAnimation } from '../../hooks/useScrollAnimation'
 import { interfaceImages } from '../../assets/index'
 
 /**
@@ -10,11 +9,16 @@ import { interfaceImages } from '../../assets/index'
  */
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false)
+  const [scrollProgress, setScrollProgress] = useState(0)
   const { trackCTAClick } = useAnalytics()
-  // const { scrollY } = useScrollAnimation()
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50)
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50)
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight
+      const progress = scrollHeight > 0 ? (window.scrollY / scrollHeight) * 100 : 0
+      setScrollProgress(progress)
+    }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -94,7 +98,7 @@ const Header: React.FC = () => {
       <motion.div
         className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500"
         style={{
-          width: `${(scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100}%`
+          width: `${scrollProgress}%`
         }}
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}

@@ -23,7 +23,7 @@ export const useIntersectionObserver = (
 
   const [isIntersecting, setIsIntersecting] = useState(false)
   const [hasIntersected, setHasIntersected] = useState(false)
-  const targetRef = useRef<HTMLElement>(null)
+  const targetRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const node = targetRef.current
