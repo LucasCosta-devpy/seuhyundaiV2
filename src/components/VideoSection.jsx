@@ -1,38 +1,12 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { Play, Pause, Volume2, VolumeX } from 'lucide-react'
 
 const VideoSection = () => {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1
   })
-
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [isMuted, setIsMuted] = useState(true)
-
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying)
-    
-    // Analytics tracking
-    if (typeof gtag !== 'undefined') {
-      gtag('event', 'video_start', { 
-        video_src: '/assets/videos/dona.mp4',
-        video_title: 'Vídeo Explicativo da Ação'
-      })
-    }
-    if (typeof fbq !== 'undefined') {
-      fbq('trackCustom', 'VideoStart', { 
-        video_src: '/assets/videos/dona.mp4',
-        video_title: 'Vídeo Explicativo da Ação'
-      })
-    }
-  }
-
-  const handleMuteToggle = () => {
-    setIsMuted(!isMuted)
-  }
 
 
   const containerVariants = {
@@ -88,54 +62,16 @@ const VideoSection = () => {
           animate={inView ? "visible" : "hidden"}
           className="relative"
         >
-          <div className="relative bg-black rounded-3xl overflow-hidden shadow-2xl max-w-4xl mx-auto">
-            <div className="relative">
-              <video
-                className="w-full h-auto object-contain"
-                poster="/assets/img/carro.png"
-                controls={isPlaying}
-                muted={isMuted}
-                onPlay={() => setIsPlaying(true)}
-                onPause={() => setIsPlaying(false)}
-              >
-                <source src="/assets/videos/dona.mp4" type="video/mp4" />
-                Seu navegador não suporta vídeo HTML5.
-              </video>
-
-              {/* Custom Play Button Overlay */}
-              {!isPlaying && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="absolute inset-0 flex items-center justify-center bg-black/30"
-                >
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={handlePlayPause}
-                    className="bg-white/90 hover:bg-white text-gray-800 p-6 rounded-full shadow-2xl transition-all duration-300"
-                  >
-                    <Play className="w-12 h-12 ml-1" />
-                  </motion.button>
-                </motion.div>
-              )}
-
-              {/* Custom Controls */}
-              {isPlaying && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute bottom-4 right-4 flex gap-2"
-                >
-                  <button
-                    onClick={handleMuteToggle}
-                    className="bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-300"
-                  >
-                    {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                  </button>
-                </motion.div>
-              )}
-            </div>
+          <div className="relative bg-black rounded-3xl overflow-hidden shadow-2xl max-w-3xl mx-auto">
+            <video
+              className="w-full h-auto"
+              poster="/assets/img/carro.png"
+              controls
+              preload="metadata"
+            >
+              <source src="/assets/videos/dona.mp4" type="video/mp4" />
+              Seu navegador não suporta vídeo HTML5.
+            </video>
           </div>
 
           {/* Video Info */}
