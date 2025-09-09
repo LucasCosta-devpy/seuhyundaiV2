@@ -6,7 +6,7 @@ import { resolve } from 'path'
 export default defineConfig({
   plugins: [react()],
   // Configuração condicional para desenvolvimento e produção
-  base: process.env.NODE_ENV === 'production' ? '/seuhyundai/' : '/',
+  base: process.env.NODE_ENV === 'production' ? '/seuhyundaiteste/' : '/',
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
