@@ -98,7 +98,7 @@ const ExtraAction = () => {
                   ATIVA
                 </div>
                 <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-2 rounded-full text-lg font-bold">
-                  R$ 6,00
+                  R$ 3,00
                 </div>
               </div>
             </div>
