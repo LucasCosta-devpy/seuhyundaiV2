@@ -60,14 +60,18 @@ const Testimonials = () => {
           </motion.p>
         </motion.div>
 
-        {/* Video Testimonial */}
+        {/* Video Testimonials */}
         <motion.div
-          variants={itemVariants}
+          variants={containerVariants}
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
-          className="mb-16"
+          className="mb-16 grid grid-cols-1 md:grid-cols-2 gap-8"
         >
-          <div className="relative bg-black rounded-3xl overflow-hidden shadow-2xl max-w-xl mx-auto">
+          {/* First Video Testimonial */}
+          <motion.div
+            variants={itemVariants}
+            className="relative bg-black rounded-3xl overflow-hidden shadow-2xl"
+          >
             <video
               className="w-full h-auto"
               poster="/assets/img/carro.png"
@@ -77,7 +81,7 @@ const Testimonials = () => {
               webkit-playsinline="true"
               style={{ maxHeight: '350px' }}
             >
-              <source src="/assets/videos/rifinha-relâmpago-01-Rodrigo.mp4" type="video/mp4" />
+              <source src="/assets/videos/1.mp4" type="video/mp4" />
               Seu navegador não suporta vídeo HTML5.
             </video>
             
@@ -85,7 +89,31 @@ const Testimonials = () => {
             <div className="absolute top-4 left-4 bg-black/50 text-white px-4 py-2 rounded-lg">
               <p className="text-sm font-semibold">Depoimento Real de Ganhador</p>
             </div>
-          </div>
+          </motion.div>
+
+          {/* Second Video Testimonial */}
+          <motion.div
+            variants={itemVariants}
+            className="relative bg-black rounded-3xl overflow-hidden shadow-2xl"
+          >
+            <video
+              className="w-full h-auto"
+              poster="/assets/img/carro.png"
+              controls
+              preload="metadata"
+              playsInline
+              webkit-playsinline="true"
+              style={{ maxHeight: '350px' }}
+            >
+              <source src="/assets/videos/2.mp4" type="video/mp4" />
+              Seu navegador não suporta vídeo HTML5.
+            </video>
+            
+            {/* Video Title Overlay */}
+            <div className="absolute top-4 left-4 bg-black/50 text-white px-4 py-2 rounded-lg">
+              <p className="text-sm font-semibold">Depoimento Real de Ganhador</p>
+            </div>
+          </motion.div>
         </motion.div>
 
         {/* Text Testimonials - Será adicionado quando houver depoimentos reais */}

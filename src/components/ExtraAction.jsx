@@ -13,21 +13,21 @@ const ExtraAction = () => {
     // Analytics tracking
     if (typeof gtag !== 'undefined') {
       gtag('event', 'acao_extra_click', { 
-        content_name: 'acao_extra_02',
-        value: 6.00,
+        content_name: 'rifinha_premiada_03',
+        value: 3.89,
         currency: 'BRL'
       })
     }
     if (typeof fbq !== 'undefined') {
       fbq('track', 'ViewContent', { 
-        content_name: 'Ação Extra',
+        content_name: 'Rifinha Premiada',
         content_type: 'product',
-        value: 6.00,
+        value: 3.89,
         currency: 'BRL'
       })
     }
     
-    window.open('https://rumomaisumarota.com.br/rifinha/rifaespecial02', '_blank', 'noopener')
+    window.open('https://rumomaisumarota.com.br/rifinha/rifinhapremiada03', '_blank', 'noopener')
   }
 
   const containerVariants = {
@@ -66,14 +66,14 @@ const ExtraAction = () => {
             variants={itemVariants}
             className="text-4xl md:text-5xl font-bold mb-6 gradient-text"
           >
-            🎯 Ação entre Amigos Extra
+            🎉 RIFINHA PREMIADA
           </motion.h2>
           
           <motion.p
             variants={itemVariants}
             className="text-xl text-gray-600 max-w-3xl mx-auto"
           >
-            Ações extras para conquistar mais cotas na ação principal do Creta!
+            🔥 Serão 60 bilhetes em jogo e 2 ganhadores! 🎟️💥
           </motion.p>
         </motion.div>
 
@@ -98,14 +98,14 @@ const ExtraAction = () => {
                   ATIVA
                 </div>
                 <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-2 rounded-full text-lg font-bold">
-                  R$ 3,00
+                  R$ 3,89
                 </div>
               </div>
             </div>
 
             {/* Title */}
             <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 text-center">
-              Ação Extra - Escolha seu número e concorra a 10 cotas na ação principal!
+              🎉 Vem aí a RIFINHA PREMIADA! 🎉
             </h3>
 
             {/* Details */}
@@ -114,24 +114,24 @@ const ExtraAction = () => {
                 <div className="flex items-center gap-3">
                   <Gift className="w-6 h-6 text-orange-600" />
                   <div>
-                    <span className="font-semibold text-gray-800">Prêmio:</span>
-                    <span className="text-gray-700 ml-2">Concorra a 10 cotas extras para o Creta</span>
+                    <span className="font-semibold text-gray-800">Prêmios:</span>
+                    <span className="text-gray-700 ml-2">🥇 1º lugar: 40 bilhetes | 🥈 2º lugar: 20 bilhetes</span>
                   </div>
                 </div>
                 
                 <div className="flex items-center gap-3">
                   <Calendar className="w-6 h-6 text-orange-600" />
                   <div>
-                    <span className="font-semibold text-gray-800">Data da Ação Extra:</span>
-                    <span className="text-gray-700 ml-2">27/09/2025 às 16:00</span>
+                    <span className="font-semibold text-gray-800">Sorteio:</span>
+                    <span className="text-gray-700 ml-2">Realizado assim que 100% dos bilhetes forem vendidos ✅</span>
                   </div>
                 </div>
                 
                 <div className="flex items-center gap-3">
                   <Ticket className="w-6 h-6 text-orange-600" />
                   <div>
-                    <span className="font-semibold text-gray-800">Disponível:</span>
-                    <span className="text-gray-700 ml-2">60 números</span>
+                    <span className="font-semibold text-gray-800">Bilhetes:</span>
+                    <span className="text-gray-700 ml-2">60 bilhetes em jogo - R$ 3,89 cada</span>
                   </div>
                 </div>
               </div>
@@ -174,22 +174,22 @@ const ExtraAction = () => {
                 }}
               />
               <Target className="w-5 h-5 relative z-10" />
-              <span className="relative z-10">PARTICIPAR DA AÇÃO</span>
+              <span className="relative z-10">PARTICIPAR DA RIFINHA PREMIADA</span>
             </motion.button>
 
             {/* Benefits */}
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center">
                 <div className="text-2xl mb-2">🎯</div>
-                <p className="text-sm text-gray-600">Escolha seu número favorito</p>
+                <p className="text-sm text-gray-600">60 bilhetes em jogo</p>
               </div>
               <div className="text-center">
                 <div className="text-2xl mb-2">🏆</div>
-                <p className="text-sm text-gray-600">10 cotas extras garantidas</p>
+                <p className="text-sm text-gray-600">2 ganhadores</p>
               </div>
               <div className="text-center">
                 <div className="text-2xl mb-2">⚡</div>
-                <p className="text-sm text-gray-600">Ação rápida e simples</p>
+                <p className="text-sm text-gray-600">Sorteio rápido</p>
               </div>
             </div>
           </motion.div>
@@ -206,8 +206,9 @@ const ExtraAction = () => {
                 💡 Como funciona?
               </h4>
               <p className="text-blue-700">
-                Compre seu número na ação extra por apenas R$ 6,00 e concorra a 10 cotas extras 
-                na ação principal do Creta. Quanto mais cotas você tiver, maior sua chance de conquistar!
+                Compre seu bilhete por apenas R$ 3,89 e concorra a bilhetes na rifa principal! 
+                🥇 1º lugar ganha 40 bilhetes e 🥈 2º lugar ganha 20 bilhetes. 
+                🚀 Corre garantir o seu e aumentar suas chances de ganhar!!!
               </p>
             </div>
           </motion.div>

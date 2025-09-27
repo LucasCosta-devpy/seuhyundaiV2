@@ -11,6 +11,18 @@ const PreviousActions = () => {
 
   const previousActions = [
     {
+      id: 2,
+      title: "Rifinha Especial - Escolha seu nr e concorra a 10 bilhetes na rifa principal!",
+      status: "FINALIZADA",
+      value: "R$ 3,00",
+      winner: "Tereza",
+      winnerRole: "Ganhadora da rifinha especial",
+      topBuyer: null,
+      topBuyerRole: null,
+      date: "Recente",
+      color: "from-green-500 to-green-600"
+    },
+    {
       id: 1,
       title: "Ação Relâmpago - Concorreu a cotas na ação principal",
       status: "FINALIZADA",
@@ -116,14 +128,16 @@ const PreviousActions = () => {
                     </div>
                   </div>
                   
-                  {/* Top Buyer */}
-                  <div className="flex items-center gap-3">
-                    <User className="w-5 h-5 text-blue-600" />
-                    <div>
-                      <span className="font-semibold text-gray-800">{action.topBuyer}</span>
-                      <p className="text-sm text-gray-600">{action.topBuyerRole}</p>
+                  {/* Top Buyer - Only show if exists */}
+                  {action.topBuyer && (
+                    <div className="flex items-center gap-3">
+                      <User className="w-5 h-5 text-blue-600" />
+                      <div>
+                        <span className="font-semibold text-gray-800">{action.topBuyer}</span>
+                        <p className="text-sm text-gray-600">{action.topBuyerRole}</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
                   
                   {/* Date */}
                   <div className="flex items-center gap-3">
