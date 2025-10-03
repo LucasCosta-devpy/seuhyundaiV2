@@ -57,6 +57,7 @@ const ParticipationLevels = () => {
       originalPrice: 7.00,
       currentPrice: 7.00,
       discount: 0,
+      discountAmount: 0,
       popular: false,
       icon: Gift
     },
@@ -66,6 +67,7 @@ const ParticipationLevels = () => {
       originalPrice: 14.00,
       currentPrice: 11.00,
       discount: 21,
+      discountAmount: 3,
       popular: false,
       icon: Users
     },
@@ -75,6 +77,7 @@ const ParticipationLevels = () => {
       originalPrice: 21.00,
       currentPrice: 17.00,
       discount: 19,
+      discountAmount: 4,
       popular: false,
       icon: Users
     },
@@ -84,6 +87,7 @@ const ParticipationLevels = () => {
       originalPrice: 35.00,
       currentPrice: 30.00,
       discount: 14,
+      discountAmount: 5,
       popular: true,
       icon: Users
     },
@@ -93,6 +97,7 @@ const ParticipationLevels = () => {
       originalPrice: 49.00,
       currentPrice: 42.00,
       discount: 14,
+      discountAmount: 7,
       popular: false,
       icon: Users
     },
@@ -102,6 +107,7 @@ const ParticipationLevels = () => {
       originalPrice: 70.00,
       currentPrice: 60.00,
       discount: 14,
+      discountAmount: 10,
       popular: false,
       icon: Users
     }
@@ -197,21 +203,15 @@ const ParticipationLevels = () => {
 
                   <div className="mb-6">
                     {/* Só mostra desconto se for maior que 0% */}
-                    {combo.discount > 0 && (
+                    {combo.discountAmount > 0 && (
                       <div className="flex items-center justify-center gap-2 mb-2">
-                        <span className="text-lg text-gray-500 line-through whitespace-nowrap">
-                          R$ {combo.originalPrice.toFixed(2).replace('.', ',')}
-                        </span>
-                        <span className="bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-bold whitespace-nowrap">
-                          -{combo.discount}%
+                        <span className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-bold whitespace-nowrap">
+                          R$ {combo.discountAmount.toFixed(0)} de desconto
                         </span>
                       </div>
                     )}
                     <div className="text-2xl font-bold gradient-text whitespace-nowrap">
                       R$ {combo.currentPrice.toFixed(2).replace('.', ',')}
-                    </div>
-                    <div className="text-sm text-gray-500 mt-1 h-5 flex items-center justify-center">
-                      {combo.tickets > 1 ? `R$ ${(combo.currentPrice / combo.tickets).toFixed(2).replace('.', ',')} por cota` : ''}
                     </div>
                   </div>
                 </div>
