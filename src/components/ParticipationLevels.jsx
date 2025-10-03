@@ -17,7 +17,7 @@ const ParticipationLevels = () => {
       gtag('event', 'generate_lead', { 
         content_name: `combo_${combo}`, 
         method: 'button',
-        value: combo === '1' ? 5.99 : combo === '10' ? 49.99 : combo === '20' ? 89.99 : combo === '30' ? 132.99 : 221.99
+        value: combo === '1' ? 7.00 : combo === '2' ? 11.00 : combo === '3' ? 17.00 : combo === '5' ? 30.00 : combo === '7' ? 42.00 : 60.00
       })
     }
     if (typeof fbq !== 'undefined') {
@@ -37,7 +37,7 @@ const ParticipationLevels = () => {
         gtag('event', 'generate_lead', { 
           content_name: `custom_quantity_${quantity}`, 
           method: 'input',
-          value: quantity * 5.99 // Preço aproximado por bilhete
+          value: quantity * 7.00 // Preço por bilhete
         })
       }
       if (typeof fbq !== 'undefined') {
@@ -54,45 +54,54 @@ const ParticipationLevels = () => {
     {
       id: '1',
       tickets: 1,
-      originalPrice: 15.00,
-      currentPrice: 5.99,
-      discount: 60,
+      originalPrice: 7.00,
+      currentPrice: 7.00,
+      discount: 0,
       popular: false,
       icon: Gift
     },
     {
-      id: '10',
-      tickets: 10,
-      originalPrice: 150.00,
-      currentPrice: 49.99,
-      discount: 67,
+      id: '2',
+      tickets: 2,
+      originalPrice: 14.00,
+      currentPrice: 11.00,
+      discount: 21,
+      popular: false,
+      icon: Users
+    },
+    {
+      id: '3',
+      tickets: 3,
+      originalPrice: 21.00,
+      currentPrice: 17.00,
+      discount: 19,
+      popular: false,
+      icon: Users
+    },
+    {
+      id: '5',
+      tickets: 5,
+      originalPrice: 35.00,
+      currentPrice: 30.00,
+      discount: 14,
       popular: true,
       icon: Users
     },
     {
-      id: '20',
-      tickets: 20,
-      originalPrice: 300.00,
-      currentPrice: 89.99,
-      discount: 70,
+      id: '7',
+      tickets: 7,
+      originalPrice: 49.00,
+      currentPrice: 42.00,
+      discount: 14,
       popular: false,
       icon: Users
     },
     {
-      id: '30',
-      tickets: 30,
-      originalPrice: 450.00,
-      currentPrice: 132.99,
-      discount: 70,
-      popular: false,
-      icon: Users
-    },
-    {
-      id: '50',
-      tickets: 50,
-      originalPrice: 750.00,
-      currentPrice: 221.99,
-      discount: 70,
+      id: '10',
+      tickets: 10,
+      originalPrice: 70.00,
+      currentPrice: 60.00,
+      discount: 14,
       popular: false,
       icon: Users
     }
@@ -157,7 +166,7 @@ const ParticipationLevels = () => {
           variants={containerVariants}
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-4"
         >
           {combos.map((combo) => {
             const IconComponent = combo.icon
@@ -166,7 +175,7 @@ const ParticipationLevels = () => {
                 key={combo.id}
                 variants={itemVariants}
                 whileHover={{ scale: 1.05, y: -10 }}
-                className={`relative card p-4 md:p-6 text-center ${
+                className={`relative card p-4 md:p-6 text-center h-full flex flex-col justify-between ${
                   combo.popular ? 'ring-2 ring-primary-500 shadow-2xl' : ''
                 }`}
               >
@@ -178,49 +187,58 @@ const ParticipationLevels = () => {
                   </div>
                 )}
 
-                <div className="mb-4">
-                  <IconComponent className="w-12 h-12 mx-auto text-primary-500 mb-3" />
-                  <h3 className="text-2xl font-bold text-gray-800">
-                    {combo.tickets} {combo.tickets === 1 ? 'Cota' : 'Cotas'}
-                  </h3>
+                <div className="flex-1">
+                  <div className="mb-4">
+                    <IconComponent className="w-12 h-12 mx-auto text-primary-500 mb-3" />
+                    <h3 className="text-2xl font-bold text-gray-800">
+                      {combo.tickets} {combo.tickets === 1 ? 'Cota' : 'Cotas'}
+                    </h3>
+                  </div>
+
+                  <div className="mb-6">
+                    {/* Só mostra desconto se for maior que 0% */}
+                    {combo.discount > 0 && (
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <span className="text-lg text-gray-500 line-through whitespace-nowrap">
+                          R$ {combo.originalPrice.toFixed(2).replace('.', ',')}
+                        </span>
+                        <span className="bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-bold whitespace-nowrap">
+                          -{combo.discount}%
+                        </span>
+                      </div>
+                    )}
+                    <div className="text-2xl font-bold gradient-text whitespace-nowrap">
+                      R$ {combo.currentPrice.toFixed(2).replace('.', ',')}
+                    </div>
+                    <div className="text-sm text-gray-500 mt-1 h-5 flex items-center justify-center">
+                      {combo.tickets > 1 ? `R$ ${(combo.currentPrice / combo.tickets).toFixed(2).replace('.', ',')} por cota` : ''}
+                    </div>
+                  </div>
                 </div>
 
-                <div className="mb-6">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <span className="text-lg text-gray-500 line-through">
-                      R$ {combo.originalPrice.toFixed(2)}
-                    </span>
-                    <span className="bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-bold">
-                      -{combo.discount}%
-                    </span>
-                  </div>
-                  <div className="text-3xl font-bold gradient-text">
-                    R$ {combo.currentPrice.toFixed(2)}
-                  </div>
-                  <div className="text-sm text-gray-500 mt-1">
-                    {combo.tickets > 1 ? `R$ ${(combo.currentPrice / combo.tickets).toFixed(2)} por cota` : ''}
+                <div className="mt-auto">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleCTAClick(combo.id)}
+                    className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-300 ${
+                      combo.popular
+                        ? 'bg-gradient-to-r from-primary-500 to-primary-700 text-white shadow-lg hover:shadow-xl'
+                        : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 hover:from-primary-100 hover:to-primary-200 hover:text-primary-800'
+                    }`}
+                  >
+                    Escolher {combo.tickets} Cota{combo.tickets > 1 ? 's' : ''}
+                  </motion.button>
+
+                  <div className="mt-4 h-6 flex items-center justify-center">
+                    {combo.tickets > 1 && (
+                      <div className="flex items-center justify-center gap-1 text-sm text-green-600">
+                        <Check className="w-4 h-4" />
+                        <span>Melhor custo-benefício</span>
+                      </div>
+                    )}
                   </div>
                 </div>
-
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleCTAClick(combo.id)}
-                  className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-300 ${
-                    combo.popular
-                      ? 'bg-gradient-to-r from-primary-500 to-primary-700 text-white shadow-lg hover:shadow-xl'
-                      : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 hover:from-primary-100 hover:to-primary-200 hover:text-primary-800'
-                  }`}
-                >
-                  Escolher {combo.tickets} Cota{combo.tickets > 1 ? 's' : ''}
-                </motion.button>
-
-                {combo.tickets > 1 && (
-                  <div className="mt-4 flex items-center justify-center gap-1 text-sm text-green-600">
-                    <Check className="w-4 h-4" />
-                    <span>Melhor custo-benefício</span>
-                  </div>
-                )}
               </motion.div>
             )
           })}
