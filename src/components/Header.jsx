@@ -105,6 +105,16 @@ const Header = () => {
             <a href="#redes" className="text-gray-700 hover:text-primary-600 transition-colors whitespace-nowrap text-sm">
               Redes Sociais
             </a>
+            <motion.a
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              href="https://chat.whatsapp.com/LU3tAk9CtdILP2XZwyyxsA"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 shadow-md hover:shadow-lg"
+            >
+              Grupo
+            </motion.a>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -180,6 +190,16 @@ const Header = () => {
             >
               Redes Sociais
             </a>
+              <motion.a
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                href="https://chat.whatsapp.com/LU3tAk9CtdILP2XZwyyxsA"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-3 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg text-center"
+              >
+                Grupo
+              </motion.a>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}

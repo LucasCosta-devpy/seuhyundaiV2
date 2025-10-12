@@ -63,26 +63,26 @@ const Hero = () => {
       topWallRef.current = (header?.offsetHeight || 0) + 8
 
       const isMd = window.innerWidth >= 768
-      // raios em px (dois grandes, quatro pequenos)
+      // raios em px (dois grandes nos topos, quatro menores no meio/baixo)
       const radii = isMd ? [72, 72, 48, 48, 48, 48] : [48, 48, 40, 40, 40, 40]
 
-      // posições percentuais pensadas para não cobrir textos
+      // 3 à esquerda, 3 à direita (ordem: L-top, R-top, L-mid, R-mid, L-bot, R-bot)
       const percentPositions = isMd
         ? [
-            { x: 5, y: 10 },
-            { x: 92, y: 85 },
-            { x: 94, y: 12 },
-            { x: 6, y: 74 },
-            { x: 4, y: 50 },
-            { x: 96, y: 50 }
+            { x: 5, y: 12 },  // L-top
+            { x: 95, y: 12 }, // R-top
+            { x: 6, y: 50 },  // L-mid
+            { x: 94, y: 50 }, // R-mid
+            { x: 5, y: 85 },  // L-bot
+            { x: 95, y: 85 }  // R-bot
           ]
         : [
-            { x: 6, y: 10 },
-            { x: 10, y: 78 },
-            { x: 94, y: 26 },
-            { x: 6, y: 26 },
-            { x: 4, y: 52 },
-            { x: 96, y: 55 }
+            { x: 6, y: 16 },  // L-top
+            { x: 94, y: 24 }, // R-top
+            { x: 6, y: 54 },  // L-mid
+            { x: 94, y: 58 }, // R-mid
+            { x: 6, y: 82 },  // L-bot
+            { x: 94, y: 86 }  // R-bot
           ]
 
       const pickImg = (i) =>
@@ -119,98 +119,30 @@ const Hero = () => {
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
-  // Loop de animação com colisão entre bolhas e bordas
-  useEffect(() => {
-    let rafId
-    let previousTimestamp
-
-    const step = (timestamp) => {
-      if (!previousTimestamp) previousTimestamp = timestamp
-      const dt = Math.min((timestamp - previousTimestamp) / 1000, 0.033)
-      previousTimestamp = timestamp
-
-      setBubbles((prev) => {
-        const el = containerRef.current
-        if (!el || prev.length === 0) return prev
-        const width = el.clientWidth
-        const height = el.clientHeight
-        // atualiza a parede superior (caso o header mude de altura)
-        const header = document.querySelector('header')
-        topWallRef.current = (header?.offsetHeight || 0) + 8
-
-        const next = prev.map((b) => ({ ...b }))
-
-        // Movimenta e trata colisão com bordas
-        for (const b of next) {
-          b.x += b.vx * dt
-          b.y += b.vy * dt
-
-          if (b.x - b.radius < 0) {
-            b.x = b.radius
-            b.vx = Math.abs(b.vx)
-          }
-          if (b.x + b.radius > width) {
-            b.x = width - b.radius
-            b.vx = -Math.abs(b.vx)
-          }
-          const topWall = topWallRef.current
-          if (b.y - b.radius < topWall) {
-            b.y = topWall + b.radius
-            b.vy = Math.abs(b.vy)
-          }
-          if (b.y + b.radius > height) {
-            b.y = height - b.radius
-            b.vy = -Math.abs(b.vy)
-          }
-        }
-
-        // Colisão entre bolhas (elástica simples, massas iguais)
-        for (let i = 0; i < next.length; i++) {
-          for (let j = i + 1; j < next.length; j++) {
-            const a = next[i]
-            const b = next[j]
-            const dx = b.x - a.x
-            const dy = b.y - a.y
-            const dist = Math.hypot(dx, dy)
-            const minDist = a.radius + b.radius + 2 // pequena folga
-            if (dist > 0 && dist < minDist) {
-              const nx = dx / dist
-              const ny = dy / dist
-              const overlap = (minDist - dist) / 2
-              // separa para evitar sobreposição
-              a.x -= nx * overlap
-              a.y -= ny * overlap
-              b.x += nx * overlap
-              b.y += ny * overlap
-
-              // componente da velocidade ao longo da normal
-              const va = a.vx * nx + a.vy * ny
-              const vb = b.vx * nx + b.vy * ny
-
-              if (va - vb > 0) {
-                // troca componentes normais (massas iguais)
-                const deltaA = (vb - va) * nx
-                const deltaB = (va - vb) * nx
-                const deltaAy = (vb - va) * ny
-                const deltaBy = (va - vb) * ny
-                a.vx += deltaA
-                a.vy += deltaAy
-                b.vx += deltaB
-                b.vy += deltaBy
-              }
-            }
-          }
-        }
-
-        return next
-      })
-
-      rafId = requestAnimationFrame(step)
-    }
-
-    rafId = requestAnimationFrame(step)
-    return () => cancelAnimationFrame(rafId)
-  }, [])
+  // Animação e colisão desativadas temporariamente (manter para uso futuro)
+  // useEffect(() => {
+  //   let rafId
+  //   let previousTimestamp
+  //   const step = (timestamp) => {
+  //     if (!previousTimestamp) previousTimestamp = timestamp
+  //     const dt = Math.min((timestamp - previousTimestamp) / 1000, 0.033)
+  //     previousTimestamp = timestamp
+  //     setBubbles((prev) => {
+  //       const el = containerRef.current
+  //       if (!el || prev.length === 0) return prev
+  //       const width = el.clientWidth
+  //       const height = el.clientHeight
+  //       const header = document.querySelector('header')
+  //       topWallRef.current = (header?.offsetHeight || 0) + 8
+  //       const next = prev.map((b) => ({ ...b }))
+  //       // ... movimentação, bordas e colisão ...
+  //       return next
+  //     })
+  //     rafId = requestAnimationFrame(step)
+  //   }
+  //   rafId = requestAnimationFrame(step)
+  //   return () => cancelAnimationFrame(rafId)
+  // }, [])
   const handleCTAClick = () => {
     // Analytics tracking
     if (typeof gtag !== 'undefined') {

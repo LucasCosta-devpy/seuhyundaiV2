@@ -38,6 +38,10 @@ const ParticipationLevels = () => {
     return () => clearInterval(timer)
   }, [])
 
+  // Preço unitário atual e preço anterior (exibição)
+  const UNIT_PRICE = 7.00
+  const UNIT_OLD_PRICE = 14.99
+
   const handleCTAClick = (combo) => {
     // Analytics tracking
     if (typeof gtag !== 'undefined') {
@@ -383,7 +387,7 @@ const ParticipationLevels = () => {
 
                   <div className="mb-6">
                     {/* Só mostra desconto se for maior que 0% */}
-                    {combo.discountAmount > 0 && (
+                      {combo.discountAmount > 0 && (
                       <div className="flex items-center justify-center gap-2 mb-2">
                         <span className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-bold whitespace-nowrap">
                           R$ {combo.discountAmount.toFixed(2).replace('.', ',')} de desconto
@@ -391,21 +395,34 @@ const ParticipationLevels = () => {
                       </div>
                     )}
                      <div className="text-center">
-                       {combo.tickets > 1 
-                         ? (
-                           <div>
-                             <div className="text-2xl font-bold gradient-text whitespace-nowrap">
-                               R$ {(combo.currentPrice / combo.tickets).toFixed(2).replace('.', ',')}
+                       {combo.tickets === 1 ? (
+                         <div>
+                           <div className="flex items-center justify-center gap-2">
+                             <span className="text-2xl font-bold gradient-text whitespace-nowrap">
+                               R$ {UNIT_PRICE.toFixed(2).replace('.', ',')}
+                             </span>
+                             <span className="text-red-600 line-through text-sm font-semibold whitespace-nowrap">
+                               R$ {UNIT_OLD_PRICE.toFixed(2).replace('.', ',')}
+                             </span>
+                           </div>
+                           <div className="text-sm font-normal text-gray-600 mt-1">cota unitária</div>
+                         </div>
+                       ) : (
+                         <div>
+                           {combo.tickets > 1 ? (
+                             <div>
+                               <div className="text-2xl font-bold gradient-text whitespace-nowrap">
+                                 R$ {(combo.currentPrice / combo.tickets).toFixed(2).replace('.', ',')}
+                               </div>
+                               <div className="text-sm font-normal text-gray-600 mt-1">cada</div>
                              </div>
-                             <div className="text-sm font-normal text-gray-600 mt-1">cada</div>
-                           </div>
-                         )
-                         : (
-                           <div className="text-2xl font-bold gradient-text whitespace-nowrap">
-                             R$ {combo.currentPrice.toFixed(2).replace('.', ',')}
-                           </div>
-                         )
-                       }
+                           ) : (
+                             <div className="text-2xl font-bold gradient-text whitespace-nowrap">
+                               R$ {combo.currentPrice.toFixed(2).replace('.', ',')}
+                             </div>
+                           )}
+                         </div>
+                       )}
                      </div>
                   </div>
                 </div>
