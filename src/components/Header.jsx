@@ -68,7 +68,7 @@ const Header = () => {
       }`}
     >
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="flex items-center justify-between h-16 md:h-24">
           {/* Logo */}
           <motion.div
             whileHover={{ scale: 1.05 }}
@@ -77,7 +77,7 @@ const Header = () => {
             <img 
               src="/assets/img/logo.jpg" 
               alt="Rumo Mais Uma Rota" 
-              className="w-10 h-10 md:w-12 md:h-12 rounded-xl shadow-md"
+              className="w-10 h-10 md:w-20 md:h-20 rounded-xl shadow-md"
               onError={(e) => {
                 console.error('Erro ao carregar logo:', e.target.src)
                 e.target.style.display = 'none'
@@ -89,20 +89,20 @@ const Header = () => {
           </motion.div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#premio" className="text-gray-700 hover:text-primary-600 transition-colors">
+          <nav className="hidden md:flex items-center gap-4 lg:gap-6">
+            <a href="#premio" className="text-gray-700 hover:text-primary-600 transition-colors whitespace-nowrap text-sm">
               Recompensa
             </a>
-            <a href="#participacao" className="text-gray-700 hover:text-primary-600 transition-colors">
+            <a href="#participacao" className="text-gray-700 hover:text-primary-600 transition-colors whitespace-nowrap text-sm">
               Participação
             </a>
-            <a href="#depoimentos" className="text-gray-700 hover:text-primary-600 transition-colors">
+            <a href="#depoimentos" className="text-gray-700 hover:text-primary-600 transition-colors whitespace-nowrap text-sm">
               Depoimentos
             </a>
-            <a href="#informacoes" className="text-gray-700 hover:text-primary-600 transition-colors">
+            <a href="#informacoes" className="text-gray-700 hover:text-primary-600 transition-colors whitespace-nowrap text-sm">
               Informações
             </a>
-            <a href="#redes" className="text-gray-700 hover:text-primary-600 transition-colors">
+            <a href="#redes" className="text-gray-700 hover:text-primary-600 transition-colors whitespace-nowrap text-sm">
               Redes Sociais
             </a>
             <motion.button
