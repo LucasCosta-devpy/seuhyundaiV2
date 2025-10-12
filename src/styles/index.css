@@ -45,6 +45,36 @@
   .pulse-glow {
     animation: pulse-glow 2s ease-in-out infinite alternate;
   }
+  
+  /* Animação do carro */
+  @keyframes carMove {
+    0% { 
+      left: -80px; 
+      transform: translateX(0);
+    }
+    100% { 
+      left: 100%; 
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes wheelRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  @keyframes carBounce {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-2px); }
+  }
+  
+  .car-animation {
+    animation: carMove 12s linear infinite, carBounce 2s ease-in-out infinite;
+  }
+  
+  .wheel-animation {
+    animation: wheelRotate 0.8s linear infinite;
+  }
 }
 
 @layer utilities {
