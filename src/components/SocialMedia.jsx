@@ -94,7 +94,7 @@ const SocialMedia = () => {
         >
           <motion.h2
             variants={itemVariants}
-            className="text-4xl md:text-5xl font-bold mb-6 gradient-text"
+            className="text-4xl md:text-5xl font-bold mb-6 text-gray-800"
           >
             📱 Nos Siga nas Redes Sociais
           </motion.h2>
