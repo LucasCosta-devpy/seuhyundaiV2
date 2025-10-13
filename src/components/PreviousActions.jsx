@@ -106,7 +106,7 @@ const PreviousActions = () => {
 
               {/* Value Badge */}
               <div className="absolute top-4 left-4">
-                <div className="bg-gray-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                <div className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
                   {action.value}
                 </div>
               </div>

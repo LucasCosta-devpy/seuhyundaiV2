@@ -97,7 +97,7 @@ const ExtraAction = () => {
                   <Zap className="w-4 h-4" />
                   ATIVA
                 </div>
-                <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-2 rounded-full text-lg font-bold">
+                <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-2 rounded-full text-lg font-bold">
                   R$ 3,89
                 </div>
               </div>

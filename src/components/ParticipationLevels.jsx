@@ -101,7 +101,7 @@ const ParticipationLevels = () => {
       originalPrice: 149.90,
       currentPrice: 29.90,
       discount: 80,
-      discountAmount: 120.00,
+      discountAmount: 40.10,
       popular: false,
       icon: Users
     },
@@ -111,7 +111,7 @@ const ParticipationLevels = () => {
       originalPrice: 749.50,
       currentPrice: 75.00,
       discount: 90,
-      discountAmount: 674.50,
+      discountAmount: 275.00,
       popular: true,
       icon: Users
     },
@@ -121,7 +121,7 @@ const ParticipationLevels = () => {
       originalPrice: 1499.00,
       currentPrice: 100.00,
       discount: 93,
-      discountAmount: 1399.00,
+      discountAmount: 600.00,
       popular: false,
       icon: Users
     },
@@ -131,7 +131,7 @@ const ParticipationLevels = () => {
       originalPrice: 7495.00,
       currentPrice: 400.00,
       discount: 95,
-      discountAmount: 7095.00,
+      discountAmount: 3100.00,
       popular: false,
       icon: Users
     }
@@ -389,8 +389,8 @@ const ParticipationLevels = () => {
                     {/* Só mostra desconto se for maior que 0% */}
                       {combo.discountAmount > 0 && (
                       <div className="flex items-center justify-center gap-2 mb-2">
-                        <span className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-bold whitespace-nowrap">
-                          R$ {combo.discountAmount.toFixed(2).replace('.', ',')} de desconto
+                        <span className="bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-bold whitespace-nowrap">
+                          -R$ {combo.discountAmount.toFixed(2).replace('.', ',')} de desconto
                         </span>
                       </div>
                     )}
