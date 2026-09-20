@@ -77,6 +77,7 @@ export default function AdminDashboard() {
           <TagListEditor
             items={content.hero.countryTags}
             onChange={(v) => update(['hero', 'countryTags'], v)}
+            destinationNames={flattenDestinationNames(content.destinationGroups)}
           />
         </Section>
 
@@ -137,6 +138,16 @@ export default function AdminDashboard() {
       </div>
     </div>
   )
+}
+
+function flattenDestinationNames(groups) {
+  const names = []
+  for (const group of groups || []) {
+    for (const item of group.items || []) {
+      if (item.name) names.push(item.name)
+    }
+  }
+  return names
 }
 
 function setDeep(obj, path, value) {
@@ -246,16 +257,26 @@ function ImageField({ label, value, onChange, shape = 'photo' }) {
   )
 }
 
-function TagListEditor({ items, onChange }) {
-  const [newTag, setNewTag] = useState('')
-  function addTag() {
-    if (!newTag.trim()) return
-    onChange([...(items || []), newTag.trim()])
-    setNewTag('')
+function TagListEditor({ items, onChange, destinationNames = [] }) {
+  const available = destinationNames.filter((name) => !(items || []).includes(name))
+  const [selected, setSelected] = useState('')
+  const [customMode, setCustomMode] = useState(available.length === 0)
+  const [customTag, setCustomTag] = useState('')
+
+  function addSelected() {
+    if (!selected) return
+    onChange([...(items || []), selected])
+    setSelected('')
+  }
+  function addCustom() {
+    if (!customTag.trim()) return
+    onChange([...(items || []), customTag.trim()])
+    setCustomTag('')
   }
   function removeTag(i) {
     onChange(items.filter((_, idx) => idx !== i))
   }
+
   return (
     <div>
       <div className="mb-3 flex flex-wrap gap-2">
@@ -266,10 +287,36 @@ function TagListEditor({ items, onChange }) {
           </span>
         ))}
       </div>
-      <div className="flex gap-2">
-        <input className="input" value={newTag} onChange={(e) => setNewTag(e.target.value)} placeholder="Novo destino / país" />
-        <button onClick={addTag} className="btn-navy !py-2 !px-4 text-sm">Adicionar</button>
-      </div>
+
+      {!customMode ? (
+        <div className="flex gap-2">
+          <select className="input" value={selected} onChange={(e) => setSelected(e.target.value)}>
+            <option value="">Selecione um destino já cadastrado…</option>
+            {available.map((name) => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
+          <button onClick={addSelected} className="btn-navy !py-2 !px-4 text-sm whitespace-nowrap">Adicionar</button>
+        </div>
+      ) : (
+        <div className="flex gap-2">
+          <input className="input" value={customTag} onChange={(e) => setCustomTag(e.target.value)} placeholder="Nome da tag" />
+          <button onClick={addCustom} className="btn-navy !py-2 !px-4 text-sm whitespace-nowrap">Adicionar</button>
+        </div>
+      )}
+
+      {available.length > 0 && (
+        <button
+          type="button"
+          onClick={() => setCustomMode((v) => !v)}
+          className="mt-2 text-xs font-semibold text-navy-700 hover:underline"
+        >
+          {customMode ? 'Escolher da lista de destinos cadastrados' : 'Ou digitar um texto livre (não vai virar link)'}
+        </button>
+      )}
+      <p className="mt-2 text-xs text-gray-400">
+        Escolhendo da lista, a tag já sai clicável e leva direto pro destino certo na página.
+      </p>
     </div>
   )
 }
