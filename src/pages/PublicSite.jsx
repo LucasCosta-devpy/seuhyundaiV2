@@ -3,6 +3,7 @@ import { getContent } from '../lib/api.js'
 import { defaultContent } from '../lib/defaultContent.js'
 import { WhatsAppFloatButton, WhatsAppLink, formatPhoneDisplay } from '../components/WhatsAppButton.jsx'
 import { slugify, findDestinationSlug } from '../lib/slug.js'
+import { getLogoSize } from '../lib/logoSize.js'
 
 export default function PublicSite() {
   const [content, setContent] = useState(defaultContent)
@@ -60,6 +61,7 @@ function Header({ brand }) {
 }
 
 function Hero({ brand, hero, destinationGroups }) {
+  const logoSize = getLogoSize(brand.logoSize)
   return (
     <section className="relative overflow-hidden bg-navy-900 py-16 sm:py-24">
       <div
@@ -71,9 +73,9 @@ function Hero({ brand, hero, destinationGroups }) {
       />
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
         {brand.logoUrl ? (
-          <img src={brand.logoUrl} alt={brand.name} className="mx-auto mb-8 h-40 w-40 rounded-full object-contain bg-white p-1 shadow-2xl shadow-black/30 sm:h-56 sm:w-56" />
+          <img src={brand.logoUrl} alt={brand.name} className={`mx-auto mb-8 rounded-full object-contain bg-white p-1 shadow-2xl shadow-black/30 ${logoSize.hero}`} />
         ) : (
-          <div className="mx-auto mb-8 h-40 w-40 rounded-full border-4 border-gold-400 flex items-center justify-center text-5xl font-serif font-bold text-gold-400 shadow-2xl sm:h-56 sm:w-56 sm:text-7xl">R</div>
+          <div className={`mx-auto mb-8 rounded-full border-4 border-gold-400 flex items-center justify-center text-5xl font-serif font-bold text-gold-400 shadow-2xl sm:text-7xl ${logoSize.hero}`}>R</div>
         )}
         <h1 className="font-serif text-4xl font-bold tracking-wide text-white sm:text-7xl">{brand.name}</h1>
         <p className="mt-4 text-lg text-navy-100 sm:text-xl">{brand.tagline}</p>

@@ -4,6 +4,7 @@ export const defaultContent = {
     name: 'Rumo Mais Uma Rota',
     tagline: 'Consultoria de Viagens Personalizada & Exclusiva',
     logoUrl: '/logo.jpg',
+    logoSize: 'lg',
     instagram: '@rumomaisumarota',
     whatsapp: '5551982710564',
   },

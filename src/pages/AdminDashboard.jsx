@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getContent, saveContent, uploadImage, deleteImage, clearToken, getToken } from '../lib/api.js'
 import { defaultContent } from '../lib/defaultContent.js'
+import { LOGO_SIZES, getLogoSize } from '../lib/logoSize.js'
 
 export default function AdminDashboard() {
   const navigate = useNavigate()
@@ -65,6 +66,11 @@ export default function AdminDashboard() {
           <TextField label="Nome do negócio" value={content.brand.name} onChange={(v) => update(['brand', 'name'], v)} />
           <TextField label="Slogan" value={content.brand.tagline} onChange={(v) => update(['brand', 'tagline'], v)} />
           <ImageField label="Logo" shape="logo" value={content.brand.logoUrl} onChange={(v) => update(['brand', 'logoUrl'], v)} />
+          <LogoSizeField
+            logoUrl={content.brand.logoUrl}
+            value={content.brand.logoSize}
+            onChange={(v) => update(['brand', 'logoSize'], v)}
+          />
           <TextField label="Instagram (ex: @seuinstagram)" value={content.brand.instagram} onChange={(v) => update(['brand', 'instagram'], v)} />
           <TextField
             label="WhatsApp (com DDI e DDD, só números, ex: 5551987654321)"
@@ -181,6 +187,47 @@ function TextArea({ label, value, onChange }) {
     <div>
       <label className="label">{label}</label>
       <textarea className="input" rows={3} value={value || ''} onChange={(e) => onChange(e.target.value)} />
+    </div>
+  )
+}
+
+function LogoSizeField({ logoUrl, value, onChange }) {
+  const current = getLogoSize(value)
+  return (
+    <div>
+      <label className="label">Tamanho da logo no topo do site</label>
+
+      <div className="mb-3 flex items-center justify-center rounded-xl bg-navy-900 py-10">
+        {logoUrl ? (
+          <img
+            src={logoUrl}
+            alt="Prévia da logo no site"
+            className={`rounded-full object-contain bg-white p-1 shadow-2xl transition-all duration-200 ${current.hero}`}
+          />
+        ) : (
+          <div className={`rounded-full border-4 border-gold-400 flex items-center justify-center text-gold-400 font-serif font-bold ${current.hero}`}>
+            R
+          </div>
+        )}
+      </div>
+      <p className="mb-2 text-xs text-gray-400">Assim fica no topo da página (em telas grandes fica ainda maior que essa prévia).</p>
+
+      <div className="flex flex-wrap gap-2">
+        {Object.entries(LOGO_SIZES).map(([key, size]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => onChange(key)}
+            className={`rounded-lg border px-3 py-2 text-sm font-semibold transition-colors ${
+              value === key || (!value && key === 'lg')
+                ? 'border-navy-800 bg-navy-800 text-white'
+                : 'border-gray-300 text-gray-600 hover:border-navy-400'
+            }`}
+          >
+            {size.label}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }
