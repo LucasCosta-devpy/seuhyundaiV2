@@ -70,6 +70,8 @@ export default function AdminDashboard() {
             logoUrl={content.brand.logoUrl}
             value={content.brand.logoSize}
             onChange={(v) => update(['brand', 'logoSize'], v)}
+            scale={content.brand.logoScale}
+            onScaleChange={(v) => update(['brand', 'logoScale'], v)}
           />
           <TextField label="Instagram (ex: @seuinstagram)" value={content.brand.instagram} onChange={(v) => update(['brand', 'instagram'], v)} />
           <TextField
@@ -191,27 +193,33 @@ function TextArea({ label, value, onChange }) {
   )
 }
 
-function LogoSizeField({ logoUrl, value, onChange }) {
+function LogoSizeField({ logoUrl, value, onChange, scale, onScaleChange }) {
   const current = getLogoSize(value)
+  const scaleValue = scale || 100
+
   return (
     <div>
-      <label className="label">Tamanho da logo no topo do site</label>
+      <label className="label">Tamanho e enquadramento da logo no topo do site</label>
 
       <div className="mb-3 flex items-center justify-center rounded-xl bg-navy-900 py-10">
         {logoUrl ? (
-          <img
-            src={logoUrl}
-            alt="Prévia da logo no site"
-            className={`rounded-full object-contain bg-white p-1 shadow-2xl transition-all duration-200 ${current.hero}`}
-          />
+          <div className={`overflow-hidden rounded-full bg-white p-1 shadow-2xl transition-all duration-200 ${current.hero}`}>
+            <img
+              src={logoUrl}
+              alt="Prévia da logo no site"
+              className="h-full w-full object-contain"
+              style={{ transform: `scale(${scaleValue / 100})` }}
+            />
+          </div>
         ) : (
           <div className={`rounded-full border-4 border-gold-400 flex items-center justify-center text-gold-400 font-serif font-bold ${current.hero}`}>
             R
           </div>
         )}
       </div>
-      <p className="mb-2 text-xs text-gray-400">Assim fica no topo da página (em telas grandes fica ainda maior que essa prévia).</p>
+      <p className="mb-4 text-xs text-gray-400">Assim fica no topo da página (em telas grandes fica ainda maior que essa prévia). A logo sempre fica centralizada.</p>
 
+      <p className="label !mb-2">Tamanho do círculo</p>
       <div className="flex flex-wrap gap-2">
         {Object.entries(LOGO_SIZES).map(([key, size]) => (
           <button
@@ -228,6 +236,25 @@ function LogoSizeField({ logoUrl, value, onChange }) {
           </button>
         ))}
       </div>
+
+      {logoUrl && (
+        <div className="mt-4">
+          <p className="label !mb-2">Zoom da imagem dentro do círculo ({scaleValue}%)</p>
+          <input
+            type="range"
+            min={60}
+            max={180}
+            step={5}
+            value={scaleValue}
+            onChange={(e) => onScaleChange(Number(e.target.value))}
+            className="w-full"
+          />
+          <div className="flex justify-between text-xs text-gray-400">
+            <span>Mais afastado</span>
+            <span>Mais perto</span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -40,13 +40,26 @@ export default function PublicSite() {
   )
 }
 
+function LogoImage({ url, name, scale, className }) {
+  return (
+    <div className={`overflow-hidden rounded-full bg-white ${className || ''}`}>
+      <img
+        src={url}
+        alt={name}
+        className="h-full w-full object-contain"
+        style={{ transform: `scale(${(scale || 100) / 100})` }}
+      />
+    </div>
+  )
+}
+
 function Header({ brand }) {
   return (
     <header className="border-b border-gray-100 bg-white/90 backdrop-blur sticky top-0 z-40">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <div className="flex items-center gap-3">
           {brand.logoUrl ? (
-            <img src={brand.logoUrl} alt={brand.name} className="h-10 w-10 rounded-full object-contain bg-white" />
+            <LogoImage url={brand.logoUrl} name={brand.name} scale={brand.logoScale} className="h-10 w-10" />
           ) : (
             <div className="h-10 w-10 rounded-full border-2 border-gold-400 flex items-center justify-center text-gold-600 font-serif font-bold">R</div>
           )}
@@ -73,7 +86,12 @@ function Hero({ brand, hero, destinationGroups }) {
       />
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
         {brand.logoUrl ? (
-          <img src={brand.logoUrl} alt={brand.name} className={`mx-auto mb-8 rounded-full object-contain bg-white p-1 shadow-2xl shadow-black/30 ${logoSize.hero}`} />
+          <LogoImage
+            url={brand.logoUrl}
+            name={brand.name}
+            scale={brand.logoScale}
+            className={`mx-auto mb-8 p-1 shadow-2xl shadow-black/30 ${logoSize.hero}`}
+          />
         ) : (
           <div className={`mx-auto mb-8 rounded-full border-4 border-gold-400 flex items-center justify-center text-5xl font-serif font-bold text-gold-400 shadow-2xl sm:text-7xl ${logoSize.hero}`}>R</div>
         )}

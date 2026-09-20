@@ -5,6 +5,7 @@ export const defaultContent = {
     tagline: 'Consultoria de Viagens Personalizada & Exclusiva',
     logoUrl: '/logo.jpg',
     logoSize: 'lg',
+    logoScale: 100,
     instagram: '@rumomaisumarota',
     whatsapp: '5551982710564',
   },
