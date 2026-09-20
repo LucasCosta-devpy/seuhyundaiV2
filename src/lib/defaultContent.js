@@ -6,6 +6,8 @@ export const defaultContent = {
     logoUrl: '/logo.jpg',
     logoSize: 'lg',
     logoScale: 100,
+    logoOffsetX: 0,
+    logoOffsetY: 0,
     instagram: '@rumomaisumarota',
     whatsapp: '5551982710564',
   },

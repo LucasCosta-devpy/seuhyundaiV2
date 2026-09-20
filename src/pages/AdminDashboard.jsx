@@ -72,6 +72,10 @@ export default function AdminDashboard() {
             onChange={(v) => update(['brand', 'logoSize'], v)}
             scale={content.brand.logoScale}
             onScaleChange={(v) => update(['brand', 'logoScale'], v)}
+            offsetX={content.brand.logoOffsetX}
+            offsetY={content.brand.logoOffsetY}
+            onOffsetXChange={(v) => update(['brand', 'logoOffsetX'], v)}
+            onOffsetYChange={(v) => update(['brand', 'logoOffsetY'], v)}
           />
           <TextField label="Instagram (ex: @seuinstagram)" value={content.brand.instagram} onChange={(v) => update(['brand', 'instagram'], v)} />
           <TextField
@@ -193,9 +197,11 @@ function TextArea({ label, value, onChange }) {
   )
 }
 
-function LogoSizeField({ logoUrl, value, onChange, scale, onScaleChange }) {
+function LogoSizeField({ logoUrl, value, onChange, scale, onScaleChange, offsetX, offsetY, onOffsetXChange, onOffsetYChange }) {
   const current = getLogoSize(value)
   const scaleValue = scale || 100
+  const offsetXValue = offsetX || 0
+  const offsetYValue = offsetY || 0
 
   return (
     <div>
@@ -208,7 +214,7 @@ function LogoSizeField({ logoUrl, value, onChange, scale, onScaleChange }) {
               src={logoUrl}
               alt="Prévia da logo no site"
               className="h-full w-full object-contain"
-              style={{ transform: `scale(${scaleValue / 100})` }}
+              style={{ transform: `translate(${offsetXValue}%, ${offsetYValue}%) scale(${scaleValue / 100})` }}
             />
           </div>
         ) : (
@@ -217,7 +223,9 @@ function LogoSizeField({ logoUrl, value, onChange, scale, onScaleChange }) {
           </div>
         )}
       </div>
-      <p className="mb-4 text-xs text-gray-400">Assim fica no topo da página (em telas grandes fica ainda maior que essa prévia). A logo sempre fica centralizada.</p>
+      <p className="mb-4 text-xs text-gray-400">
+        Assim fica no topo da página. Se o desenho da sua logo não estiver bem no meio do círculo, use os controles de posição abaixo pra empurrar ele.
+      </p>
 
       <p className="label !mb-2">Tamanho do círculo</p>
       <div className="flex flex-wrap gap-2">
@@ -238,21 +246,70 @@ function LogoSizeField({ logoUrl, value, onChange, scale, onScaleChange }) {
       </div>
 
       {logoUrl && (
-        <div className="mt-4">
-          <p className="label !mb-2">Zoom da imagem dentro do círculo ({scaleValue}%)</p>
-          <input
-            type="range"
-            min={60}
-            max={180}
-            step={5}
-            value={scaleValue}
-            onChange={(e) => onScaleChange(Number(e.target.value))}
-            className="w-full"
-          />
-          <div className="flex justify-between text-xs text-gray-400">
-            <span>Mais afastado</span>
-            <span>Mais perto</span>
+        <div className="mt-4 space-y-4">
+          <div>
+            <p className="label !mb-2">Zoom da imagem dentro do círculo ({scaleValue}%)</p>
+            <input
+              type="range"
+              min={60}
+              max={180}
+              step={5}
+              value={scaleValue}
+              onChange={(e) => onScaleChange(Number(e.target.value))}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-gray-400">
+              <span>Mais afastado</span>
+              <span>Mais perto</span>
+            </div>
           </div>
+
+          <div>
+            <p className="label !mb-2">Posição horizontal</p>
+            <input
+              type="range"
+              min={-40}
+              max={40}
+              step={1}
+              value={offsetXValue}
+              onChange={(e) => onOffsetXChange(Number(e.target.value))}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-gray-400">
+              <span>Esquerda</span>
+              <span>Direita</span>
+            </div>
+          </div>
+
+          <div>
+            <p className="label !mb-2">Posição vertical</p>
+            <input
+              type="range"
+              min={-40}
+              max={40}
+              step={1}
+              value={offsetYValue}
+              onChange={(e) => onOffsetYChange(Number(e.target.value))}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-gray-400">
+              <span>Cima</span>
+              <span>Baixo</span>
+            </div>
+          </div>
+
+          {(offsetXValue !== 0 || offsetYValue !== 0) && (
+            <button
+              type="button"
+              onClick={() => {
+                onOffsetXChange(0)
+                onOffsetYChange(0)
+              }}
+              className="text-xs font-semibold text-navy-700 hover:underline"
+            >
+              Redefinir posição
+            </button>
+          )}
         </div>
       )}
     </div>

@@ -40,14 +40,14 @@ export default function PublicSite() {
   )
 }
 
-function LogoImage({ url, name, scale, className }) {
+function LogoImage({ url, name, scale, offsetX, offsetY, className }) {
   return (
     <div className={`overflow-hidden rounded-full bg-white ${className || ''}`}>
       <img
         src={url}
         alt={name}
         className="h-full w-full object-contain"
-        style={{ transform: `scale(${(scale || 100) / 100})` }}
+        style={{ transform: `translate(${offsetX || 0}%, ${offsetY || 0}%) scale(${(scale || 100) / 100})` }}
       />
     </div>
   )
@@ -59,7 +59,14 @@ function Header({ brand }) {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <div className="flex items-center gap-3">
           {brand.logoUrl ? (
-            <LogoImage url={brand.logoUrl} name={brand.name} scale={brand.logoScale} className="h-10 w-10" />
+            <LogoImage
+              url={brand.logoUrl}
+              name={brand.name}
+              scale={brand.logoScale}
+              offsetX={brand.logoOffsetX}
+              offsetY={brand.logoOffsetY}
+              className="h-10 w-10"
+            />
           ) : (
             <div className="h-10 w-10 rounded-full border-2 border-gold-400 flex items-center justify-center text-gold-600 font-serif font-bold">R</div>
           )}
@@ -90,6 +97,8 @@ function Hero({ brand, hero, destinationGroups }) {
             url={brand.logoUrl}
             name={brand.name}
             scale={brand.logoScale}
+            offsetX={brand.logoOffsetX}
+            offsetY={brand.logoOffsetY}
             className={`mx-auto mb-8 p-1 shadow-2xl shadow-black/30 ${logoSize.hero}`}
           />
         ) : (
