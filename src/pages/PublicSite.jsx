@@ -71,11 +71,11 @@ function Hero({ brand, hero, destinationGroups }) {
       />
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
         {brand.logoUrl ? (
-          <img src={brand.logoUrl} alt={brand.name} className="mx-auto mb-6 h-28 w-28 rounded-full object-cover border-4 border-gold-400 shadow-2xl shadow-black/30" />
+          <img src={brand.logoUrl} alt={brand.name} className="mx-auto mb-8 h-40 w-40 rounded-full object-cover border-4 border-gold-400 shadow-2xl shadow-black/30 sm:h-56 sm:w-56" />
         ) : (
-          <div className="mx-auto mb-6 h-28 w-28 rounded-full border-4 border-gold-400 flex items-center justify-center text-4xl font-serif font-bold text-gold-400 shadow-2xl">R</div>
+          <div className="mx-auto mb-8 h-40 w-40 rounded-full border-4 border-gold-400 flex items-center justify-center text-5xl font-serif font-bold text-gold-400 shadow-2xl sm:h-56 sm:w-56 sm:text-7xl">R</div>
         )}
-        <h1 className="font-serif text-4xl font-bold tracking-wide text-white sm:text-6xl">{brand.name}</h1>
+        <h1 className="font-serif text-4xl font-bold tracking-wide text-white sm:text-7xl">{brand.name}</h1>
         <p className="mt-4 text-lg text-navy-100 sm:text-xl">{brand.tagline}</p>
         <div className="mx-auto mt-8 h-1 w-24 rounded bg-gradient-to-r from-gold-400 to-gold-600" />
         <div className="mt-10 flex flex-wrap justify-center gap-2.5">

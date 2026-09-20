@@ -50,6 +50,10 @@ export async function uploadImage(file) {
   return result.url
 }
 
+export function deleteImage(url) {
+  return request('upload', { method: 'DELETE', body: JSON.stringify({ url }) })
+}
+
 function fileToDataUrl(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()

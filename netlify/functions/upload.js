@@ -5,8 +5,19 @@ import { requireAuth, json } from './_shared/auth.js'
 const MAX_BYTES = 5 * 1024 * 1024
 
 export default async (request) => {
-  if (request.method !== 'POST') return json({ error: 'Método não permitido' }, { status: 405 })
   if (!requireAuth(request)) return json({ error: 'Não autorizado' }, { status: 401 })
+
+  if (request.method === 'DELETE') {
+    const { url } = await request.json().catch(() => ({}))
+    const key = (url || '').split('/api/image/')[1]
+    if (!key) return json({ error: 'URL de imagem inválida' }, { status: 400 })
+
+    const store = getStore({ name: 'images', consistency: 'strong' })
+    await store.delete(key)
+    return json({ ok: true })
+  }
+
+  if (request.method !== 'POST') return json({ error: 'Método não permitido' }, { status: 405 })
 
   const { dataUrl, fileName } = await request.json().catch(() => ({}))
   const match = /^data:(image\/[a-zA-Z+]+);base64,(.+)$/.exec(dataUrl || '')

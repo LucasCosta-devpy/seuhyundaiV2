@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getContent, saveContent, uploadImage, clearToken, getToken } from '../lib/api.js'
+import { getContent, saveContent, uploadImage, deleteImage, clearToken, getToken } from '../lib/api.js'
 import { defaultContent } from '../lib/defaultContent.js'
 
 export default function AdminDashboard() {
@@ -176,6 +176,7 @@ function TextArea({ label, value, onChange }) {
 
 function ImageField({ label, value, onChange }) {
   const [uploading, setUploading] = useState(false)
+  const [removing, setRemoving] = useState(false)
 
   async function handleFile(e) {
     const file = e.target.files?.[0]
@@ -191,13 +192,40 @@ function ImageField({ label, value, onChange }) {
     }
   }
 
+  async function handleRemove() {
+    if (!value) return
+    if (!confirm('Remover esta imagem? Ela será apagada do armazenamento (Blobs).')) return
+    setRemoving(true)
+    try {
+      // só tenta apagar do Blobs se for uma imagem enviada por aqui (/api/image/...)
+      if (value.startsWith('/api/image/')) {
+        await deleteImage(value)
+      }
+      onChange('')
+    } catch (err) {
+      alert('Erro ao remover imagem: ' + err.message)
+    } finally {
+      setRemoving(false)
+    }
+  }
+
   return (
     <div>
       <label className="label">{label}</label>
       <div className="flex items-center gap-3">
         {value && <img src={value} alt="" className="h-16 w-16 rounded-lg object-cover border" />}
-        <input type="file" accept="image/*" onChange={handleFile} disabled={uploading} className="text-sm" />
+        <input type="file" accept="image/*" onChange={handleFile} disabled={uploading || removing} className="text-sm" />
         {uploading && <span className="text-xs text-gray-500">Enviando…</span>}
+        {value && !uploading && (
+          <button
+            type="button"
+            onClick={handleRemove}
+            disabled={removing}
+            className="text-xs font-semibold text-red-500 hover:text-red-700 hover:underline"
+          >
+            {removing ? 'Removendo…' : 'Remover imagem'}
+          </button>
+        )}
       </div>
     </div>
   )
