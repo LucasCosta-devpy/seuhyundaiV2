@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { getContent, saveContent, uploadImage, deleteImage, clearToken, getToken } from '../lib/api.js'
 import { defaultContent } from '../lib/defaultContent.js'
 import { LOGO_SIZES, getLogoSize } from '../lib/logoSize.js'
+import { SOCIAL_PLATFORMS, getPlatform } from '../components/SocialIcons.jsx'
 
 const TABS = [
   { key: 'marca', label: 'Marca e Contato', color: 'amber' },
+  { key: 'social', label: 'Redes Sociais', color: 'pink' },
   { key: 'destaques', label: 'Destaques', color: 'sky' },
   { key: 'sobre', label: 'Sobre', color: 'emerald' },
   { key: 'destinos', label: 'Destinos', color: 'rose' },
@@ -19,6 +21,7 @@ const TABS = [
 
 const TAB_STYLES = {
   amber: { active: 'bg-amber-500 border-amber-500 text-white', inactive: 'border-amber-200 text-amber-700 hover:bg-amber-50', top: 'border-t-amber-500' },
+  pink: { active: 'bg-pink-500 border-pink-500 text-white', inactive: 'border-pink-200 text-pink-700 hover:bg-pink-50', top: 'border-t-pink-500' },
   sky: { active: 'bg-sky-500 border-sky-500 text-white', inactive: 'border-sky-200 text-sky-700 hover:bg-sky-50', top: 'border-t-sky-500' },
   emerald: { active: 'bg-emerald-500 border-emerald-500 text-white', inactive: 'border-emerald-200 text-emerald-700 hover:bg-emerald-50', top: 'border-t-emerald-500' },
   rose: { active: 'bg-rose-500 border-rose-500 text-white', inactive: 'border-rose-200 text-rose-700 hover:bg-rose-50', top: 'border-t-rose-500' },
@@ -142,6 +145,15 @@ export default function AdminDashboard() {
                 label="WhatsApp (com DDI e DDD, só números, ex: 5551987654321)"
                 value={content.brand.whatsapp}
                 onChange={(v) => update(['brand', 'whatsapp'], v.replace(/\D/g, ''))}
+              />
+            </Panel>
+          )}
+
+          {activeTab === 'social' && (
+            <Panel title="Redes Sociais">
+              <SocialLinksEditor
+                items={content.socialLinks}
+                onChange={(v) => update(['socialLinks'], v)}
               />
             </Panel>
           )}
@@ -582,6 +594,84 @@ function CardListEditor({ items, onChange }) {
         </div>
       ))}
       <button onClick={add} className="text-sm font-semibold text-navy-700 hover:underline">+ Adicionar item</button>
+    </div>
+  )
+}
+
+function SocialLinksEditor({ items, onChange }) {
+  function update(i, field, v) {
+    const next = [...(items || [])]
+    next[i] = { ...next[i], [field]: v }
+    onChange(next)
+  }
+  function updatePlatform(i, platformKey) {
+    const next = [...(items || [])]
+    const platform = getPlatform(platformKey)
+    next[i] = {
+      ...next[i],
+      platform: platformKey,
+      name: platformKey === 'custom' ? (next[i].name || '') : platform.label,
+    }
+    onChange(next)
+  }
+  function remove(i) {
+    onChange((items || []).filter((_, idx) => idx !== i))
+  }
+  function add() {
+    onChange([...(items || []), { platform: 'instagram', name: 'Instagram', url: '', iconUrl: '' }])
+  }
+
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-gray-400">
+        Escolha uma rede da lista (já usa o logo oficial dela) ou &ldquo;Outra rede&rdquo; pra colocar um nome e um logo manual.
+      </p>
+      {(items || []).map((social, i) => {
+        const platform = getPlatform(social.platform)
+        return (
+          <div key={i} className="flex items-start gap-3 rounded-lg border border-gray-200 p-4">
+            <div className={`mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-white ${platform.color}`}>
+              {social.platform === 'custom' && social.iconUrl ? (
+                <img src={social.iconUrl} alt="" className="h-5 w-5 rounded-full object-contain" />
+              ) : (
+                <platform.Icon className="h-5 w-5" />
+              )}
+            </div>
+
+            <div className="flex-1 space-y-2">
+              <div>
+                <label className="label">Rede social</label>
+                <select className="input" value={social.platform} onChange={(e) => updatePlatform(i, e.target.value)}>
+                  {SOCIAL_PLATFORMS.map((p) => (
+                    <option key={p.key} value={p.key}>{p.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {social.platform === 'custom' && (
+                <>
+                  <TextField label="Nome da rede" value={social.name} onChange={(v) => update(i, 'name', v)} />
+                  <ImageField
+                    label="Logo da rede"
+                    shape="avatar"
+                    value={social.iconUrl}
+                    onChange={(v) => update(i, 'iconUrl', v)}
+                  />
+                </>
+              )}
+
+              <TextField
+                label="Link do perfil (URL completa)"
+                value={social.url}
+                onChange={(v) => update(i, 'url', v)}
+              />
+            </div>
+
+            <button onClick={() => remove(i)} className="mt-1 text-sm text-red-500 hover:text-red-700">Remover</button>
+          </div>
+        )
+      })}
+      <button onClick={add} className="text-sm font-semibold text-navy-700 hover:underline">+ Adicionar rede social</button>
     </div>
   )
 }

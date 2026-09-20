@@ -11,6 +11,9 @@ export const defaultContent = {
     instagram: '@rumomaisumarota',
     whatsapp: '5551982710564',
   },
+  socialLinks: [
+    { platform: 'instagram', name: 'Instagram', url: 'https://instagram.com/rumomaisumarota', iconUrl: '' },
+  ],
   hero: {
     countryTags: [
       'Brasil', 'Argentina', 'Uruguai', 'Chile', 'Venezuela', 'Guianas',

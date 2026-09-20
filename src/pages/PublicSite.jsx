@@ -4,6 +4,7 @@ import { defaultContent } from '../lib/defaultContent.js'
 import { WhatsAppFloatButton, WhatsAppLink, formatPhoneDisplay } from '../components/WhatsAppButton.jsx'
 import { slugify, findDestinationSlug } from '../lib/slug.js'
 import { getLogoSize } from '../lib/logoSize.js'
+import { getPlatform } from '../components/SocialIcons.jsx'
 
 export default function PublicSite() {
   const [content, setContent] = useState(defaultContent)
@@ -35,7 +36,7 @@ export default function PublicSite() {
     return <div className="flex min-h-screen items-center justify-center text-navy-700">Carregando…</div>
   }
 
-  const { brand, hero, about, destinationGroups, services, reasons, process, pricing, consultant, cta, footer } = content
+  const { brand, hero, about, destinationGroups, services, reasons, process, pricing, consultant, cta, footer, socialLinks } = content
 
   return (
     <div className="min-h-screen bg-white">
@@ -49,7 +50,7 @@ export default function PublicSite() {
       <Pricing pricing={pricing} brand={brand} />
       <Consultant consultant={consultant} />
       <CTA cta={cta} brand={brand} />
-      <Footer brand={brand} footer={footer} />
+      <Footer brand={brand} footer={footer} socialLinks={socialLinks} />
       <WhatsAppFloatButton whatsapp={brand.whatsapp} />
     </div>
   )
@@ -302,9 +303,33 @@ function CTA({ cta, brand }) {
   )
 }
 
-function Footer({ brand, footer }) {
+function Footer({ brand, footer, socialLinks }) {
   return (
     <footer className="border-t border-gray-100 py-10 text-center text-sm text-gray-500">
+      {socialLinks?.length > 0 && (
+        <div className="mb-4 flex justify-center gap-3">
+          {socialLinks.map((social, i) => {
+            if (!social.url) return null
+            const platform = getPlatform(social.platform)
+            return (
+              <a
+                key={i}
+                href={social.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={social.name || platform.label}
+                className={`flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br text-white shadow-md transition-transform hover:scale-110 ${platform.color}`}
+              >
+                {social.platform === 'custom' && social.iconUrl ? (
+                  <img src={social.iconUrl} alt={social.name} className="h-5 w-5 rounded-full object-contain" />
+                ) : (
+                  <platform.Icon className="h-5 w-5" />
+                )}
+              </a>
+            )
+          })}
+        </div>
+      )}
       <p>© {new Date().getFullYear()} {brand.name}. {footer.text}</p>
       <p className="mt-2">
         {brand.instagram && <span>{brand.instagram}</span>}
