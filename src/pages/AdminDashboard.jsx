@@ -95,31 +95,32 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
         {status && (
           <div className="mb-4 rounded-lg bg-navy-800 px-4 py-2 text-sm text-white">{status}</div>
         )}
 
-        <div className="mb-5 flex gap-2 overflow-x-auto pb-2">
-          {TABS.map((tab) => {
-            const style = TAB_STYLES[tab.color]
-            const isActive = activeTab === tab.key
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setActiveTab(tab.key)}
-                className={`flex-shrink-0 rounded-full border-2 px-4 py-2 text-sm font-semibold transition-colors ${
-                  isActive ? style.active : `bg-white ${style.inactive}`
-                }`}
-              >
-                {tab.label}
-              </button>
-            )
-          })}
-        </div>
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+          <aside className="flex gap-2 overflow-x-auto rounded-2xl bg-navy-900 p-3 sm:sticky sm:top-20 sm:w-60 sm:flex-shrink-0 sm:flex-col sm:overflow-visible sm:p-4">
+            {TABS.map((tab) => {
+              const style = TAB_STYLES[tab.color]
+              const isActive = activeTab === tab.key
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`flex-shrink-0 whitespace-nowrap rounded-lg px-4 py-2.5 text-left text-sm font-semibold transition-colors sm:whitespace-normal ${
+                    isActive ? style.active : 'text-navy-200 hover:bg-navy-800 hover:text-white'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              )
+            })}
+          </aside>
 
-        <div className={`rounded-2xl border-t-4 bg-white p-6 shadow-sm ${TAB_STYLES[TABS.find((t) => t.key === activeTab).color].top}`}>
+          <div className={`min-w-0 flex-1 rounded-2xl border-t-4 bg-white p-6 shadow-sm ${TAB_STYLES[TABS.find((t) => t.key === activeTab).color].top}`}>
           {activeTab === 'marca' && (
             <Panel title="Marca e Contato">
               <TextField label="Nome do negócio" value={content.brand.name} onChange={(v) => update(['brand', 'name'], v)} />
@@ -217,6 +218,7 @@ export default function AdminDashboard() {
               <TextField label="Texto do rodapé" value={content.footer.text} onChange={(v) => update(['footer', 'text'], v)} />
             </Panel>
           )}
+          </div>
         </div>
       </main>
 
