@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { getContent } from '../lib/api.js'
 import { defaultContent } from '../lib/defaultContent.js'
 import { WhatsAppFloatButton, WhatsAppLink, formatPhoneDisplay } from '../components/WhatsAppButton.jsx'
+import { slugify, findDestinationSlug } from '../lib/slug.js'
 
 export default function PublicSite() {
   const [content, setContent] = useState(defaultContent)
@@ -23,7 +24,7 @@ export default function PublicSite() {
   return (
     <div className="min-h-screen bg-white">
       <Header brand={brand} />
-      <Hero brand={brand} hero={hero} />
+      <Hero brand={brand} hero={hero} destinationGroups={destinationGroups} />
       <About about={about} />
       <Destinations groups={destinationGroups} />
       <Services services={services} />
@@ -58,25 +59,41 @@ function Header({ brand }) {
   )
 }
 
-function Hero({ brand, hero }) {
+function Hero({ brand, hero, destinationGroups }) {
   return (
-    <section className="bg-gradient-to-b from-navy-50 to-white py-14 sm:py-20">
-      <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
+    <section className="relative overflow-hidden bg-navy-900 py-16 sm:py-24">
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(circle at 20% 20%, rgba(212,165,63,0.18), transparent 45%), radial-gradient(circle at 80% 30%, rgba(63,95,140,0.35), transparent 50%), radial-gradient(circle at 50% 100%, rgba(212,165,63,0.12), transparent 55%)',
+        }}
+      />
+      <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
         {brand.logoUrl ? (
-          <img src={brand.logoUrl} alt={brand.name} className="mx-auto mb-6 h-28 w-28 rounded-full object-cover border-4 border-gold-300 shadow-lg" />
+          <img src={brand.logoUrl} alt={brand.name} className="mx-auto mb-6 h-28 w-28 rounded-full object-cover border-4 border-gold-400 shadow-2xl shadow-black/30" />
         ) : (
-          <div className="mx-auto mb-6 h-28 w-28 rounded-full border-4 border-gold-300 flex items-center justify-center text-4xl font-serif font-bold text-gold-600 shadow-lg">R</div>
+          <div className="mx-auto mb-6 h-28 w-28 rounded-full border-4 border-gold-400 flex items-center justify-center text-4xl font-serif font-bold text-gold-400 shadow-2xl">R</div>
         )}
-        <h1 className="font-serif text-4xl font-bold tracking-wide text-navy-800 sm:text-5xl">{brand.name}</h1>
-        <p className="mt-3 text-lg text-gray-600 sm:text-xl">{brand.tagline}</p>
-        <div className="mt-8 flex flex-wrap justify-center gap-2">
-          {(hero.countryTags || []).map((tag) => (
-            <span key={tag} className="rounded-full border border-gold-300 px-4 py-1.5 text-sm text-navy-700">
-              {tag}
-            </span>
-          ))}
+        <h1 className="font-serif text-4xl font-bold tracking-wide text-white sm:text-6xl">{brand.name}</h1>
+        <p className="mt-4 text-lg text-navy-100 sm:text-xl">{brand.tagline}</p>
+        <div className="mx-auto mt-8 h-1 w-24 rounded bg-gradient-to-r from-gold-400 to-gold-600" />
+        <div className="mt-10 flex flex-wrap justify-center gap-2.5">
+          {(hero.countryTags || []).map((tag) => {
+            const slug = findDestinationSlug(destinationGroups, tag)
+            const className =
+              'rounded-full border border-gold-400/60 bg-white/5 px-4 py-1.5 text-sm text-gold-100 backdrop-blur-sm transition-all duration-200 hover:border-gold-300 hover:bg-gold-400 hover:text-navy-900 hover:scale-105'
+            return slug ? (
+              <a key={tag} href={`#${slug}`} className={className}>
+                {tag}
+              </a>
+            ) : (
+              <span key={tag} className={className}>
+                {tag}
+              </span>
+            )
+          })}
         </div>
-        <div className="mx-auto mt-10 h-1 w-32 rounded bg-gradient-to-r from-gold-400 to-gold-600" />
       </div>
     </section>
   )
@@ -105,8 +122,8 @@ function Destinations({ groups }) {
           </h3>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {(group.items || []).map((item) => (
-              <div key={item.name} className="card overflow-hidden">
-                <div className="flex h-40 items-center justify-center bg-gray-50 text-gray-400">
+              <div key={item.name} id={slugify(item.name)} className="card scroll-mt-28 overflow-hidden">
+                <div className="flex h-40 items-center justify-center bg-gradient-to-br from-navy-50 to-gray-100 text-gray-400">
                   {item.imageUrl ? (
                     <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />
                   ) : (
