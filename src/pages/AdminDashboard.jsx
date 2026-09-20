@@ -64,7 +64,7 @@ export default function AdminDashboard() {
         <Section title="Marca e Contato">
           <TextField label="Nome do negócio" value={content.brand.name} onChange={(v) => update(['brand', 'name'], v)} />
           <TextField label="Slogan" value={content.brand.tagline} onChange={(v) => update(['brand', 'tagline'], v)} />
-          <ImageField label="Logo" value={content.brand.logoUrl} onChange={(v) => update(['brand', 'logoUrl'], v)} />
+          <ImageField label="Logo" shape="logo" value={content.brand.logoUrl} onChange={(v) => update(['brand', 'logoUrl'], v)} />
           <TextField label="Instagram (ex: @seuinstagram)" value={content.brand.instagram} onChange={(v) => update(['brand', 'instagram'], v)} />
           <TextField
             label="WhatsApp (com DDI e DDD, só números, ex: 5551987654321)"
@@ -116,7 +116,7 @@ export default function AdminDashboard() {
 
         <Section title="Consultora(a)">
           <TextField label="Nome" value={content.consultant.name} onChange={(v) => update(['consultant', 'name'], v)} />
-          <ImageField label="Foto" value={content.consultant.photoUrl} onChange={(v) => update(['consultant', 'photoUrl'], v)} />
+          <ImageField label="Foto" shape="avatar" value={content.consultant.photoUrl} onChange={(v) => update(['consultant', 'photoUrl'], v)} />
           <TextArea label="Biografia" value={content.consultant.bio} onChange={(v) => update(['consultant', 'bio'], v)} />
           <TextField label="Frase de destaque" value={content.consultant.quote} onChange={(v) => update(['consultant', 'quote'], v)} />
         </Section>
@@ -174,7 +174,13 @@ function TextArea({ label, value, onChange }) {
   )
 }
 
-function ImageField({ label, value, onChange }) {
+const IMAGE_PREVIEW_STYLES = {
+  logo: 'h-24 w-24 rounded-full object-contain bg-white border border-gray-200 p-1',
+  avatar: 'h-20 w-20 rounded-full object-cover border border-gray-200',
+  photo: 'h-20 w-28 rounded-lg object-cover border border-gray-200',
+}
+
+function ImageField({ label, value, onChange, shape = 'photo' }) {
   const [uploading, setUploading] = useState(false)
   const [removing, setRemoving] = useState(false)
 
@@ -212,10 +218,19 @@ function ImageField({ label, value, onChange }) {
   return (
     <div>
       <label className="label">{label}</label>
-      <div className="flex items-center gap-3">
-        {value && <img src={value} alt="" className="h-16 w-16 rounded-lg object-cover border" />}
-        <input type="file" accept="image/*" onChange={handleFile} disabled={uploading || removing} className="text-sm" />
-        {uploading && <span className="text-xs text-gray-500">Enviando…</span>}
+      <p className="mb-2 text-xs text-gray-400">Pré-visualização de como vai ficar no site:</p>
+      <div className="flex items-center gap-4">
+        {value ? (
+          <img src={value} alt="" className={IMAGE_PREVIEW_STYLES[shape]} />
+        ) : (
+          <div className={`${IMAGE_PREVIEW_STYLES[shape]} flex items-center justify-center bg-gray-50 text-[10px] text-gray-400`}>
+            sem foto
+          </div>
+        )}
+        <div className="flex flex-col gap-1">
+          <input type="file" accept="image/*" onChange={handleFile} disabled={uploading || removing} className="text-sm" />
+          {uploading && <span className="text-xs text-gray-500">Enviando…</span>}
+        </div>
         {value && !uploading && (
           <button
             type="button"
@@ -363,7 +378,7 @@ function DestinationGroupsEditor({ groups, onChange }) {
                   <TextArea label="Descrição" value={item.desc} onChange={(v) => updateItem(gi, ii, 'desc', v)} />
                 </div>
                 <div className="mt-2">
-                  <ImageField label="Foto" value={item.imageUrl} onChange={(v) => updateItem(gi, ii, 'imageUrl', v)} />
+                  <ImageField label="Foto" shape="photo" value={item.imageUrl} onChange={(v) => updateItem(gi, ii, 'imageUrl', v)} />
                 </div>
                 <button onClick={() => removeItem(gi, ii)} className="mt-2 text-sm text-red-500 hover:text-red-700">Remover destino</button>
               </div>

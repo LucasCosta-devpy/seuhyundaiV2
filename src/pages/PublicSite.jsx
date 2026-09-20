@@ -45,7 +45,7 @@ function Header({ brand }) {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <div className="flex items-center gap-3">
           {brand.logoUrl ? (
-            <img src={brand.logoUrl} alt={brand.name} className="h-10 w-10 rounded-full object-cover border border-gold-300" />
+            <img src={brand.logoUrl} alt={brand.name} className="h-10 w-10 rounded-full object-contain bg-white" />
           ) : (
             <div className="h-10 w-10 rounded-full border-2 border-gold-400 flex items-center justify-center text-gold-600 font-serif font-bold">R</div>
           )}
@@ -71,7 +71,7 @@ function Hero({ brand, hero, destinationGroups }) {
       />
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
         {brand.logoUrl ? (
-          <img src={brand.logoUrl} alt={brand.name} className="mx-auto mb-8 h-40 w-40 rounded-full object-cover border-4 border-gold-400 shadow-2xl shadow-black/30 sm:h-56 sm:w-56" />
+          <img src={brand.logoUrl} alt={brand.name} className="mx-auto mb-8 h-40 w-40 rounded-full object-contain bg-white p-1 shadow-2xl shadow-black/30 sm:h-56 sm:w-56" />
         ) : (
           <div className="mx-auto mb-8 h-40 w-40 rounded-full border-4 border-gold-400 flex items-center justify-center text-5xl font-serif font-bold text-gold-400 shadow-2xl sm:h-56 sm:w-56 sm:text-7xl">R</div>
         )}
