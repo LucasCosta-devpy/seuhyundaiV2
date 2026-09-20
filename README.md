@@ -1,149 +1,70 @@
-# 🚗 Ação entre Amigos - Rumo Mais Uma Rota
+# Rumo Mais Uma Rota — site + painel admin
 
-Um site moderno e profissional para ações entre amigos, desenvolvido com React e tecnologias de ponta.
+Projeto reestruturado do zero. Duas páginas:
 
-## ✨ Características
+- **`/`** — página pública (a "vitrine" que você manda pro cliente/lead).
+- **`/admin`** — login do painel. Depois de logar vai para `/admin/painel`, onde dá pra editar todo texto e trocar todas as imagens do site.
 
-- **React 18** com Vite para desenvolvimento rápido
-- **Tailwind CSS** para estilização moderna e responsiva
-- **Framer Motion** para animações suaves e profissionais
-- **Design responsivo** otimizado para todos os dispositivos
-- **Performance otimizada** com lazy loading e code splitting
-- **Analytics integrado** (Google Analytics, Facebook Pixel)
-- **SEO otimizado** com meta tags e estrutura semântica
+## Como funciona por trás
 
-## 🚀 Tecnologias Utilizadas
+- **Frontend:** React + Vite + Tailwind (SPA), em `src/`.
+- **Netlify Functions** (`netlify/functions/`): API que o painel usa pra logar, ler/gravar o conteúdo e subir imagens.
+- **Netlify DB (Postgres/Neon):** guarda o conteúdo do site (textos, preços, etc) em uma tabela `site_content`.
+- **Netlify Blobs:** guarda as imagens (logo, fotos dos destinos, foto da consultora).
 
-- **Frontend**: React 18, Vite
-- **Estilização**: Tailwind CSS, CSS Custom Properties
-- **Animações**: Framer Motion
-- **Ícones**: Lucide React
-- **Analytics**: Google Analytics, Facebook Pixel
-- **Deploy**: GitHub Pages
+Nenhuma imagem/texto fica "hardcoded" — tudo que aparece na página pública vem do banco, editável pelo `/admin`.
 
-## 📦 Instalação
+---
 
-1. Clone o repositório:
-```bash
-git clone https://github.com/seu-usuario/seuhyundaiteste.git
-cd seuhyundaiteste
-```
+## Passo a passo para configurar no Netlify
 
-2. Instale as dependências:
+### 1. Deploy do projeto
+
+Se o site já está conectado ao GitHub no Netlify (como na captura que você mandou), basta dar `git push` — o Netlify já vai buildar com o `netlify.toml` que está na raiz do projeto (ele já configura build, functions e redirects, não precisa mexer em nada no painel do Netlify pra isso).
+
+### 2. Ativar o Netlify DB (Postgres/Neon)
+
+1. No painel do site no Netlify, vá em **Data & storage → Netlify Database** (aparece no menu lateral da sua captura de tela).
+2. Clique em **Enable/Create database** (ou **Connect**). O Netlify provisiona um banco Postgres (Neon) pra esse site automaticamente.
+3. Isso cria sozinho a variável de ambiente `NETLIFY_DATABASE_URL` (às vezes `NETLIFY_DATABASE_URL_UNPOOLED` também) nas **Environment variables** do site — não precisa copiar/colar nada manualmente.
+4. Pronto. A função `content.js` cria a tabela `site_content` sozinha na primeira chamada (não precisa rodar migration).
+
+> Se preferir pelo terminal: com o [Netlify CLI](https://docs.netlify.com/cli/get-started/) instalado e o projeto linkado (`netlify link`), rode `netlify db init` dentro da pasta do projeto.
+
+### 3. Ativar o Netlify Blobs
+
+Não precisa ativar nada manualmente — **Netlify Blobs já funciona automaticamente** para qualquer site hospedado no Netlify, sem configuração extra. As funções `upload.js` e `image.js` já usam `getStore()` sem precisar de token, porque isso só funciona quando a função roda dentro do Netlify.
+
+### 4. Configurar as variáveis de ambiente da senha do admin
+
+Vá em **Project configuration → Environment variables** e adicione:
+
+| Variável | Valor | Para que serve |
+|---|---|---|
+| `ADMIN_PASSWORD` | uma senha forte, ex: `RumoRota2026!` | senha para entrar em `/admin` |
+| `AUTH_SECRET` | uma string aleatória longa (ex: gere em https://generate-secret.vercel.app/32) | usada pra assinar o "token" de login, mantém a sessão do admin |
+
+Depois de adicionar, faça um **novo deploy** (Deploys → Trigger deploy) pra elas entrarem em vigor.
+
+### 5. Testar
+
+1. Acesse `https://SEU-SITE.netlify.app/admin`, entre com a `ADMIN_PASSWORD`.
+2. Edite os textos, troque logo/fotos, ajuste o WhatsApp e o preço.
+3. Clique em **Salvar alterações**.
+4. Acesse `https://SEU-SITE.netlify.app/` pra ver a página pública atualizada.
+
+### 6. Domínio
+
+Quando for atualizar o domínio próprio (ex: `rumomaisumarota.com.br`), configure em **Domain management** no painel do Netlify — não precisa mexer em nada no código.
+
+---
+
+## Rodar localmente (opcional, pra mexer no código)
+
 ```bash
 npm install
+npx netlify-cli dev
 ```
 
-3. Execute o projeto em modo de desenvolvimento:
-```bash
-npm run dev
-```
-
-4. Acesse `http://localhost:3000` no seu navegador
-
-## 🏗️ Scripts Disponíveis
-
-- `npm run dev` - Inicia o servidor de desenvolvimento
-- `npm run build` - Cria a build de produção
-- `npm run preview` - Visualiza a build de produção
-- `npm run lint` - Executa o linter
-
-## 📁 Estrutura do Projeto
-
-```
-src/
-├── components/          # Componentes React
-│   ├── Header.jsx      # Cabeçalho com navegação
-│   ├── Hero.jsx        # Seção principal
-│   ├── CarGallery.jsx  # Galeria de imagens
-│   ├── PrizeDetails.jsx # Detalhes dos prêmios
-│   └── ...
-├── assets/             # Imagens e vídeos
-│   ├── img/           # Imagens do projeto
-│   └── videos/        # Vídeos do projeto
-├── styles/            # Estilos globais
-│   └── index.css      # CSS principal com Tailwind
-├── hooks/             # Custom hooks
-├── utils/             # Funções utilitárias
-└── App.jsx            # Componente principal
-```
-
-## 🎨 Componentes Principais
-
-### Header
-- Navegação responsiva
-- Logo e branding
-- CTA principal
-- Menu mobile
-
-### Hero
-- Seção principal com call-to-action
-- Animações de entrada
-- Background com imagem do carro
-- Indicadores de confiança
-
-### CarGallery
-- Carrossel de imagens
-- Navegação por setas e dots
-- Auto-play com pausa no hover
-- Contador de imagens
-
-### PrizeDetails
-- Detalhes dos prêmios
-- Cards com informações
-- Alternativas em dinheiro
-- Bônus especial
-
-### VideoSection
-- Player de vídeo customizado
-- Controles personalizados
-- Analytics de reprodução
-- Informações sobre o vídeo
-
-## 🔧 Configuração
-
-### Analytics
-O projeto inclui integração com:
-- Google Analytics (gtag)
-- Facebook Pixel
-- Google Tag Manager
-
-### SEO
-- Meta tags otimizadas
-- Estrutura semântica
-- Open Graph tags
-- Schema markup
-
-## 📱 Responsividade
-
-O site é totalmente responsivo com breakpoints:
-- Mobile: < 640px
-- Tablet: 640px - 1024px
-- Desktop: > 1024px
-
-## 🚀 Deploy
-
-Para fazer deploy no GitHub Pages:
-
-1. Faça build do projeto:
-```bash
-npm run build
-```
-
-2. Configure o GitHub Pages para servir a pasta `dist`
-
-3. O site estará disponível em `https://seu-usuario.github.io/seuhyundaiteste`
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
-
-## 🤝 Contribuição
-
-Contribuições são bem-vindas! Por favor, abra uma issue ou pull request.
-
-## 📞 Contato
-
-- Email: contato@rumomaisumarota.com
-- Website: https://rumomaisumarota.com.br
-- Instagram: @rumomaisumarota
+O `netlify dev` sobe o site + as functions juntos (o simples `npm run dev` do Vite sobe só o front, sem as APIs).
+Pra ter banco/blobs funcionando localmente, rode `netlify link` primeiro (linkando com o site já criado no Netlify) — assim ele usa o mesmo banco/blobs de produção.

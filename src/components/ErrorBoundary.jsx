@@ -1,44 +1,27 @@
-import React from 'react'
+import { Component } from 'react'
 
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { hasError: false, error: null }
+export default class ErrorBoundary extends Component {
+  state = { hasError: false }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
   }
 
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error }
-  }
-
-  componentDidCatch(error, errorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo)
+  componentDidCatch(error, info) {
+    console.error('Erro na aplicação:', error, info)
   }
 
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full text-center">
-            <div className="text-red-500 text-6xl mb-4">⚠️</div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">
-              Ops! Algo deu errado
-            </h1>
-            <p className="text-gray-600 mb-6">
-              Ocorreu um erro inesperado. Por favor, recarregue a página.
-            </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-            >
-              Recarregar Página
-            </button>
+        <div className="flex min-h-screen items-center justify-center p-6 text-center">
+          <div>
+            <h1 className="text-xl font-bold text-navy-900">Algo deu errado.</h1>
+            <p className="mt-2 text-gray-600">Recarregue a página. Se o problema continuar, entre em contato.</p>
           </div>
         </div>
       )
     }
-
     return this.props.children
   }
 }
-
-export default ErrorBoundary

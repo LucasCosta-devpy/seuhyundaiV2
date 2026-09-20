@@ -1,55 +1,19 @@
-import React from 'react'
-import { motion } from 'framer-motion'
-import ErrorBoundary from './components/ErrorBoundary'
-import DebugInfo from './components/DebugInfo'
-import Header from './components/Header'
-import Hero from './components/Hero'
-import ParticipationLevels from './components/ParticipationLevels'
-import CarGallery from './components/CarGallery'
-import PrizeDetails from './components/PrizeDetails'
-import VideoSection from './components/VideoSection'
-import Testimonials from './components/Testimonials'
-import ImportantInfo from './components/ImportantInfo'
-import ExtraAction from './components/ExtraAction'
-import PreviousActions from './components/PreviousActions'
-import SocialMedia from './components/SocialMedia'
-import Footer from './components/Footer'
-import FloatingPromo from './components/FloatingPromo'
-import PromoModal from './components/PromoModal'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import PublicSite from './pages/PublicSite.jsx'
+import AdminLogin from './pages/AdminLogin.jsx'
+import AdminDashboard from './pages/AdminDashboard.jsx'
+import ErrorBoundary from './components/ErrorBoundary.jsx'
 
-function App() {
+export default function App() {
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        <Header />
-        
-        <main className="relative">
-          <Hero />
-          
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            className="space-y-16 py-16"
-          >
-            <ParticipationLevels />
-            <CarGallery />
-            <PrizeDetails />
-            <VideoSection />
-            <Testimonials />
-            <ImportantInfo />
-            <ExtraAction />
-            <PreviousActions />
-            <SocialMedia />
-          </motion.div>
-        </main>
-        
-        <Footer />
-        {/* <FloatingPromo /> - Desativado por enquanto */}
-        {/* <PromoModal /> - Desativado por enquanto */}
-      </div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<PublicSite />} />
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin/painel" element={<AdminDashboard />} />
+        </Routes>
+      </BrowserRouter>
     </ErrorBoundary>
   )
 }
-
-export default App
