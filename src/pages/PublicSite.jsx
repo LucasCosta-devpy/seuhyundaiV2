@@ -16,6 +16,21 @@ export default function PublicSite() {
       .finally(() => setLoading(false))
   }, [])
 
+  useEffect(() => {
+    if (content.brand?.name) {
+      document.title = `${content.brand.name} - ${content.brand.tagline || 'Consultoria de Viagens'}`
+    }
+    if (content.brand?.logoUrl) {
+      let link = document.querySelector("link[rel~='icon']")
+      if (!link) {
+        link = document.createElement('link')
+        link.rel = 'icon'
+        document.head.appendChild(link)
+      }
+      link.href = content.brand.logoUrl
+    }
+  }, [content.brand?.name, content.brand?.tagline, content.brand?.logoUrl])
+
   if (loading) {
     return <div className="flex min-h-screen items-center justify-center text-navy-700">Carregando…</div>
   }
