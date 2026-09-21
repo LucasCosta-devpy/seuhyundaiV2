@@ -1,10 +1,14 @@
-import { neon } from '@netlify/neon'
+import postgres from 'postgres'
 
 let sqlClient
 let ready
 
 function getSql() {
-  if (!sqlClient) sqlClient = neon()
+  if (!sqlClient) {
+    const connectionString = process.env.POSTGRES_URL || process.env.POSTGRES_URL_NON_POOLING
+    if (!connectionString) throw new Error('POSTGRES_URL não configurado')
+    sqlClient = postgres(connectionString, { ssl: 'require' })
+  }
   return sqlClient
 }
 

@@ -35,15 +35,8 @@ export function verifyToken(token) {
   return Number.isFinite(exp) && exp > Date.now()
 }
 
-export function requireAuth(request) {
-  const header = request.headers.get('authorization') || ''
+export function requireAuth(req) {
+  const header = req.headers.authorization || ''
   const token = header.replace(/^Bearer\s+/i, '')
   return verifyToken(token)
-}
-
-export function json(data, init = {}) {
-  return new Response(JSON.stringify(data), {
-    status: init.status || 200,
-    headers: { 'Content-Type': 'application/json', ...(init.headers || {}) },
-  })
 }

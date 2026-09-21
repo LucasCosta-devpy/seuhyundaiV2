@@ -456,11 +456,11 @@ function ImageField({ label, value, onChange, shape = 'photo' }) {
 
   async function handleRemove() {
     if (!value) return
-    if (!confirm('Remover esta imagem? Ela será apagada do armazenamento (Blobs).')) return
+    if (!confirm('Remover esta imagem? Ela será apagada do armazenamento.')) return
     setRemoving(true)
     try {
-      // só tenta apagar do Blobs se for uma imagem enviada por aqui (/api/image/...)
-      if (value.startsWith('/api/image/')) {
+      // só tenta apagar do storage se for uma imagem enviada por aqui (Supabase Storage)
+      if (value.includes('/storage/v1/object/public/')) {
         await deleteImage(value)
       }
       onChange('')
