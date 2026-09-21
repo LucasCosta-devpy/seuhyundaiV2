@@ -69,7 +69,17 @@ function LogoImage({ url, name, scale, offsetX, offsetY, className }) {
   )
 }
 
+const NAV_LINKS = [
+  { href: '#sobre', label: 'Sobre' },
+  { href: '#destinos', label: 'Destinos' },
+  { href: '#servicos', label: 'Serviços' },
+  { href: '#consultora', label: 'Consultora' },
+  { href: '#contato', label: 'Contato' },
+]
+
 function Header({ brand }) {
+  const [menuOpen, setMenuOpen] = useState(false)
+
   return (
     <header className="border-b border-gray-100 bg-white/90 backdrop-blur sticky top-0 z-40">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
@@ -88,10 +98,49 @@ function Header({ brand }) {
           )}
           <span className="font-serif font-semibold text-navy-900">{brand.name}</span>
         </div>
-        <WhatsAppLink whatsapp={brand.whatsapp} className="btn-navy !py-2 !px-4 text-sm hidden sm:inline-flex">
-          Falar no WhatsApp
-        </WhatsAppLink>
+
+        <nav className="hidden items-center gap-6 lg:flex">
+          {NAV_LINKS.map((link) => (
+            <a key={link.href} href={link.href} className="text-sm font-medium text-navy-700 transition-colors hover:text-gold-600">
+              {link.label}
+            </a>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-2">
+          <WhatsAppLink whatsapp={brand.whatsapp} className="btn-navy !py-2 !px-4 text-sm hidden sm:inline-flex">
+            Falar no WhatsApp
+          </WhatsAppLink>
+          <button
+            type="button"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="Abrir menu"
+            className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 text-navy-800 lg:hidden"
+          >
+            {menuOpen ? '✕' : '☰'}
+          </button>
+        </div>
       </div>
+
+      {menuOpen && (
+        <nav className="border-t border-gray-100 bg-white px-4 py-3 lg:hidden">
+          <div className="flex flex-col gap-1">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm font-medium text-navy-700 hover:bg-navy-50"
+              >
+                {link.label}
+              </a>
+            ))}
+            <WhatsAppLink whatsapp={brand.whatsapp} className="btn-navy mt-2 !py-2 !px-4 text-center text-sm">
+              Falar no WhatsApp
+            </WhatsAppLink>
+          </div>
+        </nav>
+      )}
     </header>
   )
 }
@@ -146,7 +195,7 @@ function Hero({ brand, hero, destinationGroups }) {
 
 function About({ about }) {
   return (
-    <section className="mx-auto max-w-3xl px-4 py-14 text-center sm:px-6">
+    <section id="sobre" className="mx-auto max-w-3xl scroll-mt-20 px-4 py-14 text-center sm:px-6">
       <h2 className="section-title">{about.title}</h2>
       <div className="mt-6 space-y-4 text-gray-600">
         {(about.paragraphs || []).map((p, i) => (
@@ -201,7 +250,7 @@ function DestinationCarousel({ images, name }) {
 
 function Destinations({ groups }) {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+    <section id="destinos" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-10 sm:px-6">
       {(groups || []).map((group) => (
         <div key={group.region} className="mb-12">
           <h3 className="mb-5 border-l-4 border-gold-400 pl-3 font-serif text-2xl font-bold text-navy-900">
@@ -235,7 +284,7 @@ function Destinations({ groups }) {
 
 function Services({ services }) {
   return (
-    <section className="bg-navy-50 py-14">
+    <section id="servicos" className="scroll-mt-20 bg-navy-50 py-14">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
         <h2 className="section-title">O Que Nós Ajudamos a Organizar</h2>
         <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -312,7 +361,7 @@ function Pricing({ pricing, brand }) {
 
 function Consultant({ consultant }) {
   return (
-    <section className="bg-navy-50 py-16">
+    <section id="consultora" className="scroll-mt-20 bg-navy-50 py-16">
       <div className="mx-auto max-w-2xl px-4 text-center sm:px-6">
         <h2 className="section-title">Conheça a Consultora</h2>
         <div className="mt-8">
@@ -340,7 +389,7 @@ function Consultant({ consultant }) {
 
 function CTA({ cta, brand }) {
   return (
-    <section className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6">
+    <section id="contato" className="mx-auto max-w-3xl scroll-mt-20 px-4 py-16 text-center sm:px-6">
       <div className="card p-10">
         <h2 className="section-title">{cta.title}</h2>
         <p className="mx-auto mt-4 max-w-xl text-gray-600">{cta.desc}</p>
