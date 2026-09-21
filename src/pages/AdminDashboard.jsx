@@ -4,6 +4,7 @@ import { getContent, saveContent, uploadImage, deleteImage, clearToken, getToken
 import { defaultContent } from '../lib/defaultContent.js'
 import { LOGO_SIZES, getLogoSize } from '../lib/logoSize.js'
 import { SOCIAL_PLATFORMS, getPlatform } from '../components/SocialIcons.jsx'
+import ImageCropEditor from '../components/ImageCropEditor.jsx'
 
 const TABS = [
   { key: 'marca', label: 'Marca e Contato', color: 'amber' },
@@ -415,15 +416,35 @@ const IMAGE_PREVIEW_STYLES = {
   photo: 'h-20 w-28 rounded-lg object-cover border border-gray-200',
 }
 
+const IMAGE_ASPECT = {
+  logo: { ratio: 1, editorShape: 'circle' },
+  avatar: { ratio: 1, editorShape: 'circle' },
+  photo: { ratio: 4 / 3, editorShape: 'rect' },
+}
+
 function ImageField({ label, value, onChange, shape = 'photo' }) {
   const [uploading, setUploading] = useState(false)
   const [removing, setRemoving] = useState(false)
+  const [editingSrc, setEditingSrc] = useState(null)
+  const aspect = IMAGE_ASPECT[shape] || IMAGE_ASPECT.photo
 
-  async function handleFile(e) {
+  function handleFileSelect(e) {
     const file = e.target.files?.[0]
     if (!file) return
+    setEditingSrc(URL.createObjectURL(file))
+    e.target.value = ''
+  }
+
+  function handleAdjustExisting() {
+    if (!value) return
+    setEditingSrc(value)
+  }
+
+  async function handleCropConfirm(blob) {
+    setEditingSrc(null)
     setUploading(true)
     try {
+      const file = new File([blob], 'imagem.jpg', { type: 'image/jpeg' })
       const url = await uploadImage(file)
       onChange(url)
     } catch (err) {
@@ -463,8 +484,13 @@ function ImageField({ label, value, onChange, shape = 'photo' }) {
           </div>
         )}
         <div className="flex flex-col gap-1">
-          <input type="file" accept="image/*" onChange={handleFile} disabled={uploading || removing} className="text-sm" />
+          <input type="file" accept="image/*" onChange={handleFileSelect} disabled={uploading || removing} className="text-sm" />
           {uploading && <span className="text-xs text-gray-500">Enviando…</span>}
+          {value && !uploading && (
+            <button type="button" onClick={handleAdjustExisting} className="text-left text-xs font-semibold text-navy-700 hover:underline">
+              Ajustar enquadramento
+            </button>
+          )}
         </div>
         {value && !uploading && (
           <button
@@ -477,6 +503,16 @@ function ImageField({ label, value, onChange, shape = 'photo' }) {
           </button>
         )}
       </div>
+
+      {editingSrc && (
+        <ImageCropEditor
+          src={editingSrc}
+          aspectRatio={aspect.ratio}
+          shape={aspect.editorShape}
+          onConfirm={handleCropConfirm}
+          onCancel={() => setEditingSrc(null)}
+        />
+      )}
     </div>
   )
 }
@@ -676,6 +712,75 @@ function SocialLinksEditor({ items, onChange }) {
   )
 }
 
+function DestinationImagesEditor({ item, onUpdate }) {
+  const mode = item.imageMode === 'carousel' ? 'carousel' : 'single'
+  const images = item.images || []
+
+  function setMode(nextMode) {
+    onUpdate('imageMode', nextMode)
+    if (nextMode === 'carousel' && images.length === 0 && item.imageUrl) {
+      onUpdate('images', [item.imageUrl])
+    }
+  }
+
+  function updateImage(i, url) {
+    const next = [...images]
+    next[i] = url
+    onUpdate('images', next.filter(Boolean))
+  }
+  function removeImage(i) {
+    onUpdate('images', images.filter((_, idx) => idx !== i))
+  }
+  function addImage() {
+    onUpdate('images', [...images, ''])
+  }
+
+  return (
+    <div>
+      <p className="label !mb-2">Foto(s) do destino</p>
+      <div className="mb-3 flex gap-2">
+        <button
+          type="button"
+          onClick={() => setMode('single')}
+          className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
+            mode === 'single' ? 'border-navy-800 bg-navy-800 text-white' : 'border-gray-300 text-gray-600 hover:border-navy-400'
+          }`}
+        >
+          Única imagem
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode('carousel')}
+          className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
+            mode === 'carousel' ? 'border-navy-800 bg-navy-800 text-white' : 'border-gray-300 text-gray-600 hover:border-navy-400'
+          }`}
+        >
+          Carrossel (várias fotos)
+        </button>
+      </div>
+
+      {mode === 'single' ? (
+        <ImageField label="Foto" shape="photo" value={item.imageUrl} onChange={(v) => onUpdate('imageUrl', v)} />
+      ) : (
+        <div className="space-y-3">
+          {images.map((url, i) => (
+            <div key={i} className="rounded-lg border border-gray-200 p-3">
+              <ImageField label={`Foto ${i + 1} do carrossel`} shape="photo" value={url} onChange={(v) => updateImage(i, v)} />
+              <button onClick={() => removeImage(i)} className="mt-2 text-xs font-semibold text-red-500 hover:text-red-700">
+                Remover esta foto do carrossel
+              </button>
+            </div>
+          ))}
+          <button onClick={addImage} className="text-sm font-semibold text-navy-700 hover:underline">+ Adicionar foto ao carrossel</button>
+          {images.length <= 1 && (
+            <p className="text-xs text-gray-400">Adicione pelo menos 2 fotos pra o carrossel aparecer com setas de navegação no site.</p>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function DestinationGroupsEditor({ groups, onChange }) {
   const [openIndex, setOpenIndex] = useState(0)
 
@@ -704,7 +809,7 @@ function DestinationGroupsEditor({ groups, onChange }) {
   }
   function addItem(gi) {
     const next = [...groups]
-    next[gi] = { ...next[gi], items: [...next[gi].items, { name: '', desc: '', imageUrl: '' }] }
+    next[gi] = { ...next[gi], items: [...next[gi].items, { name: '', desc: '', imageUrl: '', imageMode: 'single', images: [] }] }
     onChange(next)
   }
 
@@ -747,7 +852,10 @@ function DestinationGroupsEditor({ groups, onChange }) {
                         <TextArea label="Descrição" value={item.desc} onChange={(v) => updateItem(gi, ii, 'desc', v)} />
                       </div>
                       <div className="mt-2">
-                        <ImageField label="Foto" shape="photo" value={item.imageUrl} onChange={(v) => updateItem(gi, ii, 'imageUrl', v)} />
+                        <DestinationImagesEditor
+                          item={item}
+                          onUpdate={(field, v) => updateItem(gi, ii, field, v)}
+                        />
                       </div>
                       <button onClick={() => removeItem(gi, ii)} className="mt-2 text-sm text-red-500 hover:text-red-700">Remover destino</button>
                     </div>

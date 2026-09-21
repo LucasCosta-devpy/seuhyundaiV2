@@ -157,6 +157,48 @@ function About({ about }) {
   )
 }
 
+function DestinationCarousel({ images, name }) {
+  const [index, setIndex] = useState(0)
+  function prev(e) {
+    e.preventDefault()
+    e.stopPropagation()
+    setIndex((i) => (i - 1 + images.length) % images.length)
+  }
+  function next(e) {
+    e.preventDefault()
+    e.stopPropagation()
+    setIndex((i) => (i + 1) % images.length)
+  }
+  return (
+    <div className="group relative h-full w-full">
+      <img src={images[index]} alt={name} className="h-full w-full object-cover" />
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={prev}
+            aria-label="Foto anterior"
+            className="absolute left-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100"
+          >
+            ‹
+          </button>
+          <button
+            onClick={next}
+            aria-label="Próxima foto"
+            className="absolute right-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100"
+          >
+            ›
+          </button>
+          <div className="absolute bottom-1.5 left-1/2 flex -translate-x-1/2 gap-1">
+            {images.map((_, i) => (
+              <span key={i} className={`h-1.5 w-1.5 rounded-full ${i === index ? 'bg-white' : 'bg-white/50'}`} />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 function Destinations({ groups }) {
   return (
     <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
@@ -166,21 +208,24 @@ function Destinations({ groups }) {
             {group.region}
           </h3>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {(group.items || []).map((item) => (
-              <div key={item.name} id={slugify(item.name)} className="card scroll-mt-28 overflow-hidden">
-                <div className="flex h-40 items-center justify-center bg-gradient-to-br from-navy-50 to-gray-100 text-gray-400">
-                  {item.imageUrl ? (
-                    <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />
-                  ) : (
-                    <span className="text-sm">Sem foto</span>
-                  )}
+            {(group.items || []).map((item) => {
+              const images = item.imageMode === 'carousel' ? (item.images || []).filter(Boolean) : item.imageUrl ? [item.imageUrl] : []
+              return (
+                <div key={item.name} id={slugify(item.name)} className="card scroll-mt-28 overflow-hidden">
+                  <div className="flex h-40 items-center justify-center bg-gradient-to-br from-navy-50 to-gray-100 text-gray-400">
+                    {images.length > 0 ? (
+                      <DestinationCarousel images={images} name={item.name} />
+                    ) : (
+                      <span className="text-sm">Sem foto</span>
+                    )}
+                  </div>
+                  <div className="border-t-2 border-gold-400 p-4">
+                    <h4 className="font-serif text-lg font-bold text-navy-900">{item.name}</h4>
+                    <p className="mt-1 text-sm text-gray-600">{item.desc}</p>
+                  </div>
                 </div>
-                <div className="border-t-2 border-gold-400 p-4">
-                  <h4 className="font-serif text-lg font-bold text-navy-900">{item.name}</h4>
-                  <p className="mt-1 text-sm text-gray-600">{item.desc}</p>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       ))}
