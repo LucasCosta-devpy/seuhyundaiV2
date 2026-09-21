@@ -40,7 +40,7 @@ export async function writeContent(data) {
   const sql = getSql()
   await sql`
     INSERT INTO site_content (id, data, updated_at)
-    VALUES (1, ${JSON.stringify(data)}::jsonb, now())
+    VALUES (1, ${sql.json(data)}, now())
     ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = now()
   `
 }
