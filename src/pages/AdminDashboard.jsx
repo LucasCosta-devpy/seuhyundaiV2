@@ -218,7 +218,7 @@ export default function AdminDashboard() {
           {activeTab === 'consultora' && (
             <Panel title="Consultora(a)">
               <TextField label="Nome" value={content.consultant.name} onChange={(v) => update(['consultant', 'name'], v)} />
-              <ImageField label="Foto" shape="avatar" value={content.consultant.photoUrl} onChange={(v) => update(['consultant', 'photoUrl'], v)} />
+              <ImageField label="Foto" shape="portrait" value={content.consultant.photoUrl} onChange={(v) => update(['consultant', 'photoUrl'], v)} />
               <TextArea label="Biografia" value={content.consultant.bio} onChange={(v) => update(['consultant', 'bio'], v)} />
               <TextField label="Frase de destaque" value={content.consultant.quote} onChange={(v) => update(['consultant', 'quote'], v)} />
             </Panel>
@@ -413,12 +413,14 @@ function LogoSizeField({ logoUrl, value, onChange, scale, onScaleChange, offsetX
 const IMAGE_PREVIEW_STYLES = {
   logo: 'h-24 w-24 rounded-full object-contain bg-white border border-gray-200 p-1',
   avatar: 'h-20 w-20 rounded-full object-cover border border-gray-200',
+  portrait: 'h-28 w-24 rounded-lg object-cover border border-gray-200',
   photo: 'h-20 w-28 rounded-lg object-cover border border-gray-200',
 }
 
 const IMAGE_ASPECT = {
   logo: { ratio: 1, editorShape: 'circle' },
   avatar: { ratio: 1, editorShape: 'circle' },
+  portrait: { ratio: 3 / 4, editorShape: 'rect' },
   photo: { ratio: 4 / 3, editorShape: 'rect' },
 }
 

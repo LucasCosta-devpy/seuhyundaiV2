@@ -317,9 +317,13 @@ function Consultant({ consultant }) {
         <h2 className="section-title">Conheça a Consultora</h2>
         <div className="mt-8">
           {consultant.photoUrl ? (
-            <img src={consultant.photoUrl} alt={consultant.name} className="mx-auto h-28 w-28 rounded-full border-4 border-gold-300 object-cover shadow" />
+            <img
+              src={consultant.photoUrl}
+              alt={consultant.name}
+              className="mx-auto h-80 w-64 rounded-2xl border-4 border-gold-300 object-cover shadow-lg sm:h-96 sm:w-72"
+            />
           ) : (
-            <div className="mx-auto h-28 w-28 rounded-full border-4 border-gold-300 flex items-center justify-center text-3xl font-serif font-bold text-gold-600">
+            <div className="mx-auto flex h-80 w-64 items-center justify-center rounded-2xl border-4 border-gold-300 text-3xl font-serif font-bold text-gold-600 sm:h-96 sm:w-72">
               {consultant.name?.[0]}
             </div>
           )}
