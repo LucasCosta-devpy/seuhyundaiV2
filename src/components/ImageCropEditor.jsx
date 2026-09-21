@@ -21,7 +21,8 @@ export default function ImageCropEditor({ src, aspectRatio = 1, shape = 'rect', 
     img.onload = () => {
       if (cancelled) return
       imgRef.current = img
-      const bs = Math.max(PREVIEW_W / img.width, previewH / img.height)
+      // "contain": a imagem inteira cabe no quadro, sem cortar nada (pode sobrar espaço vazio nas bordas)
+      const bs = Math.min(PREVIEW_W / img.width, previewH / img.height)
       const w = img.width * bs
       const h = img.height * bs
       setBaseScale(bs)
@@ -46,7 +47,8 @@ export default function ImageCropEditor({ src, aspectRatio = 1, shape = 'rect', 
     canvas.width = PREVIEW_W
     canvas.height = previewH
     const ctx = canvas.getContext('2d')
-    ctx.clearRect(0, 0, PREVIEW_W, previewH)
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(0, 0, PREVIEW_W, previewH)
     const w = img.width * baseScale * scale
     const h = img.height * baseScale * scale
     ctx.drawImage(img, pos.x, pos.y, w, h)
@@ -57,12 +59,10 @@ export default function ImageCropEditor({ src, aspectRatio = 1, shape = 'rect', 
     if (!img) return next
     const w = img.width * baseScale * currentScale
     const h = img.height * baseScale * currentScale
-    const minX = PREVIEW_W - w
-    const minY = previewH - h
-    return {
-      x: Math.min(0, Math.max(minX, next.x)),
-      y: Math.min(0, Math.max(minY, next.y)),
-    }
+    // se a imagem é menor que o quadro numa dimensão, centraliza nela (não deixa arrastar à toa)
+    const x = w <= PREVIEW_W ? (PREVIEW_W - w) / 2 : Math.min(0, Math.max(PREVIEW_W - w, next.x))
+    const y = h <= previewH ? (previewH - h) / 2 : Math.min(0, Math.max(previewH - h, next.y))
+    return { x, y }
   }
 
   function handlePointerDown(e) {
@@ -95,6 +95,8 @@ export default function ImageCropEditor({ src, aspectRatio = 1, shape = 'rect', 
     canvas.width = EXPORT_W
     canvas.height = exportH
     const ctx = canvas.getContext('2d')
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(0, 0, EXPORT_W, exportH)
     const w = img.width * baseScale * scale * factor
     const h = img.height * baseScale * scale * factor
     ctx.drawImage(img, pos.x * factor, pos.y * factor, w, h)
@@ -112,7 +114,9 @@ export default function ImageCropEditor({ src, aspectRatio = 1, shape = 'rect', 
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
         <h3 className="mb-1 font-serif text-lg font-bold text-navy-900">Ajustar imagem</h3>
-        <p className="mb-3 text-xs text-gray-400">Arraste a imagem pra posicionar e use o zoom pra escolher o enquadramento. Salva já no tamanho certo.</p>
+        <p className="mb-3 text-xs text-gray-400">
+          A imagem começa inteira, sem cortar nada. Se quiser aproximar/cortar, use o zoom e arraste pra posicionar.
+        </p>
 
         {ready ? (
           <div
@@ -146,6 +150,10 @@ export default function ImageCropEditor({ src, aspectRatio = 1, shape = 'rect', 
             disabled={!ready}
             className="w-full"
           />
+          <div className="flex justify-between text-xs text-gray-400">
+            <span>Imagem inteira</span>
+            <span>Aproximar / cortar</span>
+          </div>
         </div>
 
         <div className="mt-5 flex justify-end gap-2">
