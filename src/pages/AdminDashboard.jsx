@@ -459,8 +459,8 @@ function ImageField({ label, value, onChange, shape = 'photo' }) {
     if (!confirm('Remover esta imagem? Ela será apagada do armazenamento.')) return
     setRemoving(true)
     try {
-      // só tenta apagar do storage se for uma imagem enviada por aqui (Supabase Storage)
-      if (value.includes('/storage/v1/object/public/')) {
+      // só tenta apagar do storage se for uma imagem enviada por aqui (Vercel Blob)
+      if (value.includes('.blob.vercel-storage.com')) {
         await deleteImage(value)
       }
       onChange('')
