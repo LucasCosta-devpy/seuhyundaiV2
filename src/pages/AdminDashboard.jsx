@@ -781,19 +781,8 @@ function SubregionsEditor({ item, onUpdate }) {
     onUpdate('subregions', subregions.filter((_, i) => i !== si))
   }
   function addSub() {
-    onUpdate('subregions', [...subregions, { name: '', cities: [] }])
+    onUpdate('subregions', [...subregions, { name: '', desc: '', imageUrl: '' }])
     setExpanded(true)
-  }
-  function updateCity(si, ci, field, v) {
-    const cities = [...(subregions[si].cities || [])]
-    cities[ci] = { ...cities[ci], [field]: v }
-    updateSub(si, 'cities', cities)
-  }
-  function removeCity(si, ci) {
-    updateSub(si, 'cities', (subregions[si].cities || []).filter((_, i) => i !== ci))
-  }
-  function addCity(si) {
-    updateSub(si, 'cities', [...(subregions[si].cities || []), { name: '', desc: '' }])
   }
 
   return (
@@ -803,18 +792,18 @@ function SubregionsEditor({ item, onUpdate }) {
         onClick={() => setExpanded((v) => !v)}
         className="text-xs font-semibold text-navy-700 hover:underline"
       >
-        {expanded ? '− Ocultar sub-regiões e cidades' : '+ Detalhar por sub-região/estado (Norte, Sul...) e cidades'}
+        {expanded ? '− Ocultar sub-cards' : '+ Adicionar sub-cards (ex: Nordeste, Aracaju/SE)'}
       </button>
 
       {expanded && (
         <div className="mt-2 space-y-3 border-l-2 border-gray-200 pl-3">
-          <p className="text-xs text-gray-400">Opcional: use isso pra dividir um país/destino grande em sub-regiões (ex: Norte, Sul, um estado) e listar as cidades de cada uma.</p>
+          <p className="text-xs text-gray-400">Opcional: use isso pra mostrar áreas específicas dentro deste destino, cada uma com seu próprio nome, descrição e foto.</p>
           {subregions.map((sub, si) => (
             <div key={si} className="rounded-lg border border-gray-200 bg-white p-3">
               <div className="flex items-center gap-2">
                 <input
                   className="input flex-1 text-sm"
-                  placeholder="Nome da sub-região (ex: Norte, São Paulo...)"
+                  placeholder="Nome (ex: Nordeste, Aracaju/SE)"
                   value={sub.name}
                   onChange={(e) => updateSub(si, 'name', e.target.value)}
                 />
@@ -824,34 +813,17 @@ function SubregionsEditor({ item, onUpdate }) {
               <textarea
                 className="input mt-2 text-sm"
                 rows={2}
-                placeholder="Descrição desta sub-região (opcional)"
+                placeholder="Descrição (opcional)"
                 value={sub.desc || ''}
                 onChange={(e) => updateSub(si, 'desc', e.target.value)}
               />
 
-              <div className="mt-2 space-y-1.5">
-                {(sub.cities || []).map((city, ci) => (
-                  <div key={ci} className="flex gap-1.5">
-                    <input
-                      className="input flex-1 text-sm"
-                      placeholder="Cidade"
-                      value={city.name}
-                      onChange={(e) => updateCity(si, ci, 'name', e.target.value)}
-                    />
-                    <input
-                      className="input flex-1 text-sm"
-                      placeholder="Descrição curta (opcional)"
-                      value={city.desc}
-                      onChange={(e) => updateCity(si, ci, 'desc', e.target.value)}
-                    />
-                    <button onClick={() => removeCity(si, ci)} className="text-red-500 hover:text-red-700">×</button>
-                  </div>
-                ))}
-                <button onClick={() => addCity(si)} className="text-xs font-semibold text-navy-700 hover:underline">+ Adicionar cidade</button>
+              <div className="mt-2">
+                <ImageField label="Foto (opcional)" shape="photo" value={sub.imageUrl} onChange={(v) => updateSub(si, 'imageUrl', v)} />
               </div>
             </div>
           ))}
-          <button onClick={addSub} className="text-xs font-semibold text-navy-700 hover:underline">+ Adicionar sub-região/estado</button>
+          <button onClick={addSub} className="text-xs font-semibold text-navy-700 hover:underline">+ Adicionar sub-card</button>
         </div>
       )}
     </div>
@@ -967,7 +939,7 @@ function DestinationGroupsEditor({ groups, onChange }) {
                     + Adicionar novo destino/país nesta região
                   </button>
                   <p className="text-xs text-gray-400">
-                    Isso cria um card irmão (ex: outro país). Pra dividir um destino já existente em sub-áreas (Norte, Sul, um estado), abra o destino e use &ldquo;Detalhar por sub-região/estado&rdquo; — não use este botão pra isso.
+                    Isso cria um card irmão (ex: outro país). Pra dividir um destino já existente em áreas menores (ex: Nordeste, Aracaju/SE), abra o destino e use &ldquo;Adicionar sub-cards&rdquo; — não use este botão pra isso.
                   </p>
                 </div>
               </div>

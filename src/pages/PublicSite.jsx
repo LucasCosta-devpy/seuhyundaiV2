@@ -263,7 +263,7 @@ function DestinationCard({ item }) {
   const subregions = (item.subregions || []).filter((s) => s.name)
   const hasSubregions = subregions.length > 0
   const [activeSub, setActiveSub] = useState(0)
-  const activeCities = subregions[activeSub]?.cities?.filter((c) => c.name) || []
+  const activeSubregion = subregions[activeSub]
 
   return (
     <div id={slugify(item.name)} className="card scroll-mt-28 overflow-hidden">
@@ -294,21 +294,15 @@ function DestinationCard({ item }) {
                 </button>
               ))}
             </div>
-            {subregions[activeSub]?.desc && (
-              <p className="mt-2 text-sm text-gray-600">{subregions[activeSub].desc}</p>
+            {activeSubregion?.imageUrl && (
+              <img
+                src={activeSubregion.imageUrl}
+                alt={activeSubregion.name}
+                className="mt-3 h-28 w-full rounded-lg object-cover"
+              />
             )}
-            {activeCities.length > 0 && (
-              <ul className="mt-3 space-y-1.5 text-sm text-navy-800">
-                {activeCities.map((city) => (
-                  <li key={city.name} className="flex gap-1.5">
-                    <span className="text-gold-500">•</span>
-                    <span>
-                      <strong className="font-semibold">{city.name}</strong>
-                      {city.desc && <span className="text-gray-600"> — {city.desc}</span>}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+            {activeSubregion?.desc && (
+              <p className="mt-2 text-sm text-gray-600">{activeSubregion.desc}</p>
             )}
           </div>
         )}
