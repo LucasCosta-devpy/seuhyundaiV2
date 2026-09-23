@@ -263,15 +263,23 @@ function Destinations({ groups }) {
             {(group.items || []).map((item) => {
               const images = item.imageMode === 'carousel' ? (item.images || []).filter(Boolean) : item.imageUrl ? [item.imageUrl] : []
               return (
-                <div key={item.name} id={slugify(item.name)} className="card scroll-mt-28 overflow-hidden">
-                  <div className="flex h-40 items-center justify-center bg-gradient-to-br from-navy-50 to-gray-100 text-gray-400">
+                <div key={item.name} id={slugify(item.name)} className="card group relative scroll-mt-28 overflow-visible hover:z-20">
+                  <div className="relative flex h-40 items-center justify-center overflow-hidden rounded-t-2xl bg-gradient-to-br from-navy-50 to-gray-100 text-gray-400">
                     {images.length > 0 ? (
                       <DestinationCarousel images={images} name={item.name} />
                     ) : (
                       <span className="text-sm">Sem foto</span>
                     )}
                   </div>
-                  <div className="border-t-2 border-gold-400 p-4">
+                  {images.length > 0 && (
+                    <img
+                      src={images[0]}
+                      alt=""
+                      aria-hidden="true"
+                      className="pointer-events-none absolute left-1/2 top-20 z-30 max-h-64 w-auto max-w-[85vw] -translate-x-1/2 -translate-y-1/2 scale-90 rounded-xl border-4 border-white bg-white object-contain opacity-0 shadow-2xl transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 sm:max-w-xs"
+                    />
+                  )}
+                  <div className="rounded-b-2xl border-t-2 border-gold-400 bg-white p-4">
                     <h4 className="font-serif text-lg font-bold text-navy-900">{item.name}</h4>
                     <p className="mt-1 text-sm text-gray-600">{item.desc}</p>
                   </div>
