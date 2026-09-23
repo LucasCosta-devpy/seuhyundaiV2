@@ -9,7 +9,6 @@ import ImageCropEditor from '../components/ImageCropEditor.jsx'
 const TABS = [
   { key: 'marca', label: 'Marca e Contato', color: 'amber' },
   { key: 'social', label: 'Redes Sociais', color: 'pink' },
-  { key: 'destaques', label: 'Destaques', color: 'sky' },
   { key: 'sobre', label: 'Sobre', color: 'emerald' },
   { key: 'destinos', label: 'Destinos', color: 'rose' },
   { key: 'servicos', label: 'Serviços', color: 'violet' },
@@ -159,16 +158,6 @@ export default function AdminDashboard() {
             </Panel>
           )}
 
-          {activeTab === 'destaques' && (
-            <Panel title="Destaques (tags abaixo do título)">
-              <TagListEditor
-                items={content.hero.countryTags}
-                onChange={(v) => update(['hero', 'countryTags'], v)}
-                destinationNames={flattenDestinationNames(content.destinationGroups)}
-              />
-            </Panel>
-          )}
-
           {activeTab === 'sobre' && (
             <Panel title="Sobre">
               <TextField label="Título" value={content.about.title} onChange={(v) => update(['about', 'title'], v)} />
@@ -181,6 +170,9 @@ export default function AdminDashboard() {
 
           {activeTab === 'destinos' && (
             <Panel title="Destinos (agrupados por região)">
+              <p className="-mt-2 mb-2 text-xs text-gray-400">
+                Os botões que aparecem no topo do site (embaixo do título) são gerados automaticamente a partir do nome de cada região aqui embaixo — adicionar ou remover uma região adiciona ou remove o botão sozinho, sem precisar configurar em outro lugar.
+              </p>
               <DestinationGroupsEditor
                 groups={content.destinationGroups}
                 onChange={(v) => update(['destinationGroups'], v)}
@@ -247,16 +239,6 @@ export default function AdminDashboard() {
       </div>
     </div>
   )
-}
-
-function flattenDestinationNames(groups) {
-  const names = []
-  for (const group of groups || []) {
-    for (const item of group.items || []) {
-      if (item.name) names.push(item.name)
-    }
-  }
-  return names
 }
 
 function setDeep(obj, path, value) {
@@ -522,69 +504,6 @@ function ImageField({ label, value, onChange, shape = 'photo' }) {
   )
 }
 
-function TagListEditor({ items, onChange, destinationNames = [] }) {
-  const available = destinationNames.filter((name) => !(items || []).includes(name))
-  const [selected, setSelected] = useState('')
-  const [customMode, setCustomMode] = useState(available.length === 0)
-  const [customTag, setCustomTag] = useState('')
-
-  function addSelected() {
-    if (!selected) return
-    onChange([...(items || []), selected])
-    setSelected('')
-  }
-  function addCustom() {
-    if (!customTag.trim()) return
-    onChange([...(items || []), customTag.trim()])
-    setCustomTag('')
-  }
-  function removeTag(i) {
-    onChange(items.filter((_, idx) => idx !== i))
-  }
-
-  return (
-    <div>
-      <div className="mb-3 flex flex-wrap gap-2">
-        {(items || []).map((tag, i) => (
-          <span key={i} className="flex items-center gap-1 rounded-full bg-navy-100 px-3 py-1 text-sm text-navy-800">
-            {tag}
-            <button onClick={() => removeTag(i)} className="text-navy-500 hover:text-red-600">×</button>
-          </span>
-        ))}
-      </div>
-
-      {!customMode ? (
-        <div className="flex gap-2">
-          <select className="input" value={selected} onChange={(e) => setSelected(e.target.value)}>
-            <option value="">Selecione um destino já cadastrado…</option>
-            {available.map((name) => (
-              <option key={name} value={name}>{name}</option>
-            ))}
-          </select>
-          <button onClick={addSelected} className="btn-navy !py-2 !px-4 text-sm whitespace-nowrap">Adicionar</button>
-        </div>
-      ) : (
-        <div className="flex gap-2">
-          <input className="input" value={customTag} onChange={(e) => setCustomTag(e.target.value)} placeholder="Nome da tag" />
-          <button onClick={addCustom} className="btn-navy !py-2 !px-4 text-sm whitespace-nowrap">Adicionar</button>
-        </div>
-      )}
-
-      {available.length > 0 && (
-        <button
-          type="button"
-          onClick={() => setCustomMode((v) => !v)}
-          className="mt-2 text-xs font-semibold text-navy-700 hover:underline"
-        >
-          {customMode ? 'Escolher da lista de destinos cadastrados' : 'Ou digitar um texto livre (não vai virar link)'}
-        </button>
-      )}
-      <p className="mt-2 text-xs text-gray-400">
-        Escolhendo da lista, a tag já sai clicável e leva direto pro destino certo na página.
-      </p>
-    </div>
-  )
-}
 
 function ParagraphListEditor({ items, onChange }) {
   function update(i, v) {

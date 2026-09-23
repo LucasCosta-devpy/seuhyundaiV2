@@ -14,14 +14,6 @@ export const defaultContent = {
   socialLinks: [
     { platform: 'instagram', name: 'Instagram', url: 'https://instagram.com/rumomaisumarota', iconUrl: '' },
   ],
-  hero: {
-    countryTags: [
-      'Brasil', 'Argentina', 'Uruguai', 'Chile', 'Venezuela', 'Guianas',
-      'Portugal', 'Espanha', 'França', 'Itália', 'Alemanha', 'Polônia',
-      'Eslováquia', 'Hungria', 'Suíça', 'Áustria', 'Países Baixos',
-      'Bélgica', 'Reino Unido', 'Marrocos',
-    ],
-  },
   about: {
     title: 'Nossa Experiência, O Seu Guia Perfeito',
     paragraphs: [

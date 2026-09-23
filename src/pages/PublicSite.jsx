@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { getContent } from '../lib/api.js'
 import { defaultContent } from '../lib/defaultContent.js'
 import { WhatsAppFloatButton, WhatsAppLink, formatPhoneDisplay } from '../components/WhatsAppButton.jsx'
-import { slugify, findDestinationSlug } from '../lib/slug.js'
+import { slugify } from '../lib/slug.js'
 import { getLogoSize } from '../lib/logoSize.js'
 import { getPlatform } from '../components/SocialIcons.jsx'
 
@@ -36,12 +36,12 @@ export default function PublicSite() {
     return <div className="flex min-h-screen items-center justify-center text-navy-700">Carregando…</div>
   }
 
-  const { brand, hero, about, destinationGroups, services, reasons, process, pricing, consultant, cta, footer, socialLinks } = content
+  const { brand, about, destinationGroups, services, reasons, process, pricing, consultant, cta, footer, socialLinks } = content
 
   return (
     <div className="min-h-screen bg-white">
       <Header brand={brand} />
-      <Hero brand={brand} hero={hero} destinationGroups={destinationGroups} />
+      <Hero brand={brand} destinationGroups={destinationGroups} />
       <About about={about} />
       <Destinations groups={destinationGroups} />
       <Services services={services} />
@@ -146,7 +146,7 @@ function Header({ brand }) {
   )
 }
 
-function Hero({ brand, hero, destinationGroups }) {
+function Hero({ brand, destinationGroups }) {
   const logoSize = getLogoSize(brand.logoSize)
   return (
     <section className="relative overflow-hidden bg-navy-900 py-16 sm:py-24">
@@ -176,16 +176,15 @@ function Hero({ brand, hero, destinationGroups }) {
         <p className="mt-4 text-lg text-navy-100 sm:text-xl">{brand.tagline}</p>
         <div className="mx-auto mt-8 h-1 w-24 rounded bg-gradient-to-r from-gold-400 to-gold-600" />
         <div className="mt-10 flex flex-wrap justify-center gap-2.5">
-          {(hero.countryTags || []).map((tag) => {
-            const slug = findDestinationSlug(destinationGroups, tag)
-            const className =
-              'rounded-full border border-gold-400/60 bg-white/5 px-4 py-1.5 text-sm text-gold-100 backdrop-blur-sm transition-all duration-200 hover:border-gold-300 hover:bg-gold-400 hover:text-navy-900 hover:scale-105'
-            return (
-              <a key={tag} href={slug ? `#${slug}` : '#destinos'} className={className}>
-                {tag}
-              </a>
-            )
-          })}
+          {(destinationGroups || []).map((group) => (
+            <a
+              key={group.region}
+              href={`#${slugify(group.region)}`}
+              className="rounded-full border border-gold-400/60 bg-white/5 px-4 py-1.5 text-sm text-gold-100 backdrop-blur-sm transition-all duration-200 hover:border-gold-300 hover:bg-gold-400 hover:text-navy-900 hover:scale-105"
+            >
+              {group.region}
+            </a>
+          ))}
         </div>
       </div>
     </section>
