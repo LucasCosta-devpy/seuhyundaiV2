@@ -73,6 +73,7 @@ const NAV_LINKS = [
   { href: '#sobre', label: 'Sobre' },
   { href: '#destinos', label: 'Destinos' },
   { href: '#servicos', label: 'Serviços' },
+  { href: '#preco', label: 'Preço' },
   { href: '#consultora', label: 'Consultora' },
   { href: '#contato', label: 'Contato' },
 ]
@@ -339,17 +340,31 @@ function Process({ process }) {
 
 function Pricing({ pricing, brand }) {
   return (
-    <section className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6">
-      <h2 className="section-title">Investimento na Consultoria</h2>
+    <section id="preco" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-16 text-center sm:px-6">
+      <h2 className="section-title">{pricing.title || 'Investimento na Consultoria'}</h2>
       <p className="mx-auto mt-4 max-w-xl text-gray-600">
-        Trabalhamos com um valor justo e acessível para entregar um planejamento completo, seguro e detalhado para a sua viagem dos sonhos.
+        {pricing.intro || 'Trabalhamos com um valor justo e acessível para entregar um planejamento completo, seguro e detalhado para a sua viagem dos sonhos.'}
       </p>
-      <div className="mx-auto mt-8 max-w-md rounded-2xl border-2 border-gold-400 p-8">
-        <h3 className="font-serif text-xl font-bold text-navy-900">{pricing.title}</h3>
-        <p className="mt-3 font-serif text-4xl font-extrabold text-navy-900">{pricing.priceLabel}</p>
-        <p className="mt-3 text-sm text-gray-600">{pricing.desc}</p>
+
+      <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
+        {(pricing.plans || []).map((plan) => (
+          <div key={plan.name} className="flex flex-col rounded-2xl border-2 border-gold-400 p-6 text-left">
+            <h3 className="font-serif text-xl font-bold text-navy-900">{plan.name}</h3>
+            <p className="mt-2 font-serif text-2xl font-extrabold text-navy-900">{plan.priceLabel}</p>
+            <p className="mt-3 text-sm text-gray-600">{plan.tagline}</p>
+            <ul className="mt-4 flex-1 space-y-2 text-sm text-navy-800">
+              {(plan.bullets || []).map((bullet, i) => (
+                <li key={i} className="flex gap-2">
+                  <span className="text-gold-500">✓</span>
+                  <span>{bullet}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
-      <div className="mx-auto mt-6 max-w-xl border-l-4 border-gold-400 bg-gold-50 p-4 text-left text-sm text-navy-800">
+
+      <div className="mx-auto mt-8 max-w-xl border-l-4 border-gold-400 bg-gold-50 p-4 text-left text-sm text-navy-800">
         <strong>Forma de pagamento:</strong> {pricing.paymentInfo?.replace('Forma de pagamento:', '').trim()}
       </div>
       <WhatsAppLink whatsapp={brand.whatsapp} className="btn-gold mt-8">

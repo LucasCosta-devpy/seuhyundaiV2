@@ -82,9 +82,40 @@ export const defaultContent = {
     { title: 'Hora de Viajar!', desc: 'Suporte e acompanhamento por WhatsApp disponível durante o seu itinerário para emergências e orientações rápidas.' },
   ],
   pricing: {
-    title: 'Consultoria de Viagem Completa',
-    priceLabel: 'A partir de R$ 350,00',
-    desc: 'Planejamento personalizado, roteiro dia a dia, auxílio em hotéis, passagens, passeios e suporte dedicado.',
+    title: 'Investimento na Consultoria',
+    intro: 'Escolha o nível de planejamento ideal para a complexidade da sua viagem.',
+    plans: [
+      {
+        name: 'Consultoria de Viagem',
+        priceLabel: 'A partir de R$ 197',
+        tagline: 'Para quem já sabe para onde quer ir e precisa de orientação para tomar as melhores decisões.',
+        bullets: [
+          'Análise estratégica do destino e da melhor época pra viajar',
+          'Curadoria de hospedagem, mobilidade e onde comer bem',
+          'Sessão de alinhamento individual pra tirar todas as dúvidas',
+        ],
+      },
+      {
+        name: 'Roteiro Personalizado',
+        priceLabel: 'A partir de R$ 397',
+        tagline: 'Para quem quer que a gente estude a viagem e construa um itinerário exclusivo.',
+        bullets: [
+          'Itinerário diário sob medida, desenhado pro seu ritmo',
+          'Guia completo de atrações e experiências alinhadas ao seu perfil',
+          'Documentação de viagem organizada num guia digital exclusivo',
+        ],
+      },
+      {
+        name: 'Planejamento Completo',
+        priceLabel: 'A partir de R$ 797 (orçamento personalizado para roteiros de altíssima complexidade)',
+        tagline: 'Para viagens complexas, como uma Europa + África de 50 dias, com múltiplos destinos.',
+        bullets: [
+          'Gestão logística de alta complexidade (voos, trens, traslados)',
+          'Curadoria integral de hospedagens em todo o percurso',
+          'Suporte dedicado com plano de contingência pra imprevistos',
+        ],
+      },
+    ],
     paymentInfo: 'Forma de pagamento: 50% de sinal via Pix no ato da contratação e 50% restantes na entrega final do roteiro em PDF.',
   },
   consultant: {

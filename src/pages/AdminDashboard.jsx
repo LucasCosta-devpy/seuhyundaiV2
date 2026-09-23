@@ -208,9 +208,12 @@ export default function AdminDashboard() {
 
           {activeTab === 'preco' && (
             <Panel title="Investimento / Preço">
-              <TextField label="Título do plano" value={content.pricing.title} onChange={(v) => update(['pricing', 'title'], v)} />
-              <TextField label="Valor exibido" value={content.pricing.priceLabel} onChange={(v) => update(['pricing', 'priceLabel'], v)} />
-              <TextArea label="Descrição" value={content.pricing.desc} onChange={(v) => update(['pricing', 'desc'], v)} />
+              <TextField label="Título da seção" value={content.pricing.title} onChange={(v) => update(['pricing', 'title'], v)} />
+              <TextArea label="Texto de introdução" value={content.pricing.intro} onChange={(v) => update(['pricing', 'intro'], v)} />
+              <PricingPlansEditor
+                plans={content.pricing.plans}
+                onChange={(v) => update(['pricing', 'plans'], v)}
+              />
               <TextArea label="Forma de pagamento" value={content.pricing.paymentInfo} onChange={(v) => update(['pricing', 'paymentInfo'], v)} />
             </Panel>
           )}
@@ -632,6 +635,48 @@ function CardListEditor({ items, onChange }) {
         </div>
       ))}
       <button onClick={add} className="text-sm font-semibold text-navy-700 hover:underline">+ Adicionar item</button>
+    </div>
+  )
+}
+
+function PricingPlansEditor({ plans, onChange }) {
+  function update(i, field, v) {
+    const next = [...(plans || [])]
+    next[i] = { ...next[i], [field]: v }
+    onChange(next)
+  }
+  function updateBullets(i, bullets) {
+    update(i, 'bullets', bullets)
+  }
+  function remove(i) {
+    onChange((plans || []).filter((_, idx) => idx !== i))
+  }
+  function add() {
+    onChange([...(plans || []), { name: '', priceLabel: '', tagline: '', bullets: [] }])
+  }
+
+  return (
+    <div>
+      <p className="label !mb-2">Planos</p>
+      <div className="space-y-4">
+        {(plans || []).map((plan, i) => (
+          <div key={i} className="rounded-lg border border-gray-200 p-4">
+            <TextField label="Nome do plano" value={plan.name} onChange={(v) => update(i, 'name', v)} />
+            <div className="mt-2">
+              <TextField label="Valor exibido" value={plan.priceLabel} onChange={(v) => update(i, 'priceLabel', v)} />
+            </div>
+            <div className="mt-2">
+              <TextArea label="Frase curta (pra quem é esse plano)" value={plan.tagline} onChange={(v) => update(i, 'tagline', v)} />
+            </div>
+            <div className="mt-2">
+              <p className="label !mb-2">Tópicos (o que inclui)</p>
+              <ParagraphListEditor items={plan.bullets} onChange={(v) => updateBullets(i, v)} />
+            </div>
+            <button onClick={() => remove(i)} className="mt-2 text-sm text-red-500 hover:text-red-700">Remover plano</button>
+          </div>
+        ))}
+        <button onClick={add} className="text-sm font-semibold text-navy-700 hover:underline">+ Adicionar plano</button>
+      </div>
     </div>
   )
 }
