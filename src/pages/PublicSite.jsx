@@ -252,63 +252,52 @@ function DestinationCarousel({ images, name }) {
   )
 }
 
-function DestinationCard({ item }) {
+function DestinationCard({ name, desc, imageUrl, imageMode, images: itemImages, photoCaption }) {
   const rawImages =
-    item.imageMode === 'carousel'
-      ? (item.images || []).filter((img) => (typeof img === 'string' ? img : img?.url))
-      : item.imageUrl
-        ? [{ url: item.imageUrl, caption: item.photoCaption }]
+    imageMode === 'carousel'
+      ? (itemImages || []).filter((img) => (typeof img === 'string' ? img : img?.url))
+      : imageUrl
+        ? [{ url: imageUrl, caption: photoCaption }]
         : []
   const images = rawImages.map((img) => (typeof img === 'string' ? { url: img, caption: '' } : img))
-  const subregions = (item.subregions || []).filter((s) => s.name)
-  const hasSubregions = subregions.length > 0
-  const [activeSub, setActiveSub] = useState(0)
-  const activeSubregion = subregions[activeSub]
 
   return (
-    <div id={slugify(item.name)} className="card scroll-mt-28 overflow-hidden">
+    <div id={slugify(name)} className="card scroll-mt-28 overflow-hidden">
       <div className="flex h-40 items-center justify-center bg-gradient-to-br from-navy-50 to-gray-100 text-gray-400">
         {images.length > 0 ? (
-          <DestinationCarousel images={images} name={item.name} />
+          <DestinationCarousel images={images} name={name} />
         ) : (
           <span className="text-sm">Sem foto</span>
         )}
       </div>
       <div className="border-t-2 border-gold-400 p-4">
-        <h4 className="font-serif text-lg font-bold text-navy-900">{item.name}</h4>
-        <p className="mt-1 text-sm text-gray-600">{item.desc}</p>
-
-        {hasSubregions && (
-          <div className="mt-4 border-t border-gray-100 pt-3">
-            <div className="flex flex-wrap gap-1.5">
-              {subregions.map((sub, i) => (
-                <button
-                  key={sub.name}
-                  type="button"
-                  onClick={() => setActiveSub(i)}
-                  className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
-                    activeSub === i ? 'bg-navy-800 text-white' : 'bg-navy-50 text-navy-700 hover:bg-navy-100'
-                  }`}
-                >
-                  {sub.name}
-                </button>
-              ))}
-            </div>
-            {activeSubregion?.imageUrl && (
-              <img
-                src={activeSubregion.imageUrl}
-                alt={activeSubregion.name}
-                className="mt-3 h-28 w-full rounded-lg object-cover"
-              />
-            )}
-            {activeSubregion?.desc && (
-              <p className="mt-2 text-sm text-gray-600">{activeSubregion.desc}</p>
-            )}
-          </div>
-        )}
+        <h4 className="font-serif text-lg font-bold text-navy-900">{name}</h4>
+        <p className="mt-1 text-sm text-gray-600">{desc}</p>
       </div>
     </div>
   )
+}
+
+// Agrupa a lista de destinos de uma região em blocos, preservando a ordem:
+// destinos simples (sem sub-cards) ficam juntos numa grade; um destino com
+// sub-cards vira seu próprio bloco (cabeçalho do país + grade dos sub-cards).
+function chunkDestinationItems(items) {
+  const chunks = []
+  let currentSimple = []
+  for (const item of items || []) {
+    const subregions = (item.subregions || []).filter((s) => s.name)
+    if (subregions.length > 0) {
+      if (currentSimple.length) {
+        chunks.push({ type: 'simple', items: currentSimple })
+        currentSimple = []
+      }
+      chunks.push({ type: 'country', item, subregions })
+    } else {
+      currentSimple.push(item)
+    }
+  }
+  if (currentSimple.length) chunks.push({ type: 'simple', items: currentSimple })
+  return chunks
 }
 
 function Destinations({ groups }) {
@@ -319,10 +308,37 @@ function Destinations({ groups }) {
           <h3 className="mb-5 border-l-4 border-gold-400 pl-3 font-serif text-2xl font-bold text-navy-900">
             {group.region}
           </h3>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {(group.items || []).map((item) => (
-              <DestinationCard key={item.name} item={item} />
-            ))}
+
+          <div className="space-y-8">
+            {chunkDestinationItems(group.items).map((chunk, ci) =>
+              chunk.type === 'simple' ? (
+                <div key={ci} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {chunk.items.map((item) => (
+                    <DestinationCard
+                      key={item.name}
+                      name={item.name}
+                      desc={item.desc}
+                      imageUrl={item.imageUrl}
+                      imageMode={item.imageMode}
+                      images={item.images}
+                      photoCaption={item.photoCaption}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div key={ci} id={slugify(chunk.item.name)} className="scroll-mt-28">
+                  <h4 className="mb-1 border-l-4 border-gold-300 pl-3 font-serif text-xl font-bold text-navy-900">
+                    {chunk.item.name}
+                  </h4>
+                  {chunk.item.desc && <p className="mb-4 pl-3 text-sm text-gray-600">{chunk.item.desc}</p>}
+                  <div className="grid grid-cols-1 gap-6 pl-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {chunk.subregions.map((sub) => (
+                      <DestinationCard key={sub.name} name={sub.name} desc={sub.desc} imageUrl={sub.imageUrl} />
+                    ))}
+                  </div>
+                </div>
+              )
+            )}
           </div>
         </div>
       ))}
