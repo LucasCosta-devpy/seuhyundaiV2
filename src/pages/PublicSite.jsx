@@ -180,14 +180,10 @@ function Hero({ brand, hero, destinationGroups }) {
             const slug = findDestinationSlug(destinationGroups, tag)
             const className =
               'rounded-full border border-gold-400/60 bg-white/5 px-4 py-1.5 text-sm text-gold-100 backdrop-blur-sm transition-all duration-200 hover:border-gold-300 hover:bg-gold-400 hover:text-navy-900 hover:scale-105'
-            return slug ? (
-              <a key={tag} href={`#${slug}`} className={className}>
+            return (
+              <a key={tag} href={slug ? `#${slug}` : '#destinos'} className={className}>
                 {tag}
               </a>
-            ) : (
-              <span key={tag} className={className}>
-                {tag}
-              </span>
             )
           })}
         </div>
