@@ -246,6 +246,62 @@ function DestinationCarousel({ images, name }) {
   )
 }
 
+function DestinationCard({ item }) {
+  const images = item.imageMode === 'carousel' ? (item.images || []).filter(Boolean) : item.imageUrl ? [item.imageUrl] : []
+  const subregions = (item.subregions || []).filter((s) => s.name)
+  const hasSubregions = subregions.length > 0
+  const [activeSub, setActiveSub] = useState(0)
+  const activeCities = subregions[activeSub]?.cities?.filter((c) => c.name) || []
+
+  return (
+    <div id={slugify(item.name)} className="card scroll-mt-28 overflow-hidden">
+      <div className="flex h-40 items-center justify-center bg-gradient-to-br from-navy-50 to-gray-100 text-gray-400">
+        {images.length > 0 ? (
+          <DestinationCarousel images={images} name={item.name} />
+        ) : (
+          <span className="text-sm">Sem foto</span>
+        )}
+      </div>
+      <div className="border-t-2 border-gold-400 p-4">
+        <h4 className="font-serif text-lg font-bold text-navy-900">{item.name}</h4>
+        <p className="mt-1 text-sm text-gray-600">{item.desc}</p>
+
+        {hasSubregions && (
+          <div className="mt-4 border-t border-gray-100 pt-3">
+            <div className="flex flex-wrap gap-1.5">
+              {subregions.map((sub, i) => (
+                <button
+                  key={sub.name}
+                  type="button"
+                  onClick={() => setActiveSub(i)}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+                    activeSub === i ? 'bg-navy-800 text-white' : 'bg-navy-50 text-navy-700 hover:bg-navy-100'
+                  }`}
+                >
+                  {sub.name}
+                </button>
+              ))}
+            </div>
+            {activeCities.length > 0 && (
+              <ul className="mt-3 space-y-1.5 text-sm text-navy-800">
+                {activeCities.map((city) => (
+                  <li key={city.name} className="flex gap-1.5">
+                    <span className="text-gold-500">•</span>
+                    <span>
+                      <strong className="font-semibold">{city.name}</strong>
+                      {city.desc && <span className="text-gray-600"> — {city.desc}</span>}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function Destinations({ groups }) {
   return (
     <section id="destinos" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-10 sm:px-6">
@@ -255,24 +311,9 @@ function Destinations({ groups }) {
             {group.region}
           </h3>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {(group.items || []).map((item) => {
-              const images = item.imageMode === 'carousel' ? (item.images || []).filter(Boolean) : item.imageUrl ? [item.imageUrl] : []
-              return (
-                <div key={item.name} id={slugify(item.name)} className="card scroll-mt-28 overflow-hidden">
-                  <div className="flex h-40 items-center justify-center bg-gradient-to-br from-navy-50 to-gray-100 text-gray-400">
-                    {images.length > 0 ? (
-                      <DestinationCarousel images={images} name={item.name} />
-                    ) : (
-                      <span className="text-sm">Sem foto</span>
-                    )}
-                  </div>
-                  <div className="border-t-2 border-gold-400 p-4">
-                    <h4 className="font-serif text-lg font-bold text-navy-900">{item.name}</h4>
-                    <p className="mt-1 text-sm text-gray-600">{item.desc}</p>
-                  </div>
-                </div>
-              )
-            })}
+            {(group.items || []).map((item) => (
+              <DestinationCard key={item.name} item={item} />
+            ))}
           </div>
         </div>
       ))}

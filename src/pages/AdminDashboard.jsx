@@ -754,6 +754,88 @@ function DestinationImagesEditor({ item, onUpdate }) {
   )
 }
 
+function SubregionsEditor({ item, onUpdate }) {
+  const subregions = item.subregions || []
+  const [expanded, setExpanded] = useState(subregions.length > 0)
+
+  function updateSub(si, field, v) {
+    const next = [...subregions]
+    next[si] = { ...next[si], [field]: v }
+    onUpdate('subregions', next)
+  }
+  function removeSub(si) {
+    onUpdate('subregions', subregions.filter((_, i) => i !== si))
+  }
+  function addSub() {
+    onUpdate('subregions', [...subregions, { name: '', cities: [] }])
+    setExpanded(true)
+  }
+  function updateCity(si, ci, field, v) {
+    const cities = [...(subregions[si].cities || [])]
+    cities[ci] = { ...cities[ci], [field]: v }
+    updateSub(si, 'cities', cities)
+  }
+  function removeCity(si, ci) {
+    updateSub(si, 'cities', (subregions[si].cities || []).filter((_, i) => i !== ci))
+  }
+  function addCity(si) {
+    updateSub(si, 'cities', [...(subregions[si].cities || []), { name: '', desc: '' }])
+  }
+
+  return (
+    <div className="mt-3">
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="text-xs font-semibold text-navy-700 hover:underline"
+      >
+        {expanded ? '− Ocultar sub-regiões e cidades' : '+ Detalhar por sub-região/estado (Norte, Sul...) e cidades'}
+      </button>
+
+      {expanded && (
+        <div className="mt-2 space-y-3 border-l-2 border-gray-200 pl-3">
+          <p className="text-xs text-gray-400">Opcional: use isso pra dividir um país/destino grande em sub-regiões (ex: Norte, Sul, um estado) e listar as cidades de cada uma.</p>
+          {subregions.map((sub, si) => (
+            <div key={si} className="rounded-lg border border-gray-200 bg-white p-3">
+              <div className="flex items-center gap-2">
+                <input
+                  className="input flex-1 text-sm"
+                  placeholder="Nome da sub-região (ex: Norte, São Paulo...)"
+                  value={sub.name}
+                  onChange={(e) => updateSub(si, 'name', e.target.value)}
+                />
+                <button onClick={() => removeSub(si)} className="whitespace-nowrap text-xs text-red-500 hover:text-red-700">Remover</button>
+              </div>
+
+              <div className="mt-2 space-y-1.5">
+                {(sub.cities || []).map((city, ci) => (
+                  <div key={ci} className="flex gap-1.5">
+                    <input
+                      className="input flex-1 text-sm"
+                      placeholder="Cidade"
+                      value={city.name}
+                      onChange={(e) => updateCity(si, ci, 'name', e.target.value)}
+                    />
+                    <input
+                      className="input flex-1 text-sm"
+                      placeholder="Descrição curta (opcional)"
+                      value={city.desc}
+                      onChange={(e) => updateCity(si, ci, 'desc', e.target.value)}
+                    />
+                    <button onClick={() => removeCity(si, ci)} className="text-red-500 hover:text-red-700">×</button>
+                  </div>
+                ))}
+                <button onClick={() => addCity(si)} className="text-xs font-semibold text-navy-700 hover:underline">+ Adicionar cidade</button>
+              </div>
+            </div>
+          ))}
+          <button onClick={addSub} className="text-xs font-semibold text-navy-700 hover:underline">+ Adicionar sub-região/estado</button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function DestinationGroupsEditor({ groups, onChange }) {
   const [openIndex, setOpenIndex] = useState(0)
 
@@ -830,7 +912,11 @@ function DestinationGroupsEditor({ groups, onChange }) {
                           onUpdate={(field, v) => updateItem(gi, ii, field, v)}
                         />
                       </div>
-                      <button onClick={() => removeItem(gi, ii)} className="mt-2 text-sm text-red-500 hover:text-red-700">Remover destino</button>
+                      <SubregionsEditor
+                        item={item}
+                        onUpdate={(field, v) => updateItem(gi, ii, field, v)}
+                      />
+                      <button onClick={() => removeItem(gi, ii)} className="mt-3 text-sm text-red-500 hover:text-red-700">Remover destino</button>
                     </div>
                   ))}
                   <button onClick={() => addItem(gi)} className="text-sm font-semibold text-navy-700 hover:underline">+ Adicionar destino nesta região</button>
