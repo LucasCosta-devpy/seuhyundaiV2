@@ -15,16 +15,26 @@ function normalize(text) {
     .toLowerCase()
 }
 
-// Encontra, dentro dos grupos de destinos, o item cujo nome melhor
-// corresponde a uma tag do hero (ex: tag "Guianas" -> item "Venezuela & Guianas").
+// Encontra, dentro dos grupos de destinos, a REGIÃO (não o card individual)
+// que melhor corresponde a uma tag do hero — sempre leva ao topo do bloco da
+// região, evitando cair no meio de uma lista longa de cards.
 export function findDestinationSlug(groups, tag) {
   const target = normalize(tag)
+
+  for (const group of groups || []) {
+    const region = normalize(group.region)
+    if (region.includes(target) || target.includes(region)) {
+      return slugify(group.region)
+    }
+  }
+
   for (const group of groups || []) {
     for (const item of group.items || []) {
       if (normalize(item.name).includes(target)) {
-        return slugify(item.name)
+        return slugify(group.region)
       }
     }
   }
+
   return null
 }

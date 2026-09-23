@@ -251,7 +251,7 @@ function Destinations({ groups }) {
   return (
     <section id="destinos" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-10 sm:px-6">
       {(groups || []).map((group) => (
-        <div key={group.region} className="mb-12">
+        <div key={group.region} id={slugify(group.region)} className="mb-12 scroll-mt-24">
           <h3 className="mb-5 border-l-4 border-gold-400 pl-3 font-serif text-2xl font-bold text-navy-900">
             {group.region}
           </h3>
