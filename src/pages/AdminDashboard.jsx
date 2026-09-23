@@ -685,6 +685,8 @@ function SocialLinksEditor({ items, onChange }) {
   )
 }
 
+const MAX_CAROUSEL_IMAGES = 5
+
 function DestinationImagesEditor({ item, onUpdate }) {
   const mode = item.imageMode === 'carousel' ? 'carousel' : 'single'
   const images = (item.images || []).map((img) => (typeof img === 'string' ? { url: img, caption: '' } : img))
@@ -705,6 +707,7 @@ function DestinationImagesEditor({ item, onUpdate }) {
     onUpdate('images', images.filter((_, idx) => idx !== i))
   }
   function addImage() {
+    if (images.length >= MAX_CAROUSEL_IMAGES) return
     onUpdate('images', [...images, { url: '', caption: '' }])
   }
 
@@ -758,7 +761,11 @@ function DestinationImagesEditor({ item, onUpdate }) {
               </button>
             </div>
           ))}
-          <button onClick={addImage} className="text-sm font-semibold text-navy-700 hover:underline">+ Adicionar foto ao carrossel</button>
+          {images.length < MAX_CAROUSEL_IMAGES ? (
+            <button onClick={addImage} className="text-sm font-semibold text-navy-700 hover:underline">+ Adicionar foto ao carrossel</button>
+          ) : (
+            <p className="text-xs text-gray-400">Limite de {MAX_CAROUSEL_IMAGES} fotos atingido.</p>
+          )}
           {images.length <= 1 && (
             <p className="text-xs text-gray-400">Adicione pelo menos 2 fotos pra o carrossel aparecer com setas de navegação no site.</p>
           )}
@@ -771,6 +778,7 @@ function DestinationImagesEditor({ item, onUpdate }) {
 function SubregionsEditor({ item, onUpdate }) {
   const subregions = item.subregions || []
   const [expanded, setExpanded] = useState(subregions.length > 0)
+  const [openSub, setOpenSub] = useState(-1)
 
   function updateSub(si, field, v) {
     const next = [...subregions]
@@ -779,10 +787,13 @@ function SubregionsEditor({ item, onUpdate }) {
   }
   function removeSub(si) {
     onUpdate('subregions', subregions.filter((_, i) => i !== si))
+    setOpenSub(-1)
   }
   function addSub() {
-    onUpdate('subregions', [...subregions, { name: '', desc: '', imageUrl: '' }])
+    const next = [...subregions, { name: '', desc: '', imageUrl: '', imageMode: 'single', images: [] }]
+    onUpdate('subregions', next)
     setExpanded(true)
+    setOpenSub(next.length - 1)
   }
 
   return (
@@ -792,38 +803,50 @@ function SubregionsEditor({ item, onUpdate }) {
         onClick={() => setExpanded((v) => !v)}
         className="text-xs font-semibold text-navy-700 hover:underline"
       >
-        {expanded ? '− Ocultar sub-cards' : '+ Adicionar sub-cards (ex: Nordeste, Aracaju/SE)'}
+        {expanded ? '− Ocultar cidades' : '+ Adicionar cidades (ex: Aracaju/SE)'}
       </button>
 
       {expanded && (
-        <div className="mt-2 space-y-3 border-l-2 border-gray-200 pl-3">
-          <p className="text-xs text-gray-400">Opcional: use isso pra mostrar áreas específicas dentro deste destino, cada uma com seu próprio nome, descrição e foto.</p>
-          {subregions.map((sub, si) => (
-            <div key={si} className="rounded-lg border border-gray-200 bg-white p-3">
-              <div className="flex items-center gap-2">
-                <input
-                  className="input flex-1 text-sm"
-                  placeholder="Nome (ex: Nordeste, Aracaju/SE)"
-                  value={sub.name}
-                  onChange={(e) => updateSub(si, 'name', e.target.value)}
-                />
-                <button onClick={() => removeSub(si)} className="whitespace-nowrap text-xs text-red-500 hover:text-red-700">Remover</button>
-              </div>
+        <div className="mt-2 space-y-2 border-l-2 border-gray-300 pl-4">
+          <p className="text-xs text-gray-400">Opcional: liste as cidades/áreas dentro deste destino, cada uma com nome, descrição e até {MAX_CAROUSEL_IMAGES} fotos.</p>
+          {subregions.map((sub, si) => {
+            const subOpen = openSub === si
+            return (
+              <div key={si} className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+                <button
+                  type="button"
+                  onClick={() => setOpenSub(subOpen ? -1 : si)}
+                  className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left"
+                >
+                  <span className="text-sm font-semibold text-navy-900">{sub.name || 'Nova cidade (sem nome ainda)'}</span>
+                  <span className="text-gray-500">{subOpen ? '−' : '+'}</span>
+                </button>
 
-              <textarea
-                className="input mt-2 text-sm"
-                rows={2}
-                placeholder="Descrição (opcional)"
-                value={sub.desc || ''}
-                onChange={(e) => updateSub(si, 'desc', e.target.value)}
-              />
-
-              <div className="mt-2">
-                <ImageField label="Foto (opcional)" shape="photo" value={sub.imageUrl} onChange={(v) => updateSub(si, 'imageUrl', v)} />
+                {subOpen && (
+                  <div className="border-t border-gray-200 p-3">
+                    <input
+                      className="input text-sm"
+                      placeholder="Nome (ex: Aracaju/SE)"
+                      value={sub.name}
+                      onChange={(e) => updateSub(si, 'name', e.target.value)}
+                    />
+                    <textarea
+                      className="input mt-2 text-sm"
+                      rows={2}
+                      placeholder="Descrição (opcional)"
+                      value={sub.desc || ''}
+                      onChange={(e) => updateSub(si, 'desc', e.target.value)}
+                    />
+                    <div className="mt-2">
+                      <DestinationImagesEditor item={sub} onUpdate={(field, v) => updateSub(si, field, v)} />
+                    </div>
+                    <button onClick={() => removeSub(si)} className="mt-2 text-xs text-red-500 hover:text-red-700">Remover cidade</button>
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
-          <button onClick={addSub} className="text-xs font-semibold text-navy-700 hover:underline">+ Adicionar sub-card</button>
+            )
+          })}
+          <button onClick={addSub} className="text-xs font-semibold text-navy-700 hover:underline">+ Adicionar cidade</button>
         </div>
       )}
     </div>
@@ -939,7 +962,7 @@ function DestinationGroupsEditor({ groups, onChange }) {
                     + Adicionar novo destino/país nesta região
                   </button>
                   <p className="text-xs text-gray-400">
-                    Isso cria um card irmão (ex: outro país). Pra dividir um destino já existente em áreas menores (ex: Nordeste, Aracaju/SE), abra o destino e use &ldquo;Adicionar sub-cards&rdquo; — não use este botão pra isso.
+                    Isso cria um card irmão (ex: outro país). Pra adicionar cidades dentro de um destino já existente, abra o destino e use &ldquo;Adicionar cidades&rdquo; — não use este botão pra isso.
                   </p>
                 </div>
               </div>

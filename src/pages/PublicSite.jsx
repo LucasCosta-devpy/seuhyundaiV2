@@ -333,7 +333,15 @@ function Destinations({ groups }) {
                   {chunk.item.desc && <p className="mb-4 pl-3 text-sm text-gray-600">{chunk.item.desc}</p>}
                   <div className="grid grid-cols-1 gap-6 pl-3 sm:grid-cols-2 lg:grid-cols-3">
                     {chunk.subregions.map((sub) => (
-                      <DestinationCard key={sub.name} name={sub.name} desc={sub.desc} imageUrl={sub.imageUrl} />
+                      <DestinationCard
+                        key={sub.name}
+                        name={sub.name}
+                        desc={sub.desc}
+                        imageUrl={sub.imageUrl}
+                        imageMode={sub.imageMode}
+                        images={sub.images}
+                        photoCaption={sub.photoCaption}
+                      />
                     ))}
                   </div>
                 </div>
