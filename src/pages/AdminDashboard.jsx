@@ -687,25 +687,25 @@ function SocialLinksEditor({ items, onChange }) {
 
 function DestinationImagesEditor({ item, onUpdate }) {
   const mode = item.imageMode === 'carousel' ? 'carousel' : 'single'
-  const images = item.images || []
+  const images = (item.images || []).map((img) => (typeof img === 'string' ? { url: img, caption: '' } : img))
 
   function setMode(nextMode) {
     onUpdate('imageMode', nextMode)
     if (nextMode === 'carousel' && images.length === 0 && item.imageUrl) {
-      onUpdate('images', [item.imageUrl])
+      onUpdate('images', [{ url: item.imageUrl, caption: item.photoCaption || '' }])
     }
   }
 
-  function updateImage(i, url) {
+  function updateImage(i, field, v) {
     const next = [...images]
-    next[i] = url
-    onUpdate('images', next.filter(Boolean))
+    next[i] = { ...next[i], [field]: v }
+    onUpdate('images', next.filter((img) => img.url))
   }
   function removeImage(i) {
     onUpdate('images', images.filter((_, idx) => idx !== i))
   }
   function addImage() {
-    onUpdate('images', [...images, ''])
+    onUpdate('images', [...images, { url: '', caption: '' }])
   }
 
   return (
@@ -733,12 +733,26 @@ function DestinationImagesEditor({ item, onUpdate }) {
       </div>
 
       {mode === 'single' ? (
-        <ImageField label="Foto" shape="photo" value={item.imageUrl} onChange={(v) => onUpdate('imageUrl', v)} />
+        <div className="space-y-2">
+          <ImageField label="Foto" shape="photo" value={item.imageUrl} onChange={(v) => onUpdate('imageUrl', v)} />
+          <TextField
+            label="Legenda da foto (opcional, ex: Nordeste, Aracaju/SE) — texto simples, não é clicável"
+            value={item.photoCaption}
+            onChange={(v) => onUpdate('photoCaption', v)}
+          />
+        </div>
       ) : (
         <div className="space-y-3">
-          {images.map((url, i) => (
+          {images.map((img, i) => (
             <div key={i} className="rounded-lg border border-gray-200 p-3">
-              <ImageField label={`Foto ${i + 1} do carrossel`} shape="photo" value={url} onChange={(v) => updateImage(i, v)} />
+              <ImageField label={`Foto ${i + 1} do carrossel`} shape="photo" value={img.url} onChange={(v) => updateImage(i, 'url', v)} />
+              <div className="mt-2">
+                <TextField
+                  label="Legenda desta foto (opcional, ex: Nordeste, Aracaju/SE) — texto simples, não é clicável"
+                  value={img.caption}
+                  onChange={(v) => updateImage(i, 'caption', v)}
+                />
+              </div>
               <button onClick={() => removeImage(i)} className="mt-2 text-xs font-semibold text-red-500 hover:text-red-700">
                 Remover esta foto do carrossel
               </button>
@@ -807,6 +821,14 @@ function SubregionsEditor({ item, onUpdate }) {
                 <button onClick={() => removeSub(si)} className="whitespace-nowrap text-xs text-red-500 hover:text-red-700">Remover</button>
               </div>
 
+              <textarea
+                className="input mt-2 text-sm"
+                rows={2}
+                placeholder="Descrição desta sub-região (opcional)"
+                value={sub.desc || ''}
+                onChange={(e) => updateSub(si, 'desc', e.target.value)}
+              />
+
               <div className="mt-2 space-y-1.5">
                 {(sub.cities || []).map((city, ci) => (
                   <div key={ci} className="flex gap-1.5">
@@ -838,6 +860,11 @@ function SubregionsEditor({ item, onUpdate }) {
 
 function DestinationGroupsEditor({ groups, onChange }) {
   const [openIndex, setOpenIndex] = useState(0)
+  const [openItems, setOpenItems] = useState({})
+
+  function toggleItem(gi, ii) {
+    setOpenItems((prev) => ({ ...prev, [gi]: prev[gi] === ii ? -1 : ii }))
+  }
 
   function updateGroup(gi, field, v) {
     const next = [...groups]
@@ -866,6 +893,7 @@ function DestinationGroupsEditor({ groups, onChange }) {
     const next = [...groups]
     next[gi] = { ...next[gi], items: [...next[gi].items, { name: '', desc: '', imageUrl: '', imageMode: 'single', images: [] }] }
     onChange(next)
+    setOpenItems((prev) => ({ ...prev, [gi]: next[gi].items.length - 1 }))
   }
 
   return (
@@ -899,27 +927,48 @@ function DestinationGroupsEditor({ groups, onChange }) {
                   <button onClick={() => removeGroup(gi)} className="whitespace-nowrap text-sm text-red-500 hover:text-red-700">Remover região</button>
                 </div>
 
-                <div className="mt-4 space-y-4">
-                  {group.items.map((item, ii) => (
-                    <div key={ii} className="rounded-lg bg-gray-50 p-3">
-                      <TextField label="Destino" value={item.name} onChange={(v) => updateItem(gi, ii, 'name', v)} />
-                      <div className="mt-2">
-                        <TextArea label="Descrição" value={item.desc} onChange={(v) => updateItem(gi, ii, 'desc', v)} />
+                <div className="mt-4 space-y-2">
+                  {group.items.map((item, ii) => {
+                    const itemOpen = (openItems[gi] ?? -1) === ii
+                    return (
+                      <div key={ii} className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                        <button
+                          type="button"
+                          onClick={() => toggleItem(gi, ii)}
+                          className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left"
+                        >
+                          <span className="text-sm font-semibold text-navy-900">{item.name || 'Novo destino (sem nome ainda)'}</span>
+                          <span className="text-gray-500">{itemOpen ? '−' : '+'}</span>
+                        </button>
+
+                        {itemOpen && (
+                          <div className="border-t border-gray-200 bg-white p-3">
+                            <TextField label="Destino" value={item.name} onChange={(v) => updateItem(gi, ii, 'name', v)} />
+                            <div className="mt-2">
+                              <TextArea label="Descrição" value={item.desc} onChange={(v) => updateItem(gi, ii, 'desc', v)} />
+                            </div>
+                            <div className="mt-2">
+                              <DestinationImagesEditor
+                                item={item}
+                                onUpdate={(field, v) => updateItem(gi, ii, field, v)}
+                              />
+                            </div>
+                            <SubregionsEditor
+                              item={item}
+                              onUpdate={(field, v) => updateItem(gi, ii, field, v)}
+                            />
+                            <button onClick={() => removeItem(gi, ii)} className="mt-3 text-sm text-red-500 hover:text-red-700">Remover destino</button>
+                          </div>
+                        )}
                       </div>
-                      <div className="mt-2">
-                        <DestinationImagesEditor
-                          item={item}
-                          onUpdate={(field, v) => updateItem(gi, ii, field, v)}
-                        />
-                      </div>
-                      <SubregionsEditor
-                        item={item}
-                        onUpdate={(field, v) => updateItem(gi, ii, field, v)}
-                      />
-                      <button onClick={() => removeItem(gi, ii)} className="mt-3 text-sm text-red-500 hover:text-red-700">Remover destino</button>
-                    </div>
-                  ))}
-                  <button onClick={() => addItem(gi)} className="text-sm font-semibold text-navy-700 hover:underline">+ Adicionar destino nesta região</button>
+                    )
+                  })}
+                  <button onClick={() => addItem(gi)} className="text-sm font-semibold text-navy-700 hover:underline">
+                    + Adicionar novo destino/país nesta região
+                  </button>
+                  <p className="text-xs text-gray-400">
+                    Isso cria um card irmão (ex: outro país). Pra dividir um destino já existente em sub-áreas (Norte, Sul, um estado), abra o destino e use &ldquo;Detalhar por sub-região/estado&rdquo; — não use este botão pra isso.
+                  </p>
                 </div>
               </div>
             )}

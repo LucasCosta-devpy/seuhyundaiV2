@@ -206,6 +206,7 @@ function About({ about }) {
 
 function DestinationCarousel({ images, name }) {
   const [index, setIndex] = useState(0)
+  const current = images[index]
   function prev(e) {
     e.preventDefault()
     e.stopPropagation()
@@ -218,7 +219,12 @@ function DestinationCarousel({ images, name }) {
   }
   return (
     <div className="group relative h-full w-full">
-      <img src={images[index]} alt={name} className="h-full w-full object-cover" />
+      <img src={current.url} alt={name} className="h-full w-full object-cover" />
+      {current.caption && (
+        <span className="pointer-events-none absolute bottom-1.5 left-1.5 rounded bg-black/55 px-2 py-0.5 text-xs text-white">
+          {current.caption}
+        </span>
+      )}
       {images.length > 1 && (
         <>
           <button
@@ -247,7 +253,13 @@ function DestinationCarousel({ images, name }) {
 }
 
 function DestinationCard({ item }) {
-  const images = item.imageMode === 'carousel' ? (item.images || []).filter(Boolean) : item.imageUrl ? [item.imageUrl] : []
+  const rawImages =
+    item.imageMode === 'carousel'
+      ? (item.images || []).filter((img) => (typeof img === 'string' ? img : img?.url))
+      : item.imageUrl
+        ? [{ url: item.imageUrl, caption: item.photoCaption }]
+        : []
+  const images = rawImages.map((img) => (typeof img === 'string' ? { url: img, caption: '' } : img))
   const subregions = (item.subregions || []).filter((s) => s.name)
   const hasSubregions = subregions.length > 0
   const [activeSub, setActiveSub] = useState(0)
@@ -282,6 +294,9 @@ function DestinationCard({ item }) {
                 </button>
               ))}
             </div>
+            {subregions[activeSub]?.desc && (
+              <p className="mt-2 text-sm text-gray-600">{subregions[activeSub].desc}</p>
+            )}
             {activeCities.length > 0 && (
               <ul className="mt-3 space-y-1.5 text-sm text-navy-800">
                 {activeCities.map((city) => (
