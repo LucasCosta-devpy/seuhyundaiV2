@@ -326,7 +326,7 @@ function Destinations({ groups }) {
                   ))}
                 </div>
               ) : (
-                <div key={ci} id={slugify(chunk.item.name)} className="scroll-mt-28">
+                <div key={ci} id={slugify(chunk.item.name)} className="scroll-mt-28 pl-6 sm:pl-10">
                   <h4 className="mb-1 border-l-4 border-gold-300 pl-3 font-serif text-xl font-bold text-navy-900">
                     {chunk.item.name}
                   </h4>
