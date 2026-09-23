@@ -99,7 +99,8 @@ export const defaultContent = {
       },
       {
         name: 'Planejamento Completo',
-        priceLabel: 'A partir de R$ 797 (orçamento personalizado para roteiros de altíssima complexidade)',
+        priceLabel: 'A partir de R$ 797',
+        priceNote: 'Orçamento personalizado para roteiros de altíssima complexidade e longa duração',
         tagline: 'Para viagens complexas, como uma Europa + África de 50 dias, com múltiplos destinos.',
         bullets: [
           'Gestão logística de alta complexidade (voos, trens, traslados)',

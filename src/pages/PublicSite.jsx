@@ -345,14 +345,15 @@ function Pricing({ pricing, brand }) {
 
       <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
         {(pricing.plans || []).map((plan) => (
-          <div key={plan.name} className="flex flex-col rounded-2xl border-2 border-gold-400 p-6 text-left">
-            <h3 className="font-serif text-xl font-bold text-navy-900">{plan.name}</h3>
-            <p className="mt-2 font-serif text-2xl font-extrabold text-navy-900">{plan.priceLabel}</p>
-            <p className="mt-3 text-sm text-gray-600">{plan.tagline}</p>
-            <ul className="mt-4 flex-1 space-y-2 text-sm text-navy-800">
+          <div key={plan.name} className="flex flex-col rounded-2xl border-2 border-gold-400 bg-white p-6 text-left shadow-sm">
+            <h3 className="text-base font-bold uppercase tracking-wide text-navy-700">{plan.name}</h3>
+            <p className="mt-3 font-serif text-3xl font-extrabold text-gold-600">{plan.priceLabel}</p>
+            {plan.priceNote && <p className="mt-1 text-xs italic text-gray-400">{plan.priceNote}</p>}
+            <p className="mt-4 text-sm leading-relaxed text-gray-600">{plan.tagline}</p>
+            <ul className="mt-5 flex-1 space-y-3 text-sm text-navy-800">
               {(plan.bullets || []).map((bullet, i) => (
-                <li key={i} className="flex gap-2">
-                  <span className="text-gold-500">✓</span>
+                <li key={i} className="flex gap-2 leading-relaxed">
+                  <span className="mt-0.5 flex-shrink-0 text-gold-500">✓</span>
                   <span>{bullet}</span>
                 </li>
               ))}

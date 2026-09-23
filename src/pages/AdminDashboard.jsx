@@ -571,7 +571,7 @@ function PricingPlansEditor({ plans, onChange }) {
     onChange((plans || []).filter((_, idx) => idx !== i))
   }
   function add() {
-    onChange([...(plans || []), { name: '', priceLabel: '', tagline: '', bullets: [] }])
+    onChange([...(plans || []), { name: '', priceLabel: '', priceNote: '', tagline: '', bullets: [] }])
   }
 
   return (
@@ -583,6 +583,13 @@ function PricingPlansEditor({ plans, onChange }) {
             <TextField label="Nome do plano" value={plan.name} onChange={(v) => update(i, 'name', v)} />
             <div className="mt-2">
               <TextField label="Valor exibido" value={plan.priceLabel} onChange={(v) => update(i, 'priceLabel', v)} />
+            </div>
+            <div className="mt-2">
+              <TextField
+                label="Observação do valor (opcional, ex: 'Orçamento personalizado...')"
+                value={plan.priceNote}
+                onChange={(v) => update(i, 'priceNote', v)}
+              />
             </div>
             <div className="mt-2">
               <TextArea label="Frase curta (pra quem é esse plano)" value={plan.tagline} onChange={(v) => update(i, 'tagline', v)} />
