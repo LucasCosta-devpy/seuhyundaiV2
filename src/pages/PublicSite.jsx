@@ -170,7 +170,9 @@ function Hero({ brand, hero, destinationGroups }) {
         ) : (
           <div className={`mx-auto mb-8 rounded-full border-4 border-gold-400 flex items-center justify-center text-5xl font-serif font-bold text-gold-400 shadow-2xl sm:text-7xl ${logoSize.hero}`}>R</div>
         )}
-        <h1 className="font-serif text-4xl font-bold tracking-wide text-white sm:text-7xl">{brand.name}</h1>
+        <h1 className="bg-gradient-to-r from-gold-200 via-gold-400 to-gold-200 bg-clip-text font-serif text-4xl font-bold tracking-wide text-transparent sm:text-7xl">
+          {brand.name}
+        </h1>
         <p className="mt-4 text-lg text-navy-100 sm:text-xl">{brand.tagline}</p>
         <div className="mx-auto mt-8 h-1 w-24 rounded bg-gradient-to-r from-gold-400 to-gold-600" />
         <div className="mt-10 flex flex-wrap justify-center gap-2.5">
