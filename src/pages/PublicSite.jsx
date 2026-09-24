@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { WhatsAppFloatButton, WhatsAppLink, formatPhoneDisplay } from '../components/WhatsAppButton.jsx'
 import { slugify } from '../lib/slug.js'
 import { getLogoSize } from '../lib/logoSize.js'
@@ -8,6 +8,13 @@ import { useSiteContent } from '../lib/useSiteContent.js'
 
 export default function PublicSite() {
   const { content, loading } = useSiteContent()
+  const location = useLocation()
+
+  useEffect(() => {
+    if (loading || !location.hash) return
+    const el = document.querySelector(location.hash)
+    if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 50)
+  }, [loading, location.hash])
 
   if (loading) {
     return <div className="flex min-h-screen items-center justify-center text-navy-700">Carregando…</div>
@@ -57,6 +64,19 @@ const NAV_LINKS = [
 
 export function Header({ brand }) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  function goToSection(e, hash) {
+    e.preventDefault()
+    setMenuOpen(false)
+    if (location.pathname === '/') {
+      document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' })
+      window.history.replaceState(null, '', `/${hash}`)
+    } else {
+      navigate(`/${hash}`)
+    }
+  }
 
   return (
     <header className="border-b border-gray-100 bg-white/90 backdrop-blur sticky top-0 z-40">
@@ -79,9 +99,14 @@ export function Header({ brand }) {
 
         <nav className="hidden items-center gap-6 lg:flex">
           {NAV_LINKS.map((link) => (
-            <Link key={link.href} to={`/${link.href}`} className="text-sm font-medium text-navy-700 transition-colors hover:text-gold-600">
+            <a
+              key={link.href}
+              href={`/${link.href}`}
+              onClick={(e) => goToSection(e, link.href)}
+              className="text-sm font-medium text-navy-700 transition-colors hover:text-gold-600"
+            >
               {link.label}
-            </Link>
+            </a>
           ))}
         </nav>
 
@@ -104,14 +129,14 @@ export function Header({ brand }) {
         <nav className="border-t border-gray-100 bg-white px-4 py-3 lg:hidden">
           <div className="flex flex-col gap-1">
             {NAV_LINKS.map((link) => (
-              <Link
+              <a
                 key={link.href}
-                to={`/${link.href}`}
-                onClick={() => setMenuOpen(false)}
+                href={`/${link.href}`}
+                onClick={(e) => goToSection(e, link.href)}
                 className="rounded-lg px-3 py-2 text-sm font-medium text-navy-700 hover:bg-navy-50"
               >
                 {link.label}
-              </Link>
+              </a>
             ))}
             <WhatsAppLink whatsapp={brand.whatsapp} className="btn-navy mt-2 !py-2 !px-4 text-center text-sm">
               Falar no WhatsApp
