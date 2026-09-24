@@ -417,11 +417,11 @@ const IMAGE_PREVIEW_STYLES = {
 }
 
 const IMAGE_ASPECT = {
-  logo: { ratio: 1, editorShape: 'circle' },
-  avatar: { ratio: 1, editorShape: 'circle' },
-  portrait: { ratio: 3 / 4, editorShape: 'rect' },
-  photo: { ratio: 4 / 3, editorShape: 'rect' },
-  banner: { ratio: 16 / 6, editorShape: 'rect' },
+  logo: { ratio: 1, editorShape: 'circle', recommended: '800 × 800px (quadrada)' },
+  avatar: { ratio: 1, editorShape: 'circle', recommended: '800 × 800px (quadrada)' },
+  portrait: { ratio: 3 / 4, editorShape: 'rect', recommended: '900 × 1200px (vertical)' },
+  photo: { ratio: 4 / 3, editorShape: 'rect', recommended: '1200 × 900px (horizontal)' },
+  banner: { ratio: 16 / 6, editorShape: 'rect', recommended: '1600 × 600px (bem largo e baixo)' },
 }
 
 function ImageField({ label, value, onChange, shape = 'photo' }) {
@@ -476,6 +476,7 @@ function ImageField({ label, value, onChange, shape = 'photo' }) {
   return (
     <div>
       <label className="label">{label}</label>
+      <p className="mb-1 text-xs text-gray-400">Tamanho recomendado da imagem: <strong className="font-semibold text-gray-500">{aspect.recommended}</strong></p>
       <p className="mb-2 text-xs text-gray-400">Pré-visualização de como vai ficar no site:</p>
       <div className="flex items-center gap-4">
         {value ? (
@@ -764,7 +765,8 @@ function CityMediaEditor({ city, onPatch }) {
 
   return (
     <div>
-      <p className="label !mb-2">Tipo de mídia</p>
+      <p className="label !mb-1">Tipo de mídia</p>
+      <p className="mb-2 text-xs text-gray-400">Tamanho recomendado da imagem: <strong className="font-semibold text-gray-500">1200 × 900px (horizontal)</strong></p>
       <div className="flex flex-wrap items-start gap-4">
         <div className="flex overflow-hidden rounded-lg border border-gray-300">
           {[
