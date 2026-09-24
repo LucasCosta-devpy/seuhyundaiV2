@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 const PREVIEW_W = 360
 const EXPORT_W = 1000
 
-export default function ImageCropEditor({ src, aspectRatio = 1, shape = 'rect', onConfirm, onCancel }) {
+export default function ImageCropEditor({ src, aspectRatio = 1, shape = 'rect', fit = 'contain', onConfirm, onCancel }) {
   const canvasRef = useRef(null)
   const imgRef = useRef(null)
   const dragRef = useRef(null)
@@ -22,7 +22,8 @@ export default function ImageCropEditor({ src, aspectRatio = 1, shape = 'rect', 
       if (cancelled) return
       imgRef.current = img
       // "contain": a imagem inteira cabe no quadro, sem cortar nada (pode sobrar espaço vazio nas bordas)
-      const bs = Math.min(PREVIEW_W / img.width, previewH / img.height)
+      // "cover": preenche o quadro inteiro, cortando o excesso (sem sobrar espaço vazio)
+      const bs = fit === 'cover' ? Math.max(PREVIEW_W / img.width, previewH / img.height) : Math.min(PREVIEW_W / img.width, previewH / img.height)
       const w = img.width * bs
       const h = img.height * bs
       setBaseScale(bs)
@@ -115,7 +116,9 @@ export default function ImageCropEditor({ src, aspectRatio = 1, shape = 'rect', 
       <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
         <h3 className="mb-1 font-serif text-lg font-bold text-navy-900">Ajustar imagem</h3>
         <p className="mb-3 text-xs text-gray-400">
-          A imagem começa inteira, sem cortar nada. Se quiser aproximar/cortar, use o zoom e arraste pra posicionar.
+          {fit === 'cover'
+            ? 'A imagem já começa preenchendo o quadro inteiro. Use o zoom e arraste pra ajustar o enquadramento.'
+            : 'A imagem começa inteira, sem cortar nada. Se quiser aproximar/cortar, use o zoom e arraste pra posicionar.'}
         </p>
 
         {ready ? (
