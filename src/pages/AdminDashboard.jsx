@@ -443,11 +443,11 @@ function ImageField({ label, value, onChange, shape = 'photo' }) {
     setEditingSrc(value)
   }
 
-  async function handleCropConfirm(blob) {
+  async function handleCropConfirm(blob, ext) {
     setEditingSrc(null)
     setUploading(true)
     try {
-      const file = new File([blob], 'imagem.jpg', { type: 'image/jpeg' })
+      const file = new File([blob], `imagem.${ext}`, { type: blob.type })
       const url = await uploadImage(file)
       onChange(url)
     } catch (err) {
@@ -740,12 +740,12 @@ function CityMediaEditor({ city, onPatch }) {
     setEditing({ src: URL.createObjectURL(file), index: null })
   }
 
-  async function handleCropConfirm(blob) {
+  async function handleCropConfirm(blob, ext) {
     const target = editing
     setEditing(null)
     setUploading(true)
     try {
-      const url = await uploadImage(new File([blob], 'imagem.jpg', { type: 'image/jpeg' }))
+      const url = await uploadImage(new File([blob], `imagem.${ext}`, { type: blob.type }))
       const next = [...urls]
       if (target.index === null) next.push(url)
       else next[target.index] = url

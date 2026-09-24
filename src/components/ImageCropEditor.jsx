@@ -2,6 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 
 const PREVIEW_W = 360
 
+function supportsWebP() {
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = 1
+  return canvas.toDataURL('image/webp').startsWith('data:image/webp')
+}
+
 export default function ImageCropEditor({ src, aspectRatio = 1, shape = 'rect', fit = 'contain', exportWidth = 1000, onConfirm, onCancel }) {
   const canvasRef = useRef(null)
   const imgRef = useRef(null)
@@ -100,13 +106,14 @@ export default function ImageCropEditor({ src, aspectRatio = 1, shape = 'rect', 
     const w = img.width * baseScale * scale * factor
     const h = img.height * baseScale * scale * factor
     ctx.drawImage(img, pos.x * factor, pos.y * factor, w, h)
+    const useWebP = supportsWebP()
     canvas.toBlob(
       (blob) => {
         setSaving(false)
-        if (blob) onConfirm(blob)
+        if (blob) onConfirm(blob, useWebP ? 'webp' : 'jpg')
       },
-      'image/jpeg',
-      0.88
+      useWebP ? 'image/webp' : 'image/jpeg',
+      useWebP ? 0.92 : 0.88
     )
   }
 
