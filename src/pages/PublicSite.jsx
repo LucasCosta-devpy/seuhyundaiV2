@@ -456,7 +456,7 @@ function CTA({ cta, brand }) {
         <h2 className="section-title">{cta.title}</h2>
         <p className="mx-auto mt-4 max-w-xl text-gray-600">{cta.desc}</p>
         <WhatsAppLink whatsapp={brand.whatsapp} className="btn-gold mt-8">
-          Falar no WhatsApp {brand.whatsapp ? `(${formatPhoneDisplay(brand.whatsapp)})` : ''}
+          Falar no WhatsApp
         </WhatsAppLink>
       </div>
     </section>
