@@ -5,6 +5,7 @@ import { defaultContent } from '../lib/defaultContent.js'
 import { LOGO_SIZES, getLogoSize } from '../lib/logoSize.js'
 import { SOCIAL_PLATFORMS, getPlatform } from '../components/SocialIcons.jsx'
 import ImageCropEditor from '../components/ImageCropEditor.jsx'
+import { DestinationCard, chunkDestinationItems } from './PublicSite.jsx'
 
 const TABS = [
   { key: 'marca', label: 'Marca e Contato', color: 'amber' },
@@ -173,10 +174,20 @@ export default function AdminDashboard() {
               <p className="-mt-2 mb-2 text-xs text-gray-400">
                 Os botões que aparecem no topo do site (embaixo do título) são gerados automaticamente a partir do nome de cada região aqui embaixo — adicionar ou remover uma região adiciona ou remove o botão sozinho, sem precisar configurar em outro lugar.
               </p>
-              <DestinationGroupsEditor
-                groups={content.destinationGroups}
-                onChange={(v) => update(['destinationGroups'], v)}
-              />
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <DestinationGroupsEditor
+                  groups={content.destinationGroups}
+                  onChange={(v) => update(['destinationGroups'], v)}
+                />
+
+                <div className="lg:sticky lg:top-24 lg:self-start">
+                  <p className="mb-2 text-sm font-semibold text-navy-900">👁 Pré-visualização no site</p>
+                  <p className="mb-3 text-xs text-gray-400">Atualiza ao vivo enquanto você edita, antes mesmo de salvar.</p>
+                  <div className="max-h-[75vh] overflow-y-auto rounded-xl border border-gray-200 bg-white p-3">
+                    <DestinationsPreview groups={content.destinationGroups} />
+                  </div>
+                </div>
+              </div>
             </Panel>
           )}
 
@@ -849,6 +860,66 @@ function SubregionsEditor({ item, onUpdate }) {
           <button onClick={addSub} className="text-xs font-semibold text-navy-700 hover:underline">+ Adicionar cidade</button>
         </div>
       )}
+    </div>
+  )
+}
+
+function DestinationsPreview({ groups }) {
+  const validGroups = (groups || []).filter((g) => g.region)
+
+  if (validGroups.length === 0) {
+    return <p className="text-sm text-gray-400">Nenhuma região cadastrada ainda.</p>
+  }
+
+  return (
+    <div className="space-y-6">
+      {validGroups.map((group) => (
+        <div key={group.region} className="overflow-hidden rounded-xl border border-gray-200">
+          <div className="bg-navy-900 px-4 py-3">
+            <p className="font-serif text-lg font-bold text-white">{group.region}</p>
+          </div>
+          <div className="space-y-4 bg-gray-50 p-3">
+            {(!group.items || group.items.length === 0) && (
+              <p className="text-xs text-gray-400">Nenhum destino cadastrado ainda nesta região.</p>
+            )}
+            {chunkDestinationItems(group.items).map((chunk, ci) =>
+              chunk.type === 'simple' ? (
+                <div key={ci} className="space-y-3">
+                  {chunk.items.map((item) => (
+                    <DestinationCard
+                      key={item.name}
+                      name={item.name}
+                      desc={item.desc}
+                      imageUrl={item.imageUrl}
+                      imageMode={item.imageMode}
+                      images={item.images}
+                      photoCaption={item.photoCaption}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div key={ci} className="pl-2">
+                  <p className="mb-2 border-l-4 border-gold-300 pl-2 font-serif font-bold text-navy-900">{chunk.item.name}</p>
+                  {chunk.item.desc && <p className="mb-2 pl-2 text-xs text-gray-600">{chunk.item.desc}</p>}
+                  <div className="space-y-3 pl-2">
+                    {chunk.subregions.map((sub) => (
+                      <DestinationCard
+                        key={sub.name}
+                        name={sub.name}
+                        desc={sub.desc}
+                        imageUrl={sub.imageUrl}
+                        imageMode={sub.imageMode}
+                        images={sub.images}
+                        photoCaption={sub.photoCaption}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )
+            )}
+          </div>
+        </div>
+      ))}
     </div>
   )
 }

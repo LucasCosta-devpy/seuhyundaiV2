@@ -252,7 +252,7 @@ function DestinationCarousel({ images, name }) {
   )
 }
 
-function DestinationCard({ name, desc, imageUrl, imageMode, images: itemImages, photoCaption }) {
+export function DestinationCard({ name, desc, imageUrl, imageMode, images: itemImages, photoCaption }) {
   const rawImages =
     imageMode === 'carousel'
       ? (itemImages || []).filter((img) => (typeof img === 'string' ? img : img?.url))
@@ -281,7 +281,7 @@ function DestinationCard({ name, desc, imageUrl, imageMode, images: itemImages, 
 // Agrupa a lista de destinos de uma região em blocos, preservando a ordem:
 // destinos simples (sem sub-cards) ficam juntos numa grade; um destino com
 // sub-cards vira seu próprio bloco (cabeçalho do país + grade dos sub-cards).
-function chunkDestinationItems(items) {
+export function chunkDestinationItems(items) {
   const chunks = []
   let currentSimple = []
   for (const item of items || []) {
