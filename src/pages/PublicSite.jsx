@@ -309,11 +309,27 @@ export function RegionBlock({ group, compact = false }) {
           const flag = getCountryFlag(country.name, '')
           return (
             <div key={ci} id={slugify(country.name)} className={`scroll-mt-28 ${compact ? 'pl-3' : 'pl-6 sm:pl-10'}`}>
-              <h4 className="flex items-center gap-2 border-l-4 border-gold-300 pl-3 font-serif text-xl font-bold text-navy-900">
-                {flag && <span>{flag}</span>}
-                {country.name}
-              </h4>
-              {country.desc && <p className="mt-1 pl-3 text-sm text-gray-600">{country.desc}</p>}
+              {country.coverUrl ? (
+                <div className={`relative overflow-hidden rounded-xl bg-navy-900 ${compact ? 'h-20' : 'h-28 sm:h-36'}`}>
+                  <img src={country.coverUrl} alt={country.name} className="absolute inset-0 h-full w-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/40 to-navy-900/10" />
+                  <div className={`absolute inset-0 flex flex-col justify-end ${compact ? 'p-2' : 'p-3 sm:p-5'}`}>
+                    <h4 className={`flex items-center gap-2 font-serif font-bold text-white ${compact ? 'text-sm' : 'text-lg sm:text-xl'}`}>
+                      {flag && <span>{flag}</span>}
+                      {country.name}
+                    </h4>
+                    {country.desc && <p className={`mt-1 text-navy-100 ${compact ? 'text-xs' : 'text-xs sm:text-sm'}`}>{country.desc}</p>}
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <h4 className="flex items-center gap-2 border-l-4 border-gold-300 pl-3 font-serif text-xl font-bold text-navy-900">
+                    {flag && <span>{flag}</span>}
+                    {country.name}
+                  </h4>
+                  {country.desc && <p className="mt-1 pl-3 text-sm text-gray-600">{country.desc}</p>}
+                </>
+              )}
               {cities.length > 0 && (
                 <div className={`mt-4 pl-3 ${grid}`}>
                   {cities.map((city, i) => (

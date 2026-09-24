@@ -1014,6 +1014,12 @@ function CountriesEditor({ countries, onChange }) {
                     <label className="label">Descrição do país (opcional)</label>
                     <textarea className="input text-sm" rows={2} value={country.desc || ''} onChange={(e) => patchCountry(ci, { desc: e.target.value })} />
                   </div>
+                  <ImageField
+                    label="Capa do país (opcional, imagem única)"
+                    shape="banner"
+                    value={country.coverUrl}
+                    onChange={(v) => patchCountry(ci, { coverUrl: v })}
+                  />
                   <CitiesEditor cities={country.subregions || []} onChange={(v) => patchCountry(ci, { subregions: v })} />
                 </div>
               )}
