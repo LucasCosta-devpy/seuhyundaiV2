@@ -7,7 +7,7 @@ import { getCountryFlag } from '../lib/flags.js'
 
 function Breadcrumbs({ items }) {
   return (
-    <nav className="mx-auto max-w-6xl px-4 pt-4 text-sm text-gray-500 sm:px-6">
+    <nav className="mx-auto max-w-[1400px] px-4 pt-4 text-sm text-gray-500 sm:px-6">
       <Link to="/" className="hover:text-navy-700">Início</Link>
       {items.map((item, i) => (
         <span key={i}>
@@ -26,7 +26,7 @@ function Breadcrumbs({ items }) {
 function Banner({ title, desc, coverUrl, flag, height = 'h-44 sm:h-64' }) {
   if (coverUrl) {
     return (
-      <div className={`relative mx-auto mt-4 max-w-6xl overflow-hidden rounded-2xl bg-navy-900 px-4 sm:px-6 ${height}`}>
+      <div className={`relative mx-auto mt-4 max-w-[1400px] overflow-hidden rounded-2xl bg-navy-900 px-4 sm:px-6 ${height}`}>
         <div className="absolute inset-0 mx-4 overflow-hidden rounded-2xl sm:mx-6">
           <img src={coverUrl} alt={title} className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/40 to-navy-900/10" />
@@ -40,7 +40,7 @@ function Banner({ title, desc, coverUrl, flag, height = 'h-44 sm:h-64' }) {
     )
   }
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+    <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6">
       <h1 className="flex items-center gap-2 border-l-4 border-gold-400 pl-4 font-serif text-3xl font-bold text-navy-900 sm:text-4xl">
         {title}
       </h1>
@@ -105,10 +105,10 @@ export function RegionPage() {
           <Breadcrumbs items={[{ label: group.region }]} />
           <Banner title={group.region} desc={group.desc} coverUrl={group.coverUrl} />
 
-          <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+          <section className="mx-auto max-w-[1400px] px-4 py-10 sm:px-6">
             <h2 className="font-serif text-xl font-bold text-navy-900">Países de {group.region}</h2>
             <p className="mt-1 text-sm text-gray-500">Escolha um país para descobrir suas cidades e destinos.</p>
-            <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {(group.items || []).filter((c) => c.name).map((country, ci) => (
                 <ExploreCard
                   key={ci}
@@ -156,10 +156,10 @@ export function CountryPage() {
             flag={getCountryFlag(country.name, '')}
           />
 
-          <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+          <section className="mx-auto max-w-[1400px] px-4 py-10 sm:px-6">
             <h2 className="font-serif text-xl font-bold text-navy-900">Cidades de {country.name}</h2>
             <p className="mt-1 text-sm text-gray-500">Descubra os destinos mais incríveis por lá.</p>
-            <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {(country.subregions || []).filter((c) => c.name).map((city, i) => (
                 <Link key={i} to={`/destinos/${regionSlug}/${countrySlug}/${slugify(city.name)}`} className="block">
                   <DestinationCard

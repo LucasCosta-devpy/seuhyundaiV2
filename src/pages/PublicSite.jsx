@@ -358,13 +358,13 @@ function RegionSummaryCard({ group }) {
 function Destinations({ groups }) {
   const validGroups = (groups || []).filter((g) => g.region)
   return (
-    <section id="destinos" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-14 sm:px-6">
+    <section id="destinos" className="mx-auto max-w-[1400px] scroll-mt-20 px-4 py-14 sm:px-6">
       <div className="text-center">
         <h2 className="section-title">Nossos Destinos</h2>
         <p className="mx-auto mt-3 max-w-xl text-gray-600">Explore o mundo e encontre seu próximo destino.</p>
       </div>
       {validGroups.length > 0 ? (
-        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {validGroups.map((group, gi) => (
             <RegionSummaryCard key={gi} group={group} />
           ))}
