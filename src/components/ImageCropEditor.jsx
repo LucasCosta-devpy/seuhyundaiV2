@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 
 const PREVIEW_W = 360
-const EXPORT_W = 1000
 
-export default function ImageCropEditor({ src, aspectRatio = 1, shape = 'rect', fit = 'contain', onConfirm, onCancel }) {
+export default function ImageCropEditor({ src, aspectRatio = 1, shape = 'rect', fit = 'contain', exportWidth = 1000, onConfirm, onCancel }) {
   const canvasRef = useRef(null)
   const imgRef = useRef(null)
   const dragRef = useRef(null)
@@ -90,14 +89,14 @@ export default function ImageCropEditor({ src, aspectRatio = 1, shape = 'rect', 
     const img = imgRef.current
     if (!img) return
     setSaving(true)
-    const exportH = Math.round(EXPORT_W / aspectRatio)
-    const factor = EXPORT_W / PREVIEW_W
+    const exportH = Math.round(exportWidth / aspectRatio)
+    const factor = exportWidth / PREVIEW_W
     const canvas = document.createElement('canvas')
-    canvas.width = EXPORT_W
+    canvas.width = exportWidth
     canvas.height = exportH
     const ctx = canvas.getContext('2d')
     ctx.fillStyle = '#ffffff'
-    ctx.fillRect(0, 0, EXPORT_W, exportH)
+    ctx.fillRect(0, 0, exportWidth, exportH)
     const w = img.width * baseScale * scale * factor
     const h = img.height * baseScale * scale * factor
     ctx.drawImage(img, pos.x * factor, pos.y * factor, w, h)
