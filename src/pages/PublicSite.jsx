@@ -1,37 +1,14 @@
-import { useEffect, useState } from 'react'
-import { getContent } from '../lib/api.js'
-import { defaultContent } from '../lib/defaultContent.js'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { WhatsAppFloatButton, WhatsAppLink, formatPhoneDisplay } from '../components/WhatsAppButton.jsx'
 import { slugify } from '../lib/slug.js'
 import { getLogoSize } from '../lib/logoSize.js'
 import { getPlatform } from '../components/SocialIcons.jsx'
 import { getCountryFlag } from '../lib/flags.js'
+import { useSiteContent } from '../lib/useSiteContent.js'
 
 export default function PublicSite() {
-  const [content, setContent] = useState(defaultContent)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    getContent()
-      .then((data) => setContent({ ...defaultContent, ...data }))
-      .catch(() => setContent(defaultContent))
-      .finally(() => setLoading(false))
-  }, [])
-
-  useEffect(() => {
-    if (content.brand?.name) {
-      document.title = `${content.brand.name} - ${content.brand.tagline || 'Consultoria de Viagens'}`
-    }
-    if (content.brand?.logoUrl) {
-      let link = document.querySelector("link[rel~='icon']")
-      if (!link) {
-        link = document.createElement('link')
-        link.rel = 'icon'
-        document.head.appendChild(link)
-      }
-      link.href = content.brand.logoUrl
-    }
-  }, [content.brand?.name, content.brand?.tagline, content.brand?.logoUrl])
+  const { content, loading } = useSiteContent()
 
   if (loading) {
     return <div className="flex min-h-screen items-center justify-center text-navy-700">Carregando…</div>
@@ -79,7 +56,7 @@ const NAV_LINKS = [
   { href: '#contato', label: 'Contato' },
 ]
 
-function Header({ brand }) {
+export function Header({ brand }) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
@@ -103,9 +80,9 @@ function Header({ brand }) {
 
         <nav className="hidden items-center gap-6 lg:flex">
           {NAV_LINKS.map((link) => (
-            <a key={link.href} href={link.href} className="text-sm font-medium text-navy-700 transition-colors hover:text-gold-600">
+            <Link key={link.href} to={`/${link.href}`} className="text-sm font-medium text-navy-700 transition-colors hover:text-gold-600">
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -128,14 +105,14 @@ function Header({ brand }) {
         <nav className="border-t border-gray-100 bg-white px-4 py-3 lg:hidden">
           <div className="flex flex-col gap-1">
             {NAV_LINKS.map((link) => (
-              <a
+              <Link
                 key={link.href}
-                href={link.href}
+                to={`/${link.href}`}
                 onClick={() => setMenuOpen(false)}
                 className="rounded-lg px-3 py-2 text-sm font-medium text-navy-700 hover:bg-navy-50"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
             <WhatsAppLink whatsapp={brand.whatsapp} className="btn-navy mt-2 !py-2 !px-4 text-center text-sm">
               Falar no WhatsApp
@@ -177,14 +154,14 @@ function Hero({ brand, destinationGroups }) {
         <p className="mt-4 text-lg text-navy-100 sm:text-xl">{brand.tagline}</p>
         <div className="mx-auto mt-8 h-1 w-24 rounded bg-gradient-to-r from-gold-400 to-gold-600" />
         <div className="mt-10 flex flex-wrap justify-center gap-2.5">
-          {(destinationGroups || []).map((group) => (
-            <a
+          {(destinationGroups || []).filter((g) => g.region).map((group) => (
+            <Link
               key={group.region}
-              href={`#${slugify(group.region)}`}
+              to={`/destinos/${slugify(group.region)}`}
               className="rounded-full border border-gold-400/60 bg-white/5 px-4 py-1.5 text-sm text-gold-100 backdrop-blur-sm transition-all duration-200 hover:border-gold-300 hover:bg-gold-400 hover:text-navy-900 hover:scale-105"
             >
               {group.region}
-            </a>
+            </Link>
           ))}
         </div>
       </div>
@@ -205,7 +182,7 @@ function About({ about }) {
   )
 }
 
-function DestinationCarousel({ images, name }) {
+export function DestinationCarousel({ images, name }) {
   const [index, setIndex] = useState(0)
   const current = images[index]
   function prev(e) {
@@ -253,7 +230,7 @@ function DestinationCarousel({ images, name }) {
   )
 }
 
-function DestinationCard({ name, desc, imageUrl, imageMode, images: itemImages, photoCaption }) {
+export function DestinationCard({ name, desc, imageUrl, imageMode, images: itemImages, photoCaption, large = false }) {
   const rawImages =
     imageMode === 'carousel'
       ? (itemImages || []).filter((img) => (typeof img === 'string' ? img : img?.url))
@@ -264,16 +241,16 @@ function DestinationCard({ name, desc, imageUrl, imageMode, images: itemImages, 
 
   return (
     <div className="card overflow-hidden">
-      <div className="flex h-40 items-center justify-center bg-gradient-to-br from-navy-50 to-gray-100 text-gray-400">
+      <div className={`flex items-center justify-center bg-gradient-to-br from-navy-50 to-gray-100 text-gray-400 ${large ? 'h-72 sm:h-96' : 'h-40'}`}>
         {images.length > 0 ? (
           <DestinationCarousel images={images} name={name} />
         ) : (
           <span className="text-sm">Sem foto</span>
         )}
       </div>
-      <div className="border-t-2 border-gold-400 p-4">
-        <h4 className="font-serif text-lg font-bold text-navy-900">{name}</h4>
-        <p className="mt-1 text-sm text-gray-600">{desc}</p>
+      <div className={`border-t-2 border-gold-400 ${large ? 'p-6' : 'p-4'}`}>
+        <h4 className={`font-serif font-bold text-navy-900 ${large ? 'text-2xl' : 'text-lg'}`}>{name}</h4>
+        <p className={`mt-1 text-gray-600 ${large ? '' : 'text-sm'}`}>{desc}</p>
       </div>
     </div>
   )
@@ -353,14 +330,48 @@ export function RegionBlock({ group, compact = false }) {
   )
 }
 
-function Destinations({ groups }) {
+function RegionSummaryCard({ group }) {
+  const countryCount = (group.items || []).filter((c) => c.name).length
   return (
-    <section id="destinos" className="mx-auto max-w-6xl scroll-mt-20 space-y-14 px-4 py-10 sm:px-6">
-      {(groups || [])
-        .filter((g) => g.region)
-        .map((group, gi) => (
-          <RegionBlock key={gi} group={group} />
-        ))}
+    <Link
+      to={`/destinos/${slugify(group.region)}`}
+      className="group relative block h-56 overflow-hidden rounded-2xl bg-navy-900 shadow-md transition-transform hover:scale-[1.02]"
+    >
+      {group.coverUrl ? (
+        <img src={group.coverUrl} alt={group.region} className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-navy-800 to-navy-900" />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/40 to-navy-900/10" />
+      <div className="absolute inset-0 flex flex-col justify-end p-5">
+        <h3 className="font-serif text-2xl font-bold text-white">{group.region}</h3>
+        {group.desc && <p className="mt-1 line-clamp-2 text-sm text-navy-100">{group.desc}</p>}
+        <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-gold-300">
+          {countryCount > 0 ? `${countryCount} país${countryCount === 1 ? '' : 'es'}` : 'Explorar região'}
+          <span className="transition-transform group-hover:translate-x-1">→</span>
+        </span>
+      </div>
+    </Link>
+  )
+}
+
+function Destinations({ groups }) {
+  const validGroups = (groups || []).filter((g) => g.region)
+  return (
+    <section id="destinos" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-14 sm:px-6">
+      <div className="text-center">
+        <h2 className="section-title">Nossos Destinos</h2>
+        <p className="mx-auto mt-3 max-w-xl text-gray-600">Explore o mundo e encontre seu próximo destino.</p>
+      </div>
+      {validGroups.length > 0 ? (
+        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {validGroups.map((group, gi) => (
+            <RegionSummaryCard key={gi} group={group} />
+          ))}
+        </div>
+      ) : (
+        <p className="mt-10 text-center text-gray-400">Nenhuma região cadastrada ainda.</p>
+      )}
     </section>
   )
 }
@@ -499,7 +510,7 @@ function CTA({ cta, brand }) {
   )
 }
 
-function Footer({ brand, footer, socialLinks }) {
+export function Footer({ brand, footer, socialLinks }) {
   return (
     <footer className="border-t border-gray-100 py-10 text-center text-sm text-gray-500">
       {socialLinks?.length > 0 && (
