@@ -287,8 +287,21 @@ export function RegionBlock({ group, compact = false }) {
 
   return (
     <div id={slugify(group.region)} className="scroll-mt-24">
-      <h3 className="border-l-4 border-gold-400 pl-3 font-serif text-2xl font-bold text-navy-900">{group.region}</h3>
-      {group.desc && <p className="mt-2 pl-4 text-gray-600">{group.desc}</p>}
+      {group.coverUrl ? (
+        <div className={`relative overflow-hidden rounded-2xl bg-navy-900 ${compact ? 'h-28' : 'h-40 sm:h-56'}`}>
+          <img src={group.coverUrl} alt={group.region} className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/40 to-navy-900/10" />
+          <div className={`absolute inset-0 flex flex-col justify-end ${compact ? 'p-3' : 'p-5 sm:p-8'}`}>
+            <h3 className={`font-serif font-bold text-white ${compact ? 'text-lg' : 'text-2xl sm:text-4xl'}`}>{group.region}</h3>
+            {group.desc && <p className={`mt-1 text-navy-100 ${compact ? 'text-xs' : 'text-sm sm:text-base'}`}>{group.desc}</p>}
+          </div>
+        </div>
+      ) : (
+        <>
+          <h3 className="border-l-4 border-gold-400 pl-3 font-serif text-2xl font-bold text-navy-900">{group.region}</h3>
+          {group.desc && <p className="mt-2 pl-4 text-gray-600">{group.desc}</p>}
+        </>
+      )}
 
       <div className="mt-6 space-y-10">
         {countries.map((country, ci) => {

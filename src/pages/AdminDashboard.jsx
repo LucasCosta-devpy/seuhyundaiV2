@@ -413,6 +413,7 @@ const IMAGE_PREVIEW_STYLES = {
   avatar: 'h-20 w-20 rounded-full object-cover border border-gray-200',
   portrait: 'h-28 w-24 rounded-lg object-cover border border-gray-200',
   photo: 'h-20 w-28 rounded-lg object-cover border border-gray-200',
+  banner: 'h-16 w-full max-w-xs rounded-lg object-cover border border-gray-200',
 }
 
 const IMAGE_ASPECT = {
@@ -420,6 +421,7 @@ const IMAGE_ASPECT = {
   avatar: { ratio: 1, editorShape: 'circle' },
   portrait: { ratio: 3 / 4, editorShape: 'rect' },
   photo: { ratio: 4 / 3, editorShape: 'rect' },
+  banner: { ratio: 16 / 6, editorShape: 'rect' },
 }
 
 function ImageField({ label, value, onChange, shape = 'photo' }) {
@@ -1091,6 +1093,12 @@ function DestinationGroupsEditor({ groups, onChange }) {
                     <label className="label">Descrição da região (opcional)</label>
                     <textarea className="input text-sm" rows={2} value={group.desc || ''} onChange={(e) => patchGroup(gi, { desc: e.target.value })} />
                   </div>
+                  <ImageField
+                    label="Capa da região (opcional — aparece como banner atrás do título)"
+                    shape="banner"
+                    value={group.coverUrl}
+                    onChange={(v) => patchGroup(gi, { coverUrl: v })}
+                  />
                   <CountriesEditor countries={group.items || []} onChange={(v) => patchGroup(gi, { items: v })} />
                 </div>
               )}
