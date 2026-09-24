@@ -927,6 +927,7 @@ function DestinationsPreview({ groups }) {
 function DestinationGroupsEditor({ groups, onChange }) {
   const [openIndex, setOpenIndex] = useState(0)
   const [openItems, setOpenItems] = useState({})
+  const [dragIndex, setDragIndex] = useState(null)
 
   function toggleItem(gi, ii) {
     setOpenItems((prev) => ({ ...prev, [gi]: prev[gi] === ii ? -1 : ii }))
@@ -942,6 +943,19 @@ function DestinationGroupsEditor({ groups, onChange }) {
   }
   function addGroup() {
     onChange([...groups, { region: 'Nova região', items: [] }])
+  }
+  function moveRegion(from, to) {
+    if (to < 0 || to >= groups.length || from === to) return
+    const next = [...groups]
+    const [moved] = next.splice(from, 1)
+    next.splice(to, 0, moved)
+    onChange(next)
+    setOpenIndex(-1)
+  }
+  function handleDrop(gi) {
+    if (dragIndex === null) return
+    moveRegion(dragIndex, gi)
+    setDragIndex(null)
   }
   function updateItem(gi, ii, field, v) {
     const next = [...groups]
@@ -967,20 +981,52 @@ function DestinationGroupsEditor({ groups, onChange }) {
       {groups.map((group, gi) => {
         const color = REGION_COLORS[gi % REGION_COLORS.length]
         const isOpen = openIndex === gi
+        const isDragging = dragIndex === gi
         return (
-          <div key={gi} className={`overflow-hidden rounded-lg border-l-4 border border-gray-200 ${color.border}`}>
-            <button
-              type="button"
-              onClick={() => setOpenIndex(isOpen ? -1 : gi)}
-              className={`flex w-full items-center justify-between gap-2 px-4 py-3 text-left transition-colors ${color.header}`}
-            >
-              <span className="flex items-center gap-2 font-semibold text-navy-900">
+          <div
+            key={gi}
+            draggable
+            onDragStart={() => setDragIndex(gi)}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={() => handleDrop(gi)}
+            onDragEnd={() => setDragIndex(null)}
+            className={`overflow-hidden rounded-lg border-l-4 border border-gray-200 transition-opacity ${color.border} ${isDragging ? 'opacity-40' : ''}`}
+          >
+            <div className={`flex items-center gap-2 px-4 py-3 transition-colors ${color.header}`}>
+              <span className="cursor-grab select-none text-gray-400" title="Arraste pra reordenar">⠿</span>
+              <button
+                type="button"
+                onClick={() => setOpenIndex(isOpen ? -1 : gi)}
+                className="flex flex-1 items-center gap-2 text-left"
+              >
                 <span className={`h-2.5 w-2.5 rounded-full ${color.badge}`} />
-                {group.region}
+                <span className="font-semibold text-navy-900">{group.region}</span>
                 <span className="text-xs font-normal text-gray-500">({group.items.length} destino{group.items.length === 1 ? '' : 's'})</span>
-              </span>
-              <span className="text-lg text-gray-500">{isOpen ? '−' : '+'}</span>
-            </button>
+              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => moveRegion(gi, gi - 1)}
+                  disabled={gi === 0}
+                  title="Mover pra cima"
+                  className="rounded px-1.5 py-1 text-gray-500 hover:bg-black/5 disabled:opacity-25 disabled:hover:bg-transparent"
+                >
+                  ▲
+                </button>
+                <button
+                  type="button"
+                  onClick={() => moveRegion(gi, gi + 1)}
+                  disabled={gi === groups.length - 1}
+                  title="Mover pra baixo"
+                  className="rounded px-1.5 py-1 text-gray-500 hover:bg-black/5 disabled:opacity-25 disabled:hover:bg-transparent"
+                >
+                  ▼
+                </button>
+                <button type="button" onClick={() => setOpenIndex(isOpen ? -1 : gi)} className="px-1.5 py-1 text-lg text-gray-500">
+                  {isOpen ? '−' : '+'}
+                </button>
+              </div>
+            </div>
 
             {isOpen && (
               <div className="bg-white p-4">
