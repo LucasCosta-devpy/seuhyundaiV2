@@ -34,6 +34,28 @@ const TAB_STYLES = {
   cyan: { active: 'bg-cyan-500 border-cyan-500 text-white', inactive: 'border-cyan-200 text-cyan-700 hover:bg-cyan-50', top: 'border-t-cyan-500' },
 }
 
+const COUNTRY_FLAGS = {
+  'brasil': '🇧🇷', 'argentina': '🇦🇷', 'uruguai': '🇺🇾', 'chile': '🇨🇱', 'venezuela': '🇻🇪',
+  'colombia': '🇨🇴', 'colômbia': '🇨🇴', 'peru': '🇵🇪', 'bolivia': '🇧🇴', 'bolívia': '🇧🇴',
+  'paraguai': '🇵🇾', 'equador': '🇪🇨', 'guiana': '🇬🇾', 'suriname': '🇸🇷',
+  'portugal': '🇵🇹', 'espanha': '🇪🇸', 'franca': '🇫🇷', 'frança': '🇫🇷', 'italia': '🇮🇹', 'itália': '🇮🇹',
+  'alemanha': '🇩🇪', 'polonia': '🇵🇱', 'polônia': '🇵🇱', 'eslovaquia': '🇸🇰', 'eslováquia': '🇸🇰',
+  'hungria': '🇭🇺', 'suica': '🇨🇭', 'suíça': '🇨🇭', 'austria': '🇦🇹', 'áustria': '🇦🇹',
+  'paises baixos': '🇳🇱', 'países baixos': '🇳🇱', 'holanda': '🇳🇱', 'belgica': '🇧🇪', 'bélgica': '🇧🇪',
+  'reino unido': '🇬🇧', 'inglaterra': '🇬🇧', 'irlanda': '🇮🇪', 'grecia': '🇬🇷', 'grécia': '🇬🇷',
+  'croacia': '🇭🇷', 'croácia': '🇭🇷', 'republica tcheca': '🇨🇿', 'república tcheca': '🇨🇿',
+  'marrocos': '🇲🇦', 'egito': '🇪🇬', 'africa do sul': '🇿🇦', 'áfrica do sul': '🇿🇦',
+  'quenia': '🇰🇪', 'quênia': '🇰🇪', 'tanzania': '🇹🇿', 'tanzânia': '🇹🇿',
+  'estados unidos': '🇺🇸', 'eua': '🇺🇸', 'canada': '🇨🇦', 'canadá': '🇨🇦', 'mexico': '🇲🇽', 'méxico': '🇲🇽',
+  'japao': '🇯🇵', 'japão': '🇯🇵', 'china': '🇨🇳', 'tailandia': '🇹🇭', 'tailândia': '🇹🇭',
+  'india': '🇮🇳', 'índia': '🇮🇳', 'indonesia': '🇮🇩', 'indonésia': '🇮🇩', 'australia': '🇦🇺', 'austrália': '🇦🇺',
+}
+
+function getCountryFlag(name) {
+  const key = (name || '').trim().toLowerCase()
+  return COUNTRY_FLAGS[key] || '📍'
+}
+
 const REGION_COLORS = [
   { border: 'border-l-amber-400', header: 'bg-amber-50', badge: 'bg-amber-400' },
   { border: 'border-l-sky-400', header: 'bg-sky-50', badge: 'bg-sky-400' },
@@ -99,7 +121,7 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
+      <main className="mx-auto max-w-screen-2xl px-4 py-6 sm:px-6">
         {status && (
           <div className="mb-4 rounded-lg bg-navy-800 px-4 py-2 text-sm text-white">{status}</div>
         )}
@@ -242,7 +264,7 @@ export default function AdminDashboard() {
       </main>
 
       <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
-        <div className="mx-auto flex max-w-4xl justify-end">
+        <div className="mx-auto flex max-w-screen-2xl justify-end">
           <button onClick={handleSave} disabled={saving} className="btn-navy">
             {saving ? 'Salvando…' : 'Salvar alterações'}
           </button>
@@ -790,6 +812,7 @@ function SubregionsEditor({ item, onUpdate }) {
   const subregions = item.subregions || []
   const [expanded, setExpanded] = useState(subregions.length > 0)
   const [openSub, setOpenSub] = useState(-1)
+  const [dragSub, setDragSub] = useState(null)
 
   function updateSub(si, field, v) {
     const next = [...subregions]
@@ -805,6 +828,14 @@ function SubregionsEditor({ item, onUpdate }) {
     onUpdate('subregions', next)
     setExpanded(true)
     setOpenSub(next.length - 1)
+  }
+  function moveSub(from, to) {
+    if (to < 0 || to >= subregions.length || from === to) return
+    const next = [...subregions]
+    const [moved] = next.splice(from, 1)
+    next.splice(to, 0, moved)
+    onUpdate('subregions', next)
+    setOpenSub(-1)
   }
 
   return (
@@ -822,16 +853,30 @@ function SubregionsEditor({ item, onUpdate }) {
           <p className="text-xs text-gray-400">Opcional: liste as cidades/áreas dentro deste destino, cada uma com nome, descrição e até {MAX_CAROUSEL_IMAGES} fotos.</p>
           {subregions.map((sub, si) => {
             const subOpen = openSub === si
+            const isDraggingSub = dragSub === si
             return (
-              <div key={si} className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-                <button
-                  type="button"
-                  onClick={() => setOpenSub(subOpen ? -1 : si)}
-                  className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left"
-                >
-                  <span className="text-sm font-semibold text-navy-900">{sub.name || 'Nova cidade (sem nome ainda)'}</span>
-                  <span className="text-gray-500">{subOpen ? '−' : '+'}</span>
-                </button>
+              <div
+                key={si}
+                draggable
+                onDragStart={() => setDragSub(si)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={() => {
+                  moveSub(dragSub, si)
+                  setDragSub(null)
+                }}
+                onDragEnd={() => setDragSub(null)}
+                className={`overflow-hidden rounded-lg border border-gray-200 bg-white transition-opacity ${isDraggingSub ? 'opacity-40' : ''}`}
+              >
+                <div className="flex items-center gap-1 px-2 py-1.5">
+                  <span className="cursor-grab select-none px-1 text-gray-400" title="Arraste pra reordenar">⠿</span>
+                  <button type="button" onClick={() => setOpenSub(subOpen ? -1 : si)} className="flex flex-1 items-center gap-2 text-left">
+                    <span className="text-sm font-semibold text-navy-900">{sub.name || 'Nova cidade (sem nome ainda)'}</span>
+                  </button>
+                  <button type="button" onClick={() => moveSub(si, si - 1)} disabled={si === 0} title="Mover pra cima" className="rounded px-1 py-1 text-xs text-gray-500 hover:bg-black/5 disabled:opacity-25">▲</button>
+                  <button type="button" onClick={() => moveSub(si, si + 1)} disabled={si === subregions.length - 1} title="Mover pra baixo" className="rounded px-1 py-1 text-xs text-gray-500 hover:bg-black/5 disabled:opacity-25">▼</button>
+                  <button type="button" onClick={() => setOpenSub(subOpen ? -1 : si)} className="px-1 py-1 text-gray-500">{subOpen ? '−' : '+'}</button>
+                  <button type="button" onClick={() => removeSub(si)} title="Remover cidade" className="px-1 py-1 text-red-400 hover:text-red-600">🗑</button>
+                </div>
 
                 {subOpen && (
                   <div className="border-t border-gray-200 p-3">
@@ -851,7 +896,6 @@ function SubregionsEditor({ item, onUpdate }) {
                     <div className="mt-2">
                       <DestinationImagesEditor item={sub} onUpdate={(field, v) => updateSub(si, field, v)} />
                     </div>
-                    <button onClick={() => removeSub(si)} className="mt-2 text-xs text-red-500 hover:text-red-700">Remover cidade</button>
                   </div>
                 )}
               </div>
@@ -928,6 +972,7 @@ function DestinationGroupsEditor({ groups, onChange }) {
   const [openIndex, setOpenIndex] = useState(0)
   const [openItems, setOpenItems] = useState({})
   const [dragIndex, setDragIndex] = useState(null)
+  const [dragItem, setDragItem] = useState(null)
 
   function toggleItem(gi, ii) {
     setOpenItems((prev) => ({ ...prev, [gi]: prev[gi] === ii ? -1 : ii }))
@@ -974,6 +1019,17 @@ function DestinationGroupsEditor({ groups, onChange }) {
     next[gi] = { ...next[gi], items: [...next[gi].items, { name: '', desc: '', imageUrl: '', imageMode: 'single', images: [] }] }
     onChange(next)
     setOpenItems((prev) => ({ ...prev, [gi]: next[gi].items.length - 1 }))
+  }
+  function moveItem(gi, from, to) {
+    const items = groups[gi].items
+    if (to < 0 || to >= items.length || from === to) return
+    const nextItems = [...items]
+    const [moved] = nextItems.splice(from, 1)
+    nextItems.splice(to, 0, moved)
+    const next = [...groups]
+    next[gi] = { ...next[gi], items: nextItems }
+    onChange(next)
+    setOpenItems((prev) => ({ ...prev, [gi]: -1 }))
   }
 
   return (
@@ -1042,16 +1098,31 @@ function DestinationGroupsEditor({ groups, onChange }) {
                 <div className="mt-4 space-y-2">
                   {group.items.map((item, ii) => {
                     const itemOpen = (openItems[gi] ?? -1) === ii
+                    const isDraggingItem = dragItem && dragItem.gi === gi && dragItem.ii === ii
                     return (
-                      <div key={ii} className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
-                        <button
-                          type="button"
-                          onClick={() => toggleItem(gi, ii)}
-                          className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left"
-                        >
-                          <span className="text-sm font-semibold text-navy-900">{item.name || 'Novo destino (sem nome ainda)'}</span>
-                          <span className="text-gray-500">{itemOpen ? '−' : '+'}</span>
-                        </button>
+                      <div
+                        key={ii}
+                        draggable
+                        onDragStart={() => setDragItem({ gi, ii })}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={() => {
+                          if (dragItem && dragItem.gi === gi) moveItem(gi, dragItem.ii, ii)
+                          setDragItem(null)
+                        }}
+                        onDragEnd={() => setDragItem(null)}
+                        className={`overflow-hidden rounded-lg border border-gray-200 bg-gray-50 transition-opacity ${isDraggingItem ? 'opacity-40' : ''}`}
+                      >
+                        <div className="flex items-center gap-1 px-2 py-1.5">
+                          <span className="cursor-grab select-none px-1 text-gray-400" title="Arraste pra reordenar">⠿</span>
+                          <button type="button" onClick={() => toggleItem(gi, ii)} className="flex flex-1 items-center gap-2 text-left">
+                            <span>{getCountryFlag(item.name)}</span>
+                            <span className="text-sm font-semibold text-navy-900">{item.name || 'Novo destino (sem nome ainda)'}</span>
+                          </button>
+                          <button type="button" onClick={() => moveItem(gi, ii, ii - 1)} disabled={ii === 0} title="Mover pra cima" className="rounded px-1 py-1 text-xs text-gray-500 hover:bg-black/5 disabled:opacity-25">▲</button>
+                          <button type="button" onClick={() => moveItem(gi, ii, ii + 1)} disabled={ii === group.items.length - 1} title="Mover pra baixo" className="rounded px-1 py-1 text-xs text-gray-500 hover:bg-black/5 disabled:opacity-25">▼</button>
+                          <button type="button" onClick={() => toggleItem(gi, ii)} className="px-1 py-1 text-gray-500">{itemOpen ? '−' : '+'}</button>
+                          <button type="button" onClick={() => removeItem(gi, ii)} title="Remover destino" className="px-1 py-1 text-red-400 hover:text-red-600">🗑</button>
+                        </div>
 
                         {itemOpen && (
                           <div className="border-t border-gray-200 bg-white p-3">
@@ -1076,8 +1147,6 @@ function DestinationGroupsEditor({ groups, onChange }) {
                                 />
                               </div>
                             )}
-
-                            <button onClick={() => removeItem(gi, ii)} className="mt-3 text-sm text-red-500 hover:text-red-700">Remover destino</button>
                           </div>
                         )}
                       </div>
