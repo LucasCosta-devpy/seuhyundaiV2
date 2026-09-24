@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getContent, saveContent, uploadImage, deleteImage, clearToken, getToken } from '../lib/api.js'
 import { defaultContent } from '../lib/defaultContent.js'
 import { LOGO_SIZES, getLogoSize } from '../lib/logoSize.js'
 import { SOCIAL_PLATFORMS, getPlatform } from '../components/SocialIcons.jsx'
 import ImageCropEditor from '../components/ImageCropEditor.jsx'
-import { DestinationCard, chunkDestinationItems } from './PublicSite.jsx'
+import { RegionBlock } from './PublicSite.jsx'
+import { getCountryFlag } from '../lib/flags.js'
 
 const TABS = [
   { key: 'marca', label: 'Marca e Contato', color: 'amber' },
@@ -34,27 +35,6 @@ const TAB_STYLES = {
   cyan: { active: 'bg-cyan-500 border-cyan-500 text-white', inactive: 'border-cyan-200 text-cyan-700 hover:bg-cyan-50', top: 'border-t-cyan-500' },
 }
 
-const COUNTRY_FLAGS = {
-  'brasil': '🇧🇷', 'argentina': '🇦🇷', 'uruguai': '🇺🇾', 'chile': '🇨🇱', 'venezuela': '🇻🇪',
-  'colombia': '🇨🇴', 'colômbia': '🇨🇴', 'peru': '🇵🇪', 'bolivia': '🇧🇴', 'bolívia': '🇧🇴',
-  'paraguai': '🇵🇾', 'equador': '🇪🇨', 'guiana': '🇬🇾', 'suriname': '🇸🇷',
-  'portugal': '🇵🇹', 'espanha': '🇪🇸', 'franca': '🇫🇷', 'frança': '🇫🇷', 'italia': '🇮🇹', 'itália': '🇮🇹',
-  'alemanha': '🇩🇪', 'polonia': '🇵🇱', 'polônia': '🇵🇱', 'eslovaquia': '🇸🇰', 'eslováquia': '🇸🇰',
-  'hungria': '🇭🇺', 'suica': '🇨🇭', 'suíça': '🇨🇭', 'austria': '🇦🇹', 'áustria': '🇦🇹',
-  'paises baixos': '🇳🇱', 'países baixos': '🇳🇱', 'holanda': '🇳🇱', 'belgica': '🇧🇪', 'bélgica': '🇧🇪',
-  'reino unido': '🇬🇧', 'inglaterra': '🇬🇧', 'irlanda': '🇮🇪', 'grecia': '🇬🇷', 'grécia': '🇬🇷',
-  'croacia': '🇭🇷', 'croácia': '🇭🇷', 'republica tcheca': '🇨🇿', 'república tcheca': '🇨🇿',
-  'marrocos': '🇲🇦', 'egito': '🇪🇬', 'africa do sul': '🇿🇦', 'áfrica do sul': '🇿🇦',
-  'quenia': '🇰🇪', 'quênia': '🇰🇪', 'tanzania': '🇹🇿', 'tanzânia': '🇹🇿',
-  'estados unidos': '🇺🇸', 'eua': '🇺🇸', 'canada': '🇨🇦', 'canadá': '🇨🇦', 'mexico': '🇲🇽', 'méxico': '🇲🇽',
-  'japao': '🇯🇵', 'japão': '🇯🇵', 'china': '🇨🇳', 'tailandia': '🇹🇭', 'tailândia': '🇹🇭',
-  'india': '🇮🇳', 'índia': '🇮🇳', 'indonesia': '🇮🇩', 'indonésia': '🇮🇩', 'australia': '🇦🇺', 'austrália': '🇦🇺',
-}
-
-function getCountryFlag(name) {
-  const key = (name || '').trim().toLowerCase()
-  return COUNTRY_FLAGS[key] || '📍'
-}
 
 const REGION_COLORS = [
   { border: 'border-l-amber-400', header: 'bg-amber-50', badge: 'bg-amber-400' },
@@ -720,451 +700,404 @@ function SocialLinksEditor({ items, onChange }) {
 
 const MAX_CAROUSEL_IMAGES = 5
 
-function DestinationImagesEditor({ item, onUpdate }) {
-  const mode = item.imageMode === 'carousel' ? 'carousel' : 'single'
-  const images = (item.images || []).map((img) => (typeof img === 'string' ? { url: img, caption: '' } : img))
+function getCityImageUrls(city) {
+  if (city.imageMode === 'carousel') {
+    return (city.images || []).map((img) => (typeof img === 'string' ? img : img?.url)).filter(Boolean)
+  }
+  return city.imageUrl ? [city.imageUrl] : []
+}
+
+function mediaPatch(mode, urls) {
+  return mode === 'carousel'
+    ? { imageMode: 'carousel', images: urls.map((url) => ({ url, caption: '' })), imageUrl: '', photoCaption: '' }
+    : { imageMode: 'single', imageUrl: urls[0] || '', images: [], photoCaption: '' }
+}
+
+function CityMediaEditor({ city, onPatch }) {
+  const mode = city.imageMode === 'carousel' ? 'carousel' : 'single'
+  const urls = getCityImageUrls(city)
+  const max = mode === 'carousel' ? MAX_CAROUSEL_IMAGES : 1
+  const [editing, setEditing] = useState(null)
+  const [uploading, setUploading] = useState(false)
+  const fileRef = useRef(null)
 
   function setMode(nextMode) {
-    onUpdate('imageMode', nextMode)
-    if (nextMode === 'carousel' && images.length === 0 && item.imageUrl) {
-      onUpdate('images', [{ url: item.imageUrl, caption: item.photoCaption || '' }])
+    if (nextMode === mode) return
+    if (nextMode === 'single' && urls.length > 1 && !confirm('Imagem única mantém só a primeira foto. Continuar?')) return
+    onPatch(mediaPatch(nextMode, nextMode === 'single' ? urls.slice(0, 1) : urls))
+  }
+
+  function handleFile(e) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setEditing({ src: URL.createObjectURL(file), index: null })
+  }
+
+  async function handleCropConfirm(blob) {
+    const target = editing
+    setEditing(null)
+    setUploading(true)
+    try {
+      const url = await uploadImage(new File([blob], 'imagem.jpg', { type: 'image/jpeg' }))
+      const next = [...urls]
+      if (target.index === null) next.push(url)
+      else next[target.index] = url
+      onPatch(mediaPatch(mode, next.slice(0, max)))
+    } catch (err) {
+      alert('Erro ao enviar imagem: ' + err.message)
+    } finally {
+      setUploading(false)
     }
   }
 
-  function updateImage(i, field, v) {
-    const next = [...images]
-    next[i] = { ...next[i], [field]: v }
-    onUpdate('images', next.filter((img) => img.url))
-  }
-  function removeImage(i) {
-    onUpdate('images', images.filter((_, idx) => idx !== i))
-  }
-  function addImage() {
-    if (images.length >= MAX_CAROUSEL_IMAGES) return
-    onUpdate('images', [...images, { url: '', caption: '' }])
+  async function removeAt(i) {
+    if (!confirm('Remover esta foto?')) return
+    const url = urls[i]
+    onPatch(mediaPatch(mode, urls.filter((_, idx) => idx !== i)))
+    if (url.includes('.blob.vercel-storage.com')) {
+      deleteImage(url).catch(() => {})
+    }
   }
 
   return (
     <div>
-      <p className="label !mb-2">Foto(s) do destino</p>
-      <div className="mb-3 flex gap-2">
-        <button
-          type="button"
-          onClick={() => setMode('single')}
-          className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
-            mode === 'single' ? 'border-navy-800 bg-navy-800 text-white' : 'border-gray-300 text-gray-600 hover:border-navy-400'
-          }`}
-        >
-          Única imagem
-        </button>
-        <button
-          type="button"
-          onClick={() => setMode('carousel')}
-          className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
-            mode === 'carousel' ? 'border-navy-800 bg-navy-800 text-white' : 'border-gray-300 text-gray-600 hover:border-navy-400'
-          }`}
-        >
-          Carrossel (várias fotos)
-        </button>
-      </div>
-
-      {mode === 'single' ? (
-        <div className="space-y-2">
-          <ImageField label="Foto" shape="photo" value={item.imageUrl} onChange={(v) => onUpdate('imageUrl', v)} />
-          <TextField
-            label="Legenda da foto (opcional, ex: Nordeste, Aracaju/SE) — texto simples, não é clicável"
-            value={item.photoCaption}
-            onChange={(v) => onUpdate('photoCaption', v)}
-          />
+      <p className="label !mb-2">Tipo de mídia</p>
+      <div className="flex flex-wrap items-start gap-4">
+        <div className="flex overflow-hidden rounded-lg border border-gray-300">
+          {[
+            { key: 'carousel', label: 'Carrossel' },
+            { key: 'single', label: 'Imagem única' },
+          ].map((opt) => (
+            <button
+              key={opt.key}
+              type="button"
+              onClick={() => setMode(opt.key)}
+              className={`px-3 py-1.5 text-xs font-semibold transition-colors ${
+                mode === opt.key ? 'bg-navy-800 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
         </div>
-      ) : (
-        <div className="space-y-3">
-          {images.map((img, i) => (
-            <div key={i} className="rounded-lg border border-gray-200 p-3">
-              <ImageField label={`Foto ${i + 1} do carrossel`} shape="photo" value={img.url} onChange={(v) => updateImage(i, 'url', v)} />
-              <div className="mt-2">
-                <TextField
-                  label="Legenda desta foto (opcional, ex: Nordeste, Aracaju/SE) — texto simples, não é clicável"
-                  value={img.caption}
-                  onChange={(v) => updateImage(i, 'caption', v)}
-                />
-              </div>
-              <button onClick={() => removeImage(i)} className="mt-2 text-xs font-semibold text-red-500 hover:text-red-700">
-                Remover esta foto do carrossel
+
+        <div className="flex flex-wrap gap-2">
+          {urls.map((url, i) => (
+            <div key={url + i} className="relative h-16 w-16 overflow-hidden rounded-lg border border-gray-200">
+              <button type="button" onClick={() => setEditing({ src: url, index: i })} title="Ajustar enquadramento" className="h-full w-full">
+                <img src={url} alt="" className="h-full w-full object-cover" />
+              </button>
+              <button
+                type="button"
+                onClick={() => removeAt(i)}
+                title="Remover foto"
+                className="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-xs leading-none text-white hover:bg-red-600"
+              >
+                ×
               </button>
             </div>
           ))}
-          {images.length < MAX_CAROUSEL_IMAGES ? (
-            <button onClick={addImage} className="text-sm font-semibold text-navy-700 hover:underline">+ Adicionar foto ao carrossel</button>
-          ) : (
-            <p className="text-xs text-gray-400">Limite de {MAX_CAROUSEL_IMAGES} fotos atingido.</p>
-          )}
-          {images.length <= 1 && (
-            <p className="text-xs text-gray-400">Adicione pelo menos 2 fotos pra o carrossel aparecer com setas de navegação no site.</p>
+          {urls.length < max && (
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              disabled={uploading}
+              title="Adicionar foto"
+              className="flex h-16 w-16 items-center justify-center rounded-lg border-2 border-dashed border-gray-300 text-2xl text-gray-400 hover:border-navy-400 hover:text-navy-600 disabled:opacity-50"
+            >
+              {uploading ? '…' : '+'}
+            </button>
           )}
         </div>
+      </div>
+      <p className="mt-1 text-xs text-gray-400">
+        {mode === 'carousel' ? `${urls.length}/${MAX_CAROUSEL_IMAGES} fotos · ` : ''}clique numa foto pra ajustar o enquadramento
+      </p>
+      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+
+      {editing && (
+        <ImageCropEditor
+          src={editing.src}
+          aspectRatio={4 / 3}
+          shape="rect"
+          onConfirm={handleCropConfirm}
+          onCancel={() => setEditing(null)}
+        />
       )}
     </div>
   )
 }
 
-function SubregionsEditor({ item, onUpdate }) {
-  const subregions = item.subregions || []
-  const [expanded, setExpanded] = useState(subregions.length > 0)
-  const [openSub, setOpenSub] = useState(-1)
-  const [dragSub, setDragSub] = useState(null)
+function SectionHeader({ icon, title, actionLabel, onAction }) {
+  return (
+    <div className="mb-2 flex items-center justify-between gap-2">
+      <p className="flex items-center gap-2 text-sm font-bold text-navy-900">
+        <span>{icon}</span>
+        {title}
+      </p>
+      {actionLabel && (
+        <button type="button" onClick={onAction} className="rounded-lg bg-navy-800 px-3 py-1.5 text-xs font-semibold text-white hover:bg-navy-700">
+          + {actionLabel}
+        </button>
+      )}
+    </div>
+  )
+}
 
-  function updateSub(si, field, v) {
-    const next = [...subregions]
-    next[si] = { ...next[si], [field]: v }
-    onUpdate('subregions', next)
-  }
-  function removeSub(si) {
-    onUpdate('subregions', subregions.filter((_, i) => i !== si))
-    setOpenSub(-1)
-  }
-  function addSub() {
-    const next = [...subregions, { name: '', desc: '', imageUrl: '', imageMode: 'single', images: [] }]
-    onUpdate('subregions', next)
-    setExpanded(true)
-    setOpenSub(next.length - 1)
-  }
-  function moveSub(from, to) {
-    if (to < 0 || to >= subregions.length || from === to) return
-    const next = [...subregions]
+function useReorder(list, onChange) {
+  const [dragIndex, setDragIndex] = useState(null)
+  const [openIndex, setOpenIndex] = useState(-1)
+
+  function move(from, to) {
+    if (from === null || to < 0 || to >= list.length || from === to) return
+    const next = [...list]
     const [moved] = next.splice(from, 1)
     next.splice(to, 0, moved)
-    onUpdate('subregions', next)
-    setOpenSub(-1)
+    onChange(next)
+    setOpenIndex(-1)
+  }
+
+  function dragProps(i) {
+    return {
+      draggable: true,
+      onDragStart: (e) => {
+        e.stopPropagation()
+        setDragIndex(i)
+      },
+      onDragOver: (e) => e.preventDefault(),
+      onDrop: (e) => {
+        e.stopPropagation()
+        move(dragIndex, i)
+        setDragIndex(null)
+      },
+      onDragEnd: (e) => {
+        e.stopPropagation()
+        setDragIndex(null)
+      },
+    }
+  }
+
+  return { dragIndex, openIndex, setOpenIndex, move, dragProps }
+}
+
+function RowHeader({ index, total, open, onToggle, onMove, onRemove, label, prefix, dragProps, className = '' }) {
+  return (
+    <div {...dragProps} className={`flex items-center gap-1 px-2 py-1.5 ${className}`}>
+      <span className="cursor-grab select-none px-1 text-gray-400" title="Arraste pra reordenar">⠿</span>
+      <button type="button" onClick={onToggle} className="flex min-w-0 flex-1 items-center gap-2 text-left">
+        {prefix && <span>{prefix}</span>}
+        <span className="truncate text-sm font-semibold text-navy-900">{label}</span>
+      </button>
+      <button type="button" onClick={() => onMove(index, index - 1)} disabled={index === 0} title="Mover pra cima" className="rounded px-1 py-1 text-xs text-gray-500 hover:bg-black/5 disabled:opacity-25">▲</button>
+      <button type="button" onClick={() => onMove(index, index + 1)} disabled={index === total - 1} title="Mover pra baixo" className="rounded px-1 py-1 text-xs text-gray-500 hover:bg-black/5 disabled:opacity-25">▼</button>
+      <button type="button" onClick={onToggle} className="px-1 py-1 text-gray-500">{open ? '−' : '+'}</button>
+      <button type="button" onClick={onRemove} title="Remover" className="px-1 py-1 text-red-400 hover:text-red-600">🗑</button>
+    </div>
+  )
+}
+
+function CitiesEditor({ cities, onChange }) {
+  const { dragIndex, openIndex, setOpenIndex, move, dragProps } = useReorder(cities, onChange)
+
+  function patchCity(ci, patch) {
+    const next = [...cities]
+    next[ci] = { ...next[ci], ...patch }
+    onChange(next)
+  }
+  function addCity() {
+    const next = [...cities, { name: '', desc: '', imageMode: 'carousel', images: [], imageUrl: '' }]
+    onChange(next)
+    setOpenIndex(next.length - 1)
+  }
+  function removeCity(ci) {
+    if (!confirm(`Remover a cidade "${cities[ci].name || 'sem nome'}"?`)) return
+    onChange(cities.filter((_, i) => i !== ci))
+    setOpenIndex(-1)
   }
 
   return (
-    <div className="mt-3">
-      <button
-        type="button"
-        onClick={() => setExpanded((v) => !v)}
-        className="text-xs font-semibold text-navy-700 hover:underline"
-      >
-        {expanded ? '− Ocultar cidades' : '+ Adicionar cidades (ex: Aracaju/SE)'}
-      </button>
-
-      {expanded && (
-        <div className="mt-2 space-y-2 border-l-2 border-gray-300 pl-4">
-          <p className="text-xs text-gray-400">Opcional: liste as cidades/áreas dentro deste destino, cada uma com nome, descrição e até {MAX_CAROUSEL_IMAGES} fotos.</p>
-          {subregions.map((sub, si) => {
-            const subOpen = openSub === si
-            const isDraggingSub = dragSub === si
-            return (
-              <div
-                key={si}
-                draggable
-                onDragStart={() => setDragSub(si)}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={() => {
-                  moveSub(dragSub, si)
-                  setDragSub(null)
-                }}
-                onDragEnd={() => setDragSub(null)}
-                className={`overflow-hidden rounded-lg border border-gray-200 bg-white transition-opacity ${isDraggingSub ? 'opacity-40' : ''}`}
-              >
-                <div className="flex items-center gap-1 px-2 py-1.5">
-                  <span className="cursor-grab select-none px-1 text-gray-400" title="Arraste pra reordenar">⠿</span>
-                  <button type="button" onClick={() => setOpenSub(subOpen ? -1 : si)} className="flex flex-1 items-center gap-2 text-left">
-                    <span className="text-sm font-semibold text-navy-900">{sub.name || 'Nova cidade (sem nome ainda)'}</span>
-                  </button>
-                  <button type="button" onClick={() => moveSub(si, si - 1)} disabled={si === 0} title="Mover pra cima" className="rounded px-1 py-1 text-xs text-gray-500 hover:bg-black/5 disabled:opacity-25">▲</button>
-                  <button type="button" onClick={() => moveSub(si, si + 1)} disabled={si === subregions.length - 1} title="Mover pra baixo" className="rounded px-1 py-1 text-xs text-gray-500 hover:bg-black/5 disabled:opacity-25">▼</button>
-                  <button type="button" onClick={() => setOpenSub(subOpen ? -1 : si)} className="px-1 py-1 text-gray-500">{subOpen ? '−' : '+'}</button>
-                  <button type="button" onClick={() => removeSub(si)} title="Remover cidade" className="px-1 py-1 text-red-400 hover:text-red-600">🗑</button>
-                </div>
-
-                {subOpen && (
-                  <div className="border-t border-gray-200 p-3">
-                    <input
-                      className="input text-sm"
-                      placeholder="Nome (ex: Aracaju/SE)"
-                      value={sub.name}
-                      onChange={(e) => updateSub(si, 'name', e.target.value)}
-                    />
-                    <textarea
-                      className="input mt-2 text-sm"
-                      rows={2}
-                      placeholder="Descrição (opcional)"
-                      value={sub.desc || ''}
-                      onChange={(e) => updateSub(si, 'desc', e.target.value)}
-                    />
-                    <div className="mt-2">
-                      <DestinationImagesEditor item={sub} onUpdate={(field, v) => updateSub(si, field, v)} />
-                    </div>
+    <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-3">
+      <SectionHeader icon="📍" title="Cidades" actionLabel="Adicionar cidade" onAction={addCity} />
+      {cities.length === 0 && <p className="text-xs text-gray-400">Nenhuma cidade ainda. As fotos aparecem só dentro das cidades.</p>}
+      <div className="space-y-2">
+        {cities.map((city, ci) => {
+          const open = openIndex === ci
+          return (
+            <div
+              key={ci}
+              className={`overflow-hidden rounded-lg border border-gray-200 bg-white transition-opacity ${dragIndex === ci ? 'opacity-40' : ''}`}
+            >
+              <RowHeader
+                dragProps={dragProps(ci)}
+                index={ci}
+                total={cities.length}
+                open={open}
+                onToggle={() => setOpenIndex(open ? -1 : ci)}
+                onMove={move}
+                onRemove={() => removeCity(ci)}
+                label={city.name || 'Nova cidade (sem nome ainda)'}
+              />
+              {open && (
+                <div className="space-y-3 border-t border-gray-200 p-3">
+                  <div>
+                    <label className="label">Nome da cidade</label>
+                    <input className="input text-sm" placeholder="Ex: Aracaju/SE" value={city.name || ''} onChange={(e) => patchCity(ci, { name: e.target.value })} />
                   </div>
-                )}
-              </div>
-            )
-          })}
-          <button onClick={addSub} className="text-xs font-semibold text-navy-700 hover:underline">+ Adicionar cidade</button>
-        </div>
-      )}
+                  <CityMediaEditor city={city} onPatch={(patch) => patchCity(ci, patch)} />
+                  <div>
+                    <label className="label">Descrição da cidade</label>
+                    <textarea className="input text-sm" rows={2} value={city.desc || ''} onChange={(e) => patchCity(ci, { desc: e.target.value })} />
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function CountriesEditor({ countries, onChange }) {
+  const { dragIndex, openIndex, setOpenIndex, move, dragProps } = useReorder(countries, onChange)
+
+  function patchCountry(ci, patch) {
+    const next = [...countries]
+    next[ci] = { ...next[ci], ...patch }
+    onChange(next)
+  }
+  function addCountry() {
+    const next = [...countries, { name: '', desc: '', subregions: [] }]
+    onChange(next)
+    setOpenIndex(next.length - 1)
+  }
+  function removeCountry(ci) {
+    if (!confirm(`Remover o país "${countries[ci].name || 'sem nome'}" e todas as cidades dele?`)) return
+    onChange(countries.filter((_, i) => i !== ci))
+    setOpenIndex(-1)
+  }
+
+  return (
+    <div className="mt-4">
+      <SectionHeader icon="🚩" title="Países" actionLabel="Adicionar país" onAction={addCountry} />
+      {countries.length === 0 && <p className="text-xs text-gray-400">Nenhum país nesta região ainda.</p>}
+      <div className="space-y-2">
+        {countries.map((country, ci) => {
+          const open = openIndex === ci
+          const cityCount = (country.subregions || []).length
+          return (
+            <div
+              key={ci}
+              className={`overflow-hidden rounded-lg border border-gray-200 bg-white transition-opacity ${dragIndex === ci ? 'opacity-40' : ''}`}
+            >
+              <RowHeader
+                dragProps={dragProps(ci)}
+                index={ci}
+                total={countries.length}
+                open={open}
+                onToggle={() => setOpenIndex(open ? -1 : ci)}
+                onMove={move}
+                onRemove={() => removeCountry(ci)}
+                prefix={getCountryFlag(country.name)}
+                label={`${country.name || 'Novo país (sem nome ainda)'}${cityCount ? ` · ${cityCount} cidade${cityCount === 1 ? '' : 's'}` : ''}`}
+              />
+              {open && (
+                <div className="space-y-3 border-t border-gray-200 p-3">
+                  <div>
+                    <label className="label">Nome do país</label>
+                    <input className="input text-sm" placeholder="Ex: Brasil" value={country.name || ''} onChange={(e) => patchCountry(ci, { name: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="label">Descrição do país (opcional)</label>
+                    <textarea className="input text-sm" rows={2} value={country.desc || ''} onChange={(e) => patchCountry(ci, { desc: e.target.value })} />
+                  </div>
+                  <CitiesEditor cities={country.subregions || []} onChange={(v) => patchCountry(ci, { subregions: v })} />
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
 
 function DestinationsPreview({ groups }) {
   const validGroups = (groups || []).filter((g) => g.region)
-
   if (validGroups.length === 0) {
     return <p className="text-sm text-gray-400">Nenhuma região cadastrada ainda.</p>
   }
-
   return (
-    <div className="space-y-6">
-      {validGroups.map((group) => (
-        <div key={group.region} className="overflow-hidden rounded-xl border border-gray-200">
-          <div className="bg-navy-900 px-4 py-3">
-            <p className="font-serif text-lg font-bold text-white">{group.region}</p>
-          </div>
-          <div className="space-y-4 bg-gray-50 p-3">
-            {(!group.items || group.items.length === 0) && (
-              <p className="text-xs text-gray-400">Nenhum destino cadastrado ainda nesta região.</p>
-            )}
-            {chunkDestinationItems(group.items).map((chunk, ci) =>
-              chunk.type === 'simple' ? (
-                <div key={ci} className="space-y-3">
-                  {chunk.items.map((item) => (
-                    <DestinationCard
-                      key={item.name}
-                      name={item.name}
-                      desc={item.desc}
-                      imageUrl={item.imageUrl}
-                      imageMode={item.imageMode}
-                      images={item.images}
-                      photoCaption={item.photoCaption}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div key={ci} className="pl-2">
-                  <p className="mb-2 border-l-4 border-gold-300 pl-2 font-serif font-bold text-navy-900">{chunk.item.name}</p>
-                  {chunk.item.desc && <p className="mb-2 pl-2 text-xs text-gray-600">{chunk.item.desc}</p>}
-                  <div className="space-y-3 pl-2">
-                    {chunk.subregions.map((sub) => (
-                      <DestinationCard
-                        key={sub.name}
-                        name={sub.name}
-                        desc={sub.desc}
-                        imageUrl={sub.imageUrl}
-                        imageMode={sub.imageMode}
-                        images={sub.images}
-                        photoCaption={sub.photoCaption}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )
-            )}
-          </div>
-        </div>
+    <div className="space-y-10">
+      {validGroups.map((group, gi) => (
+        <RegionBlock key={gi} group={group} compact />
       ))}
     </div>
   )
 }
 
 function DestinationGroupsEditor({ groups, onChange }) {
-  const [openIndex, setOpenIndex] = useState(0)
-  const [openItems, setOpenItems] = useState({})
-  const [dragIndex, setDragIndex] = useState(null)
-  const [dragItem, setDragItem] = useState(null)
+  const { dragIndex, openIndex, setOpenIndex, move, dragProps } = useReorder(groups, onChange)
 
-  function toggleItem(gi, ii) {
-    setOpenItems((prev) => ({ ...prev, [gi]: prev[gi] === ii ? -1 : ii }))
-  }
-
-  function updateGroup(gi, field, v) {
+  function patchGroup(gi, patch) {
     const next = [...groups]
-    next[gi] = { ...next[gi], [field]: v }
+    next[gi] = { ...next[gi], ...patch }
     onChange(next)
-  }
-  function removeGroup(gi) {
-    onChange(groups.filter((_, i) => i !== gi))
   }
   function addGroup() {
-    onChange([...groups, { region: 'Nova região', items: [] }])
-  }
-  function moveRegion(from, to) {
-    if (to < 0 || to >= groups.length || from === to) return
-    const next = [...groups]
-    const [moved] = next.splice(from, 1)
-    next.splice(to, 0, moved)
+    const next = [...groups, { region: '', desc: '', items: [] }]
     onChange(next)
+    setOpenIndex(next.length - 1)
+  }
+  function removeGroup(gi) {
+    if (!confirm(`Remover a região "${groups[gi].region || 'sem nome'}" com todos os países e cidades dela?`)) return
+    onChange(groups.filter((_, i) => i !== gi))
     setOpenIndex(-1)
-  }
-  function handleDrop(gi) {
-    if (dragIndex === null) return
-    moveRegion(dragIndex, gi)
-    setDragIndex(null)
-  }
-  function updateItem(gi, ii, field, v) {
-    const next = [...groups]
-    const items = [...next[gi].items]
-    items[ii] = { ...items[ii], [field]: v }
-    next[gi] = { ...next[gi], items }
-    onChange(next)
-  }
-  function removeItem(gi, ii) {
-    const next = [...groups]
-    next[gi] = { ...next[gi], items: next[gi].items.filter((_, i) => i !== ii) }
-    onChange(next)
-  }
-  function addItem(gi) {
-    const next = [...groups]
-    next[gi] = { ...next[gi], items: [...next[gi].items, { name: '', desc: '', imageUrl: '', imageMode: 'single', images: [] }] }
-    onChange(next)
-    setOpenItems((prev) => ({ ...prev, [gi]: next[gi].items.length - 1 }))
-  }
-  function moveItem(gi, from, to) {
-    const items = groups[gi].items
-    if (to < 0 || to >= items.length || from === to) return
-    const nextItems = [...items]
-    const [moved] = nextItems.splice(from, 1)
-    nextItems.splice(to, 0, moved)
-    const next = [...groups]
-    next[gi] = { ...next[gi], items: nextItems }
-    onChange(next)
-    setOpenItems((prev) => ({ ...prev, [gi]: -1 }))
   }
 
   return (
-    <div className="space-y-4">
-      {groups.map((group, gi) => {
-        const color = REGION_COLORS[gi % REGION_COLORS.length]
-        const isOpen = openIndex === gi
-        const isDragging = dragIndex === gi
-        return (
-          <div
-            key={gi}
-            draggable
-            onDragStart={() => setDragIndex(gi)}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={() => handleDrop(gi)}
-            onDragEnd={() => setDragIndex(null)}
-            className={`overflow-hidden rounded-lg border-l-4 border border-gray-200 transition-opacity ${color.border} ${isDragging ? 'opacity-40' : ''}`}
-          >
-            <div className={`flex items-center gap-2 px-4 py-3 transition-colors ${color.header}`}>
-              <span className="cursor-grab select-none text-gray-400" title="Arraste pra reordenar">⠿</span>
-              <button
-                type="button"
-                onClick={() => setOpenIndex(isOpen ? -1 : gi)}
-                className="flex flex-1 items-center gap-2 text-left"
-              >
-                <span className={`h-2.5 w-2.5 rounded-full ${color.badge}`} />
-                <span className="font-semibold text-navy-900">{group.region}</span>
-                <span className="text-xs font-normal text-gray-500">({group.items.length} destino{group.items.length === 1 ? '' : 's'})</span>
-              </button>
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => moveRegion(gi, gi - 1)}
-                  disabled={gi === 0}
-                  title="Mover pra cima"
-                  className="rounded px-1.5 py-1 text-gray-500 hover:bg-black/5 disabled:opacity-25 disabled:hover:bg-transparent"
-                >
-                  ▲
-                </button>
-                <button
-                  type="button"
-                  onClick={() => moveRegion(gi, gi + 1)}
-                  disabled={gi === groups.length - 1}
-                  title="Mover pra baixo"
-                  className="rounded px-1.5 py-1 text-gray-500 hover:bg-black/5 disabled:opacity-25 disabled:hover:bg-transparent"
-                >
-                  ▼
-                </button>
-                <button type="button" onClick={() => setOpenIndex(isOpen ? -1 : gi)} className="px-1.5 py-1 text-lg text-gray-500">
-                  {isOpen ? '−' : '+'}
-                </button>
-              </div>
+    <div>
+      <SectionHeader icon="🌐" title="Regiões" actionLabel="Adicionar região" onAction={addGroup} />
+      <div className="space-y-3">
+        {groups.map((group, gi) => {
+          const color = REGION_COLORS[gi % REGION_COLORS.length]
+          const open = openIndex === gi
+          const countryCount = (group.items || []).length
+          return (
+            <div
+              key={gi}
+              className={`overflow-hidden rounded-lg border border-l-4 border-gray-200 transition-opacity ${color.border} ${dragIndex === gi ? 'opacity-40' : ''}`}
+            >
+              <RowHeader
+                dragProps={dragProps(gi)}
+                index={gi}
+                total={groups.length}
+                open={open}
+                onToggle={() => setOpenIndex(open ? -1 : gi)}
+                onMove={move}
+                onRemove={() => removeGroup(gi)}
+                prefix={<span className={`inline-block h-2.5 w-2.5 rounded-full ${color.badge}`} />}
+                label={`${group.region || 'Nova região (sem nome ainda)'} · ${countryCount} país${countryCount === 1 ? '' : 'es'}`}
+                className={`py-2.5 ${color.header}`}
+              />
+              {open && (
+                <div className="space-y-3 bg-white p-4">
+                  <div>
+                    <label className="label">Nome da região *</label>
+                    <input className="input font-semibold" placeholder="Ex: América do Sul" value={group.region || ''} onChange={(e) => patchGroup(gi, { region: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="label">Descrição da região (opcional)</label>
+                    <textarea className="input text-sm" rows={2} value={group.desc || ''} onChange={(e) => patchGroup(gi, { desc: e.target.value })} />
+                  </div>
+                  <CountriesEditor countries={group.items || []} onChange={(v) => patchGroup(gi, { items: v })} />
+                </div>
+              )}
             </div>
-
-            {isOpen && (
-              <div className="bg-white p-4">
-                <div className="flex items-center gap-2">
-                  <input
-                    className="input flex-1 font-semibold"
-                    value={group.region}
-                    onChange={(e) => updateGroup(gi, 'region', e.target.value)}
-                  />
-                  <button onClick={() => removeGroup(gi)} className="whitespace-nowrap text-sm text-red-500 hover:text-red-700">Remover região</button>
-                </div>
-
-                <div className="mt-4 space-y-2">
-                  {group.items.map((item, ii) => {
-                    const itemOpen = (openItems[gi] ?? -1) === ii
-                    const isDraggingItem = dragItem && dragItem.gi === gi && dragItem.ii === ii
-                    return (
-                      <div
-                        key={ii}
-                        draggable
-                        onDragStart={() => setDragItem({ gi, ii })}
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={() => {
-                          if (dragItem && dragItem.gi === gi) moveItem(gi, dragItem.ii, ii)
-                          setDragItem(null)
-                        }}
-                        onDragEnd={() => setDragItem(null)}
-                        className={`overflow-hidden rounded-lg border border-gray-200 bg-gray-50 transition-opacity ${isDraggingItem ? 'opacity-40' : ''}`}
-                      >
-                        <div className="flex items-center gap-1 px-2 py-1.5">
-                          <span className="cursor-grab select-none px-1 text-gray-400" title="Arraste pra reordenar">⠿</span>
-                          <button type="button" onClick={() => toggleItem(gi, ii)} className="flex flex-1 items-center gap-2 text-left">
-                            <span>{getCountryFlag(item.name)}</span>
-                            <span className="text-sm font-semibold text-navy-900">{item.name || 'Novo destino (sem nome ainda)'}</span>
-                          </button>
-                          <button type="button" onClick={() => moveItem(gi, ii, ii - 1)} disabled={ii === 0} title="Mover pra cima" className="rounded px-1 py-1 text-xs text-gray-500 hover:bg-black/5 disabled:opacity-25">▲</button>
-                          <button type="button" onClick={() => moveItem(gi, ii, ii + 1)} disabled={ii === group.items.length - 1} title="Mover pra baixo" className="rounded px-1 py-1 text-xs text-gray-500 hover:bg-black/5 disabled:opacity-25">▼</button>
-                          <button type="button" onClick={() => toggleItem(gi, ii)} className="px-1 py-1 text-gray-500">{itemOpen ? '−' : '+'}</button>
-                          <button type="button" onClick={() => removeItem(gi, ii)} title="Remover destino" className="px-1 py-1 text-red-400 hover:text-red-600">🗑</button>
-                        </div>
-
-                        {itemOpen && (
-                          <div className="border-t border-gray-200 bg-white p-3">
-                            <TextField label="Destino" value={item.name} onChange={(v) => updateItem(gi, ii, 'name', v)} />
-                            <div className="mt-2">
-                              <TextArea label="Descrição" value={item.desc} onChange={(v) => updateItem(gi, ii, 'desc', v)} />
-                            </div>
-
-                            <SubregionsEditor
-                              item={item}
-                              onUpdate={(field, v) => updateItem(gi, ii, field, v)}
-                            />
-
-                            {(item.subregions || []).filter((s) => s.name).length === 0 && (
-                              <div className="mt-3 border-t border-gray-100 pt-3">
-                                <p className="mb-2 text-xs text-gray-400">
-                                  Sem cidades cadastradas: use a foto abaixo pra este destino aparecer como card simples no site.
-                                </p>
-                                <DestinationImagesEditor
-                                  item={item}
-                                  onUpdate={(field, v) => updateItem(gi, ii, field, v)}
-                                />
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                  <button onClick={() => addItem(gi)} className="text-sm font-semibold text-navy-700 hover:underline">
-                    + Adicionar novo destino/país nesta região
-                  </button>
-                  <p className="text-xs text-gray-400">
-                    Isso cria um card irmão (ex: outro país). Pra adicionar cidades dentro de um destino já existente, abra o destino e use &ldquo;Adicionar cidades&rdquo; — não use este botão pra isso.
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        )
-      })}
-      <button onClick={addGroup} className="text-sm font-semibold text-navy-700 hover:underline">+ Adicionar região</button>
+          )
+        })}
+      </div>
     </div>
   )
 }

@@ -5,6 +5,7 @@ import { WhatsAppFloatButton, WhatsAppLink, formatPhoneDisplay } from '../compon
 import { slugify } from '../lib/slug.js'
 import { getLogoSize } from '../lib/logoSize.js'
 import { getPlatform } from '../components/SocialIcons.jsx'
+import { getCountryFlag } from '../lib/flags.js'
 
 export default function PublicSite() {
   const [content, setContent] = useState(defaultContent)
@@ -252,7 +253,7 @@ function DestinationCarousel({ images, name }) {
   )
 }
 
-export function DestinationCard({ name, desc, imageUrl, imageMode, images: itemImages, photoCaption }) {
+function DestinationCard({ name, desc, imageUrl, imageMode, images: itemImages, photoCaption }) {
   const rawImages =
     imageMode === 'carousel'
       ? (itemImages || []).filter((img) => (typeof img === 'string' ? img : img?.url))
@@ -262,7 +263,7 @@ export function DestinationCard({ name, desc, imageUrl, imageMode, images: itemI
   const images = rawImages.map((img) => (typeof img === 'string' ? { url: img, caption: '' } : img))
 
   return (
-    <div id={slugify(name)} className="card scroll-mt-28 overflow-hidden">
+    <div className="card overflow-hidden">
       <div className="flex h-40 items-center justify-center bg-gradient-to-br from-navy-50 to-gray-100 text-gray-400">
         {images.length > 0 ? (
           <DestinationCarousel images={images} name={name} />
@@ -278,78 +279,59 @@ export function DestinationCard({ name, desc, imageUrl, imageMode, images: itemI
   )
 }
 
-// Agrupa a lista de destinos de uma região em blocos, preservando a ordem:
-// destinos simples (sem sub-cards) ficam juntos numa grade; um destino com
-// sub-cards vira seu próprio bloco (cabeçalho do país + grade dos sub-cards).
-export function chunkDestinationItems(items) {
-  const chunks = []
-  let currentSimple = []
-  for (const item of items || []) {
-    const subregions = (item.subregions || []).filter((s) => s.name)
-    if (subregions.length > 0) {
-      if (currentSimple.length) {
-        chunks.push({ type: 'simple', items: currentSimple })
-        currentSimple = []
-      }
-      chunks.push({ type: 'country', item, subregions })
-    } else {
-      currentSimple.push(item)
-    }
-  }
-  if (currentSimple.length) chunks.push({ type: 'simple', items: currentSimple })
-  return chunks
+// Região > País (cabeçalho, sem foto) > Cidades (cards com foto/carrossel).
+// `compact` força uma coluna só, pra caber na prévia estreita do admin.
+export function RegionBlock({ group, compact = false }) {
+  const grid = compact ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'
+  const countries = (group.items || []).filter((c) => c.name)
+
+  return (
+    <div id={slugify(group.region)} className="scroll-mt-24">
+      <h3 className="border-l-4 border-gold-400 pl-3 font-serif text-2xl font-bold text-navy-900">{group.region}</h3>
+      {group.desc && <p className="mt-2 pl-4 text-gray-600">{group.desc}</p>}
+
+      <div className="mt-6 space-y-10">
+        {countries.map((country, ci) => {
+          const cities = (country.subregions || []).filter((s) => s.name)
+          const flag = getCountryFlag(country.name, '')
+          return (
+            <div key={ci} id={slugify(country.name)} className={`scroll-mt-28 ${compact ? 'pl-3' : 'pl-6 sm:pl-10'}`}>
+              <h4 className="flex items-center gap-2 border-l-4 border-gold-300 pl-3 font-serif text-xl font-bold text-navy-900">
+                {flag && <span>{flag}</span>}
+                {country.name}
+              </h4>
+              {country.desc && <p className="mt-1 pl-3 text-sm text-gray-600">{country.desc}</p>}
+              {cities.length > 0 && (
+                <div className={`mt-4 pl-3 ${grid}`}>
+                  {cities.map((city, i) => (
+                    <DestinationCard
+                      key={i}
+                      name={city.name}
+                      desc={city.desc}
+                      imageUrl={city.imageUrl}
+                      imageMode={city.imageMode}
+                      images={city.images}
+                      photoCaption={city.photoCaption}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
 }
 
 function Destinations({ groups }) {
   return (
-    <section id="destinos" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-10 sm:px-6">
-      {(groups || []).map((group) => (
-        <div key={group.region} id={slugify(group.region)} className="mb-12 scroll-mt-24">
-          <h3 className="mb-5 border-l-4 border-gold-400 pl-3 font-serif text-2xl font-bold text-navy-900">
-            {group.region}
-          </h3>
-
-          <div className="space-y-8">
-            {chunkDestinationItems(group.items).map((chunk, ci) =>
-              chunk.type === 'simple' ? (
-                <div key={ci} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {chunk.items.map((item) => (
-                    <DestinationCard
-                      key={item.name}
-                      name={item.name}
-                      desc={item.desc}
-                      imageUrl={item.imageUrl}
-                      imageMode={item.imageMode}
-                      images={item.images}
-                      photoCaption={item.photoCaption}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div key={ci} id={slugify(chunk.item.name)} className="scroll-mt-28 pl-6 sm:pl-10">
-                  <h4 className="mb-1 border-l-4 border-gold-300 pl-3 font-serif text-xl font-bold text-navy-900">
-                    {chunk.item.name}
-                  </h4>
-                  {chunk.item.desc && <p className="mb-4 pl-3 text-sm text-gray-600">{chunk.item.desc}</p>}
-                  <div className="grid grid-cols-1 gap-6 pl-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {chunk.subregions.map((sub) => (
-                      <DestinationCard
-                        key={sub.name}
-                        name={sub.name}
-                        desc={sub.desc}
-                        imageUrl={sub.imageUrl}
-                        imageMode={sub.imageMode}
-                        images={sub.images}
-                        photoCaption={sub.photoCaption}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )
-            )}
-          </div>
-        </div>
-      ))}
+    <section id="destinos" className="mx-auto max-w-6xl scroll-mt-20 space-y-14 px-4 py-10 sm:px-6">
+      {(groups || [])
+        .filter((g) => g.region)
+        .map((group, gi) => (
+          <RegionBlock key={gi} group={group} />
+        ))}
     </section>
   )
 }
