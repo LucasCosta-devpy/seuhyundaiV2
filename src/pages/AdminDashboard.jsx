@@ -942,16 +942,24 @@ function DestinationGroupsEditor({ groups, onChange }) {
                             <div className="mt-2">
                               <TextArea label="Descrição" value={item.desc} onChange={(v) => updateItem(gi, ii, 'desc', v)} />
                             </div>
-                            <div className="mt-2">
-                              <DestinationImagesEditor
-                                item={item}
-                                onUpdate={(field, v) => updateItem(gi, ii, field, v)}
-                              />
-                            </div>
+
                             <SubregionsEditor
                               item={item}
                               onUpdate={(field, v) => updateItem(gi, ii, field, v)}
                             />
+
+                            {(item.subregions || []).filter((s) => s.name).length === 0 && (
+                              <div className="mt-3 border-t border-gray-100 pt-3">
+                                <p className="mb-2 text-xs text-gray-400">
+                                  Sem cidades cadastradas: use a foto abaixo pra este destino aparecer como card simples no site.
+                                </p>
+                                <DestinationImagesEditor
+                                  item={item}
+                                  onUpdate={(field, v) => updateItem(gi, ii, field, v)}
+                                />
+                              </div>
+                            )}
+
                             <button onClick={() => removeItem(gi, ii)} className="mt-3 text-sm text-red-500 hover:text-red-700">Remover destino</button>
                           </div>
                         )}
