@@ -4,7 +4,6 @@ import { WhatsAppFloatButton, WhatsAppLink, formatPhoneDisplay } from '../compon
 import { slugify } from '../lib/slug.js'
 import { getLogoSize } from '../lib/logoSize.js'
 import { getPlatform } from '../components/SocialIcons.jsx'
-import { getCountryFlag } from '../lib/flags.js'
 import { useSiteContent } from '../lib/useSiteContent.js'
 
 export default function PublicSite() {
@@ -256,85 +255,14 @@ export function DestinationCard({ name, desc, imageUrl, imageMode, images: itemI
   )
 }
 
-// Região > País (cabeçalho, sem foto) > Cidades (cards com foto/carrossel).
-// `compact` força uma coluna só, pra caber na prévia estreita do admin.
-export function RegionBlock({ group, compact = false }) {
-  const grid = compact ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'
-  const countries = (group.items || []).filter((c) => c.name)
 
-  return (
-    <div id={slugify(group.region)} className="scroll-mt-24">
-      {group.coverUrl ? (
-        <div className={`relative overflow-hidden rounded-2xl bg-navy-900 ${compact ? 'h-28' : 'h-40 sm:h-56'}`}>
-          <img src={group.coverUrl} alt={group.region} className="absolute inset-0 h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/40 to-navy-900/10" />
-          <div className={`absolute inset-0 flex flex-col justify-end ${compact ? 'p-3' : 'p-5 sm:p-8'}`}>
-            <h3 className={`font-serif font-bold text-white ${compact ? 'text-lg' : 'text-2xl sm:text-4xl'}`}>{group.region}</h3>
-            {group.desc && <p className={`mt-1 text-navy-100 ${compact ? 'text-xs' : 'text-sm sm:text-base'}`}>{group.desc}</p>}
-          </div>
-        </div>
-      ) : (
-        <>
-          <h3 className="border-l-4 border-gold-400 pl-3 font-serif text-2xl font-bold text-navy-900">{group.region}</h3>
-          {group.desc && <p className="mt-2 pl-4 text-gray-600">{group.desc}</p>}
-        </>
-      )}
-
-      <div className="mt-6 space-y-10">
-        {countries.map((country, ci) => {
-          const cities = (country.subregions || []).filter((s) => s.name)
-          const flag = getCountryFlag(country.name, '')
-          return (
-            <div key={ci} id={slugify(country.name)} className={`scroll-mt-28 ${compact ? 'pl-3' : 'pl-6 sm:pl-10'}`}>
-              {country.coverUrl ? (
-                <div className={`relative overflow-hidden rounded-xl bg-navy-900 ${compact ? 'h-20' : 'h-28 sm:h-36'}`}>
-                  <img src={country.coverUrl} alt={country.name} className="absolute inset-0 h-full w-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/40 to-navy-900/10" />
-                  <div className={`absolute inset-0 flex flex-col justify-end ${compact ? 'p-2' : 'p-3 sm:p-5'}`}>
-                    <h4 className={`flex items-center gap-2 font-serif font-bold text-white ${compact ? 'text-sm' : 'text-lg sm:text-xl'}`}>
-                      {flag && <span>{flag}</span>}
-                      {country.name}
-                    </h4>
-                    {country.desc && <p className={`mt-1 text-navy-100 ${compact ? 'text-xs' : 'text-xs sm:text-sm'}`}>{country.desc}</p>}
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <h4 className="flex items-center gap-2 border-l-4 border-gold-300 pl-3 font-serif text-xl font-bold text-navy-900">
-                    {flag && <span>{flag}</span>}
-                    {country.name}
-                  </h4>
-                  {country.desc && <p className="mt-1 pl-3 text-sm text-gray-600">{country.desc}</p>}
-                </>
-              )}
-              {cities.length > 0 && (
-                <div className={`mt-4 pl-3 ${grid}`}>
-                  {cities.map((city, i) => (
-                    <DestinationCard
-                      key={i}
-                      name={city.name}
-                      desc={city.desc}
-                      imageUrl={city.imageUrl}
-                      imageMode={city.imageMode}
-                      images={city.images}
-                      photoCaption={city.photoCaption}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-function RegionSummaryCard({ group }) {
+export function RegionSummaryCard({ group, preview = false }) {
   const countryCount = (group.items || []).filter((c) => c.name).length
+  const Tag = preview ? 'div' : Link
+  const linkProps = preview ? {} : { to: `/destinos/${slugify(group.region)}` }
   return (
-    <Link
-      to={`/destinos/${slugify(group.region)}`}
+    <Tag
+      {...linkProps}
       className="group relative block h-56 overflow-hidden rounded-2xl bg-navy-900 shadow-md transition-transform hover:scale-[1.02]"
     >
       {group.coverUrl ? (
@@ -351,7 +279,7 @@ function RegionSummaryCard({ group }) {
           <span className="transition-transform group-hover:translate-x-1">→</span>
         </span>
       </div>
-    </Link>
+    </Tag>
   )
 }
 

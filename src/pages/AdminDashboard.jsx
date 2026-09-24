@@ -5,7 +5,8 @@ import { defaultContent } from '../lib/defaultContent.js'
 import { LOGO_SIZES, getLogoSize } from '../lib/logoSize.js'
 import { SOCIAL_PLATFORMS, getPlatform } from '../components/SocialIcons.jsx'
 import ImageCropEditor from '../components/ImageCropEditor.jsx'
-import { RegionBlock } from './PublicSite.jsx'
+import { RegionSummaryCard, DestinationCard } from './PublicSite.jsx'
+import { Banner, ExploreCard } from './DestinationPages.jsx'
 import { getCountryFlag } from '../lib/flags.js'
 
 const TABS = [
@@ -1033,16 +1034,122 @@ function CountriesEditor({ countries, onChange }) {
   )
 }
 
+const PREVIEW_LEVELS = [
+  { key: 'home', label: 'Início' },
+  { key: 'regiao', label: 'Região' },
+  { key: 'pais', label: 'País' },
+  { key: 'cidade', label: 'Cidade' },
+]
+
 function DestinationsPreview({ groups }) {
   const validGroups = (groups || []).filter((g) => g.region)
+  const [level, setLevel] = useState('home')
+  const [regionIdx, setRegionIdx] = useState(0)
+  const [countryIdx, setCountryIdx] = useState(0)
+  const [cityIdx, setCityIdx] = useState(0)
+
   if (validGroups.length === 0) {
-    return <p className="text-sm text-gray-400">Nenhuma região cadastrada ainda.</p>
+    return <p className="text-sm text-gray-400">Nenhuma região cadastrada ainda. A prévia aparece aqui assim que você adicionar uma.</p>
   }
+
+  const region = validGroups[Math.min(regionIdx, validGroups.length - 1)]
+  const countries = (region.items || []).filter((c) => c.name)
+  const country = countries[Math.min(countryIdx, Math.max(countries.length - 1, 0))]
+  const cities = country ? (country.subregions || []).filter((c) => c.name) : []
+  const city = cities[Math.min(cityIdx, Math.max(cities.length - 1, 0))]
+
+  function selectRegion(i) {
+    setRegionIdx(i)
+    setCountryIdx(0)
+    setCityIdx(0)
+  }
+  function selectCountry(i) {
+    setCountryIdx(i)
+    setCityIdx(0)
+  }
+
   return (
-    <div className="space-y-10">
-      {validGroups.map((group, gi) => (
-        <RegionBlock key={gi} group={group} compact />
-      ))}
+    <div>
+      <div className="mb-3 flex flex-wrap gap-1.5">
+        {PREVIEW_LEVELS.map((l) => {
+          const disabled = (l.key === 'pais' && countries.length === 0) || (l.key === 'cidade' && cities.length === 0)
+          return (
+            <button
+              key={l.key}
+              type="button"
+              disabled={disabled}
+              onClick={() => setLevel(l.key)}
+              className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+                level === l.key ? 'bg-navy-800 text-white' : disabled ? 'cursor-not-allowed bg-gray-100 text-gray-300' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {l.label}
+            </button>
+          )
+        })}
+      </div>
+
+      {level !== 'home' && validGroups.length > 1 && (
+        <select className="input mb-2 text-xs" value={regionIdx} onChange={(e) => selectRegion(Number(e.target.value))}>
+          {validGroups.map((g, i) => (
+            <option key={i} value={i}>{g.region}</option>
+          ))}
+        </select>
+      )}
+      {(level === 'pais' || level === 'cidade') && countries.length > 1 && (
+        <select className="input mb-2 text-xs" value={countryIdx} onChange={(e) => selectCountry(Number(e.target.value))}>
+          {countries.map((c, i) => (
+            <option key={i} value={i}>{c.name}</option>
+          ))}
+        </select>
+      )}
+      {level === 'cidade' && cities.length > 1 && (
+        <select className="input mb-3 text-xs" value={cityIdx} onChange={(e) => setCityIdx(Number(e.target.value))}>
+          {cities.map((c, i) => (
+            <option key={i} value={i}>{c.name}</option>
+          ))}
+        </select>
+      )}
+
+      <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+        {level === 'home' && (
+          <div className="grid grid-cols-1 gap-3">
+            {validGroups.map((g, i) => (
+              <RegionSummaryCard key={i} group={g} preview />
+            ))}
+          </div>
+        )}
+
+        {level === 'regiao' && (
+          <div>
+            <Banner title={region.region} desc={region.desc} coverUrl={region.coverUrl} height="h-28" />
+            <p className="mt-3 text-xs font-semibold text-navy-900">Países de {region.region}</p>
+            <div className="mt-2 grid grid-cols-1 gap-3">
+              {countries.map((c, i) => (
+                <ExploreCard key={i} name={c.name} coverUrl={c.coverUrl} subtitle={c.desc} flag={getCountryFlag(c.name, '')} preview />
+              ))}
+              {countries.length === 0 && <p className="text-xs text-gray-400">Nenhum país cadastrado ainda nesta região.</p>}
+            </div>
+          </div>
+        )}
+
+        {level === 'pais' && country && (
+          <div>
+            <Banner title={country.name} desc={country.desc} coverUrl={country.coverUrl} flag={getCountryFlag(country.name, '')} height="h-24" />
+            <p className="mt-3 text-xs font-semibold text-navy-900">Cidades de {country.name}</p>
+            <div className="mt-2 grid grid-cols-1 gap-3">
+              {cities.map((c, i) => (
+                <DestinationCard key={i} name={c.name} desc={c.desc} imageUrl={c.imageUrl} imageMode={c.imageMode} images={c.images} photoCaption={c.photoCaption} />
+              ))}
+              {cities.length === 0 && <p className="text-xs text-gray-400">Nenhuma cidade cadastrada ainda neste país.</p>}
+            </div>
+          </div>
+        )}
+
+        {level === 'cidade' && city && (
+          <DestinationCard name={city.name} desc={city.desc} imageUrl={city.imageUrl} imageMode={city.imageMode} images={city.images} photoCaption={city.photoCaption} large />
+        )}
+      </div>
     </div>
   )
 }

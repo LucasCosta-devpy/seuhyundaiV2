@@ -23,7 +23,7 @@ function Breadcrumbs({ items }) {
   )
 }
 
-function Banner({ title, desc, coverUrl, flag, height = 'h-44 sm:h-64' }) {
+export function Banner({ title, desc, coverUrl, flag, height = 'h-44 sm:h-64' }) {
   if (coverUrl) {
     return (
       <div className={`relative mx-auto mt-4 max-w-[1400px] overflow-hidden rounded-2xl bg-navy-900 px-4 sm:px-6 ${height}`}>
@@ -49,9 +49,11 @@ function Banner({ title, desc, coverUrl, flag, height = 'h-44 sm:h-64' }) {
   )
 }
 
-function ExploreCard({ to, name, coverUrl, subtitle, flag }) {
+export function ExploreCard({ to, name, coverUrl, subtitle, flag, preview = false }) {
+  const Tag = preview ? 'div' : Link
+  const linkProps = preview ? {} : { to }
   return (
-    <Link to={to} className="group relative block h-44 overflow-hidden rounded-xl bg-navy-900 shadow-sm transition-transform hover:scale-[1.02]">
+    <Tag {...linkProps} className="group relative block h-44 overflow-hidden rounded-xl bg-navy-900 shadow-sm transition-transform hover:scale-[1.02]">
       {coverUrl ? (
         <img src={coverUrl} alt={name} className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
       ) : (
@@ -70,7 +72,7 @@ function ExploreCard({ to, name, coverUrl, subtitle, flag }) {
           Ver mais <span className="transition-transform group-hover:translate-x-1">→</span>
         </span>
       </div>
-    </Link>
+    </Tag>
   )
 }
 
