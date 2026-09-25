@@ -26,11 +26,9 @@ function Breadcrumbs({ items }) {
 export function Banner({ title, desc, coverUrl, flag, height = 'h-44 sm:h-64' }) {
   if (coverUrl) {
     return (
-      <div className={`relative mx-auto mt-4 max-w-6xl overflow-hidden rounded-2xl bg-navy-900 px-4 sm:px-6 ${height}`}>
-        <div className="absolute inset-0 mx-4 overflow-hidden rounded-2xl sm:mx-6">
-          <img src={coverUrl} alt={title} className="h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/40 to-navy-900/10" />
-        </div>
+      <div className={`relative mx-auto mt-4 max-w-6xl overflow-hidden ${height}`}>
+        <img src={coverUrl} alt={title} className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/40 to-navy-900/10" />
         <div className="relative flex h-full flex-col justify-end p-5 sm:p-10">
           <p className="text-xs font-semibold uppercase tracking-wide text-gold-300">{flag}</p>
           <h1 className="font-serif text-3xl font-bold text-white sm:text-5xl">{title}</h1>
