@@ -28,7 +28,7 @@ export function Banner({ title, desc, coverUrl, flag, height = 'h-72 sm:h-96' })
     return (
       <div className={`relative mx-auto mt-4 max-w-6xl overflow-hidden ${height}`}>
         <img src={coverUrl} alt={title} className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/40 to-navy-900/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy-900/60 via-navy-900/10 to-transparent" />
         <div className="relative flex h-full flex-col justify-end p-5 sm:p-10">
           <p className="text-xs font-semibold uppercase tracking-wide text-gold-300">{flag}</p>
           <h1 className="font-serif text-3xl font-bold text-white sm:text-5xl">{title}</h1>
