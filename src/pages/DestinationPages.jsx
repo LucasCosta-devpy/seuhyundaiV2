@@ -23,7 +23,7 @@ function Breadcrumbs({ items }) {
   )
 }
 
-export function Banner({ title, desc, coverUrl, flag, height = 'h-60 sm:h-80' }) {
+export function Banner({ title, desc, coverUrl, flag, height = 'h-72 sm:h-96' }) {
   if (coverUrl) {
     return (
       <div className={`relative mx-auto mt-4 max-w-6xl overflow-hidden ${height}`}>
