@@ -422,7 +422,7 @@ const IMAGE_ASPECT = {
   avatar: { ratio: 1, editorShape: 'circle', recommended: '800 × 800px (quadrada)' },
   portrait: { ratio: 3 / 4, editorShape: 'rect', recommended: '900 × 1200px (vertical)' },
   photo: { ratio: 4 / 3, editorShape: 'rect', recommended: '1200 × 900px (horizontal)' },
-  banner: { ratio: 16 / 6, editorShape: 'rect', recommended: '1600 × 600px (bem largo e baixo)', fit: 'cover', exportWidth: 2400 },
+  banner: { ratio: 16 / 6, editorShape: 'rect', recommended: '1600 × 600px (bem largo e baixo)', fit: 'cover', exportWidth: 3200 },
 }
 
 function ImageField({ label, value, onChange, shape = 'photo' }) {
