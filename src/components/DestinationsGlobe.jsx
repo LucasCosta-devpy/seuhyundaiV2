@@ -67,7 +67,7 @@ export default function DestinationsGlobe({ groups, compact = false }) {
     // Zoom por scroll desligado: perto do globo, o mouse ficaria "roubando"
     // o scroll da página inteira. Ainda dá pra girar arrastando com o mouse.
     globe.controls().enableZoom = false
-    globe.pointOfView({ lat: -10, lng: -45, altitude: 1.4 })
+    globe.pointOfView({ lat: -10, lng: -45, altitude: 0.9 })
   }, [])
 
   if (points.length === 0) {
