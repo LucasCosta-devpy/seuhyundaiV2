@@ -44,6 +44,7 @@ function buildPoints(groups) {
 function createPinElement(d, { size, onClick, onHoverChange }) {
   const wrapper = document.createElement('div')
   wrapper.style.cursor = 'pointer'
+  wrapper.style.pointerEvents = 'auto'
   wrapper.style.transform = 'translate(-50%, -100%)'
   wrapper.style.width = `${size}px`
 
@@ -53,10 +54,10 @@ function createPinElement(d, { size, onClick, onHoverChange }) {
       <circle cx="12" cy="12" r="5" fill="#101a2c"/>
     </svg>
     <div class="pin-tooltip" style="
-      position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%);
+      position:absolute; top:calc(100% + 6px); left:50%; transform:translateX(-50%);
       background:#fff; border-radius:8px; padding:6px; width:150px; text-align:left;
       font-family:sans-serif; font-size:12px; color:#101a2c; box-shadow:0 4px 12px rgba(0,0,0,.25);
-      opacity:0; pointer-events:none; transition:opacity .15s;
+      opacity:0; pointer-events:none; transition:opacity .15s; z-index:10;
     ">
       ${d.photoUrl ? `<img src="${d.photoUrl}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;display:block;margin-bottom:5px;" />` : ''}
       <strong>${d.name}</strong><br/>
@@ -107,7 +108,7 @@ export default function DestinationsGlobe({ groups, compact = false }) {
     // Zoom por scroll desligado: perto do globo, o mouse ficaria "roubando"
     // o scroll da página inteira. Ainda dá pra girar arrastando com o mouse.
     globe.controls().enableZoom = false
-    globe.pointOfView({ lat: -10, lng: -45, altitude: 1.4 })
+    globe.pointOfView({ lat: -10, lng: -45, altitude: 1.15 })
   }, [])
 
   if (points.length === 0) {
@@ -116,7 +117,7 @@ export default function DestinationsGlobe({ groups, compact = false }) {
     ) : null
   }
 
-  const pinSize = compact ? 20 : 28
+  const pinSize = compact ? 20 : 22
 
   const globeEl = (
     <div ref={containerRef} className={compact ? 'flex justify-center' : 'mx-auto mt-8 flex max-w-xl justify-center px-4 sm:px-6'}>
