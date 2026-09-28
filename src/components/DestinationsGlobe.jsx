@@ -2,48 +2,44 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Globe from 'react-globe.gl'
 import { slugify } from '../lib/slug.js'
-import { getCountryCoords } from '../lib/countryCoords.js'
 
-// Foto de capa do país; se não tiver, usa a primeira foto de alguma cidade dele.
-function getCountryPhoto(country) {
-  if (country.coverUrl) return country.coverUrl
-  for (const city of country.subregions || []) {
-    if (!city.name) continue
-    if (city.imageMode === 'carousel') {
-      const first = (city.images || []).find((img) => (typeof img === 'string' ? img : img?.url))
-      if (first) return typeof first === 'string' ? first : first.url
-    } else if (city.imageUrl) {
-      return city.imageUrl
-    }
+function getCityPhoto(city) {
+  if (city.imageMode === 'carousel') {
+    const first = (city.images || []).find((img) => (typeof img === 'string' ? img : img?.url))
+    if (first) return typeof first === 'string' ? first : first.url
+    return null
   }
-  return null
+  return city.imageUrl || null
 }
 
-// Junta região+país+coordenada pra cada país cadastrado que a gente
-// consegue localizar no mapa (ver src/lib/countryCoords.js).
+// Um ponto por cidade com latitude/longitude cadastradas no admin.
+// Cidade sem coordenada simplesmente não entra no globo.
 function buildPoints(groups) {
   const points = []
   for (const group of groups || []) {
     for (const country of group.items || []) {
       if (!country.name) continue
-      const coords = getCountryCoords(country.name)
-      if (!coords) continue
-      const cityCount = (country.subregions || []).filter((s) => s.name).length
-      points.push({
-        lat: coords.lat,
-        lng: coords.lng,
-        name: country.name,
-        region: group.region,
-        cityCount,
-        photoUrl: getCountryPhoto(country),
-        to: `/destinos/${slugify(group.region)}/${slugify(country.name)}`,
-      })
+      for (const city of country.subregions || []) {
+        if (!city.name) continue
+        const lat = Number(city.lat)
+        const lng = Number(city.lng)
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue
+        points.push({
+          lat,
+          lng,
+          name: city.name,
+          country: country.name,
+          region: group.region,
+          photoUrl: getCityPhoto(city),
+          to: `/destinos/${slugify(group.region)}/${slugify(country.name)}/${slugify(city.name)}`,
+        })
+      }
     }
   }
   return points
 }
 
-export default function DestinationsGlobe({ groups }) {
+export default function DestinationsGlobe({ groups, compact = false }) {
   const navigate = useNavigate()
   const containerRef = useRef(null)
   const globeRef = useRef(null)
@@ -55,12 +51,13 @@ export default function DestinationsGlobe({ groups }) {
     function measure() {
       if (!containerRef.current) return
       const w = containerRef.current.clientWidth
-      setSize({ width: w, height: Math.min(560, Math.max(320, w * 0.72)) })
+      const h = compact ? Math.max(220, w * 0.9) : Math.min(560, Math.max(320, w * 0.72))
+      setSize({ width: w, height: h })
     }
     measure()
     window.addEventListener('resize', measure)
     return () => window.removeEventListener('resize', measure)
-  }, [])
+  }, [compact])
 
   useEffect(() => {
     const globe = globeRef.current
@@ -70,41 +67,50 @@ export default function DestinationsGlobe({ groups }) {
     globe.pointOfView({ lat: -10, lng: -45, altitude: 2.2 })
   }, [])
 
-  if (points.length === 0) return null
+  if (points.length === 0) {
+    return compact ? (
+      <p className="text-xs text-gray-400">Nenhuma cidade com coordenadas cadastradas ainda — adicione latitude/longitude em alguma cidade pra ela aparecer aqui.</p>
+    ) : null
+  }
+
+  const globeEl = (
+    <div ref={containerRef} className={compact ? 'flex justify-center' : 'mx-auto mt-8 flex max-w-4xl justify-center px-4 sm:px-6'}>
+      <Globe
+        ref={globeRef}
+        width={size.width}
+        height={size.height}
+        backgroundColor="rgba(0,0,0,0)"
+        globeImageUrl="/globe/earth-blue-marble.jpg"
+        pointsData={points}
+        pointLat="lat"
+        pointLng="lng"
+        pointColor={() => '#d4a53f'}
+        pointAltitude={0.02}
+        pointRadius={compact ? 0.35 : 0.55}
+        pointLabel={(d) => `<div style="font-family:sans-serif;padding:6px;max-width:160px;">
+          ${d.photoUrl ? `<img src="${d.photoUrl}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;display:block;margin-bottom:6px;" />` : ''}
+          <strong>${d.name}</strong><br/>
+          <span style="opacity:.8">${d.country} · ${d.region}</span>
+        </div>`}
+        onPointClick={(d) => !compact && navigate(d.to)}
+        onPointHover={(d) => {
+          if (containerRef.current) containerRef.current.style.cursor = d ? 'pointer' : 'grab'
+        }}
+      />
+    </div>
+  )
+
+  if (compact) return globeEl
 
   return (
     <section className="bg-navy-900 py-14">
       <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
         <h2 className="section-title !text-white">Todos os Lugares Que Já Fomos</h2>
         <p className="mx-auto mt-3 max-w-xl text-navy-200">
-          Gira o globo e clica num ponto pra conhecer o destino. {points.length} país{points.length === 1 ? '' : 'es'} no mapa.
+          Gira o globo e clica num ponto pra conhecer o destino. {points.length} cidade{points.length === 1 ? '' : 's'} no mapa.
         </p>
       </div>
-
-      <div ref={containerRef} className="mx-auto mt-8 flex max-w-4xl justify-center px-4 sm:px-6">
-        <Globe
-          ref={globeRef}
-          width={size.width}
-          height={size.height}
-          backgroundColor="rgba(0,0,0,0)"
-          globeImageUrl="/globe/earth-blue-marble.jpg"
-          pointsData={points}
-          pointLat="lat"
-          pointLng="lng"
-          pointColor={() => '#d4a53f'}
-          pointAltitude={0.02}
-          pointRadius={0.55}
-          pointLabel={(d) => `<div style="font-family:sans-serif;padding:6px;max-width:160px;">
-            ${d.photoUrl ? `<img src="${d.photoUrl}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;display:block;margin-bottom:6px;" />` : ''}
-            <strong>${d.name}</strong><br/>
-            <span style="opacity:.8">${d.region}${d.cityCount ? ` · ${d.cityCount} cidade${d.cityCount === 1 ? '' : 's'}` : ''}</span>
-          </div>`}
-          onPointClick={(d) => navigate(d.to)}
-          onPointHover={(d) => {
-            if (containerRef.current) containerRef.current.style.cursor = d ? 'pointer' : 'grab'
-          }}
-        />
-      </div>
+      {globeEl}
     </section>
   )
 }
