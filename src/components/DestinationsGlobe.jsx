@@ -51,7 +51,7 @@ export default function DestinationsGlobe({ groups, compact = false }) {
     function measure() {
       if (!containerRef.current) return
       const w = containerRef.current.clientWidth
-      const h = compact ? Math.max(220, w * 0.9) : Math.min(560, Math.max(320, w * 0.72))
+      const h = compact ? Math.max(220, w * 0.9) : Math.min(560, w)
       setSize({ width: w, height: h })
     }
     measure()
