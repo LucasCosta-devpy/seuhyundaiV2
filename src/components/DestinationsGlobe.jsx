@@ -51,7 +51,7 @@ export default function DestinationsGlobe({ groups, compact = false }) {
     function measure() {
       if (!containerRef.current) return
       const w = containerRef.current.clientWidth
-      const h = compact ? Math.max(220, w * 0.9) : Math.min(560, w)
+      const h = compact ? Math.max(220, w * 0.9) : Math.min(560, w * 1.15)
       setSize({ width: w, height: h })
     }
     measure()
@@ -67,7 +67,7 @@ export default function DestinationsGlobe({ groups, compact = false }) {
     // Zoom por scroll desligado: perto do globo, o mouse ficaria "roubando"
     // o scroll da página inteira. Ainda dá pra girar arrastando com o mouse.
     globe.controls().enableZoom = false
-    globe.pointOfView({ lat: -10, lng: -45, altitude: 1.2 })
+    globe.pointOfView({ lat: -10, lng: -45, altitude: 1.4 })
   }, [])
 
   if (points.length === 0) {
