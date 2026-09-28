@@ -21,6 +21,7 @@ export const defaultContent = {
       'Com anos de estrada explorando destinos fascinantes ao redor do mundo, nós testamos, vivemos e aprovamos cada detalhe. Confira abaixo o nosso portfólio de rotas:',
     ],
   },
+  showGlobe: true,
   destinationGroups: [
     {
       region: 'América do Sul & Brasil',

@@ -178,6 +178,17 @@ export default function AdminDashboard() {
               <p className="-mt-2 mb-2 text-xs text-gray-400">
                 Os botões que aparecem no topo do site (embaixo do título) são gerados automaticamente a partir do nome de cada região aqui embaixo — adicionar ou remover uma região adiciona ou remove o botão sozinho, sem precisar configurar em outro lugar.
               </p>
+              <button
+                type="button"
+                onClick={() => update(['showGlobe'], !content.showGlobe)}
+                className={`mb-4 flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold ${
+                  content.showGlobe
+                    ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
+                    : 'border-gray-300 bg-gray-50 text-gray-500'
+                }`}
+              >
+                🌐 Globo 3D na home: {content.showGlobe ? 'ativado' : 'desativado'} (clique pra {content.showGlobe ? 'desativar' : 'ativar'})
+              </button>
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <DestinationGroupsEditor
                   groups={content.destinationGroups}

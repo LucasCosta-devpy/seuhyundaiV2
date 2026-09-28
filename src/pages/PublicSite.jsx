@@ -21,14 +21,14 @@ export default function PublicSite() {
     return <div className="flex min-h-screen items-center justify-center text-navy-700">Carregando…</div>
   }
 
-  const { brand, about, destinationGroups, services, reasons, process, pricing, consultant, cta, footer, socialLinks } = content
+  const { brand, about, destinationGroups, services, reasons, process, pricing, consultant, cta, footer, socialLinks, showGlobe } = content
 
   return (
     <div className="min-h-screen bg-white">
       <Header brand={brand} />
       <Hero brand={brand} destinationGroups={destinationGroups} />
       <About about={about} />
-      <DestinationsGlobe groups={destinationGroups} />
+      {showGlobe && <DestinationsGlobe groups={destinationGroups} />}
       <Destinations groups={destinationGroups} />
       <Services services={services} />
       <Reasons reasons={reasons} consultant={consultant} />
