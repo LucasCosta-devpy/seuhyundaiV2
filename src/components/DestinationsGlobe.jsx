@@ -64,7 +64,10 @@ export default function DestinationsGlobe({ groups, compact = false }) {
     if (!globe) return
     globe.controls().autoRotate = true
     globe.controls().autoRotateSpeed = 0.2
-    globe.pointOfView({ lat: -10, lng: -45, altitude: 2.2 })
+    // Zoom por scroll desligado: perto do globo, o mouse ficaria "roubando"
+    // o scroll da página inteira. Ainda dá pra girar arrastando com o mouse.
+    globe.controls().enableZoom = false
+    globe.pointOfView({ lat: -10, lng: -45, altitude: 1.4 })
   }, [])
 
   if (points.length === 0) {
@@ -74,7 +77,7 @@ export default function DestinationsGlobe({ groups, compact = false }) {
   }
 
   const globeEl = (
-    <div ref={containerRef} className={compact ? 'flex justify-center' : 'mx-auto mt-8 flex max-w-4xl justify-center px-4 sm:px-6'}>
+    <div ref={containerRef} className={compact ? 'flex justify-center' : 'mx-auto mt-8 flex max-w-xl justify-center px-4 sm:px-6'}>
       <Globe
         ref={globeRef}
         width={size.width}
