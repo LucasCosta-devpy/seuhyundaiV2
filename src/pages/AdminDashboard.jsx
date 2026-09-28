@@ -889,7 +889,7 @@ function useReorder(list, onChange) {
   return { dragIndex, openIndex, setOpenIndex, move, dragProps }
 }
 
-function RowHeader({ index, total, open, onToggle, onMove, onRemove, label, prefix, dragProps, className = '', extra }) {
+function RowHeader({ index, total, open, onToggle, onMove, onRemove, label, prefix, dragProps, className = '' }) {
   return (
     <div {...dragProps} className={`flex items-center gap-1 px-2 py-1.5 ${className}`}>
       <span className="cursor-grab select-none px-1 text-gray-400" title="Arraste pra reordenar">⠿</span>
@@ -897,7 +897,6 @@ function RowHeader({ index, total, open, onToggle, onMove, onRemove, label, pref
         {prefix && <span>{prefix}</span>}
         <span className="truncate text-sm font-semibold text-navy-900">{label}</span>
       </button>
-      {extra}
       <button type="button" onClick={() => onMove(index, index - 1)} disabled={index === 0} title="Mover pra cima" className="rounded px-1 py-1 text-xs text-gray-500 hover:bg-black/5 disabled:opacity-25">▲</button>
       <button type="button" onClick={() => onMove(index, index + 1)} disabled={index === total - 1} title="Mover pra baixo" className="rounded px-1 py-1 text-xs text-gray-500 hover:bg-black/5 disabled:opacity-25">▼</button>
       <button type="button" onClick={onToggle} className="px-1 py-1 text-gray-500">{open ? '−' : '+'}</button>
@@ -906,21 +905,7 @@ function RowHeader({ index, total, open, onToggle, onMove, onRemove, label, pref
   )
 }
 
-const MAX_FEATURED_CITIES = 10
-
-function countFeaturedCities(groups) {
-  let count = 0
-  for (const group of groups || []) {
-    for (const country of group.items || []) {
-      for (const city of country.subregions || []) {
-        if (city.featured) count++
-      }
-    }
-  }
-  return count
-}
-
-function CitiesEditor({ cities, onChange, featuredCount = 0 }) {
+function CitiesEditor({ cities, onChange }) {
   const { dragIndex, openIndex, setOpenIndex, move, dragProps } = useReorder(cities, onChange)
 
   function patchCity(ci, patch) {
@@ -938,21 +923,10 @@ function CitiesEditor({ cities, onChange, featuredCount = 0 }) {
     onChange(cities.filter((_, i) => i !== ci))
     setOpenIndex(-1)
   }
-  function toggleFeatured(ci) {
-    const city = cities[ci]
-    if (!city.featured && featuredCount >= MAX_FEATURED_CITIES) {
-      alert(`Limite de ${MAX_FEATURED_CITIES} cidades em destaque atingido. Desmarque alguma outra antes de adicionar esta.`)
-      return
-    }
-    patchCity(ci, { featured: !city.featured })
-  }
 
   return (
     <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-3">
       <SectionHeader icon="📍" title="Cidades" actionLabel="Adicionar cidade" onAction={addCity} />
-      <p className="-mt-1 mb-2 text-xs text-gray-400">
-        ★ marca a cidade como destaque no carrossel da home ({featuredCount}/{MAX_FEATURED_CITIES} usados no site todo).
-      </p>
       {cities.length === 0 && <p className="text-xs text-gray-400">Nenhuma cidade ainda. As fotos aparecem só dentro das cidades.</p>}
       <div className="space-y-2">
         {cities.map((city, ci) => {
@@ -971,16 +945,6 @@ function CitiesEditor({ cities, onChange, featuredCount = 0 }) {
                 onMove={move}
                 onRemove={() => removeCity(ci)}
                 label={city.name || 'Nova cidade (sem nome ainda)'}
-                extra={
-                  <button
-                    type="button"
-                    onClick={() => toggleFeatured(ci)}
-                    title={city.featured ? 'Remover dos destaques da home' : 'Marcar como destaque na home'}
-                    className={`px-1 py-1 ${city.featured ? 'text-gold-500' : 'text-gray-300 hover:text-gray-400'}`}
-                  >
-                    {city.featured ? '★' : '☆'}
-                  </button>
-                }
               />
               {open && (
                 <div className="space-y-3 border-t border-gray-200 p-3">
@@ -1028,7 +992,7 @@ function CitiesEditor({ cities, onChange, featuredCount = 0 }) {
   )
 }
 
-function CountriesEditor({ countries, onChange, featuredCount = 0 }) {
+function CountriesEditor({ countries, onChange }) {
   const { dragIndex, openIndex, setOpenIndex, move, dragProps } = useReorder(countries, onChange)
 
   function patchCountry(ci, patch) {
@@ -1087,11 +1051,7 @@ function CountriesEditor({ countries, onChange, featuredCount = 0 }) {
                     value={country.coverUrl}
                     onChange={(v) => patchCountry(ci, { coverUrl: v })}
                   />
-                  <CitiesEditor
-                    cities={country.subregions || []}
-                    onChange={(v) => patchCountry(ci, { subregions: v })}
-                    featuredCount={featuredCount}
-                  />
+                  <CitiesEditor cities={country.subregions || []} onChange={(v) => patchCountry(ci, { subregions: v })} />
                 </div>
               )}
             </div>
@@ -1227,7 +1187,6 @@ function DestinationsPreview({ groups }) {
 
 function DestinationGroupsEditor({ groups, onChange }) {
   const { dragIndex, openIndex, setOpenIndex, move, dragProps } = useReorder(groups, onChange)
-  const featuredCount = countFeaturedCities(groups)
 
   function patchGroup(gi, patch) {
     const next = [...groups]
@@ -1286,11 +1245,7 @@ function DestinationGroupsEditor({ groups, onChange }) {
                     value={group.coverUrl}
                     onChange={(v) => patchGroup(gi, { coverUrl: v })}
                   />
-                  <CountriesEditor
-                    countries={group.items || []}
-                    onChange={(v) => patchGroup(gi, { items: v })}
-                    featuredCount={featuredCount}
-                  />
+                  <CountriesEditor countries={group.items || []} onChange={(v) => patchGroup(gi, { items: v })} />
                 </div>
               )}
             </div>
