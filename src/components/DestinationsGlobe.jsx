@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Globe from 'react-globe.gl'
 import { slugify } from '../lib/slug.js'
+import FeaturedTripsCarousel from './FeaturedTripsCarousel.jsx'
 
 function getCityPhoto(city) {
   if (city.imageMode === 'carousel') {
@@ -148,12 +149,11 @@ export default function DestinationsGlobe({ groups, compact = false }) {
   return (
     <section className="bg-navy-900 py-14">
       <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
-        <h2 className="section-title !text-white">Todos os Lugares Que Já Fomos</h2>
-        <p className="mx-auto mt-3 max-w-xl text-navy-200">
-          Gira o globo e clica num ponto pra conhecer o destino. {points.length} cidade{points.length === 1 ? '' : 's'} no mapa.
-        </p>
+        <h2 className="section-title !text-white">Nossas Viagens pelo Mundo</h2>
+        <p className="mt-2 text-sm text-navy-200">{points.length} cidade{points.length === 1 ? '' : 's'} no mapa</p>
       </div>
       {globeEl}
+      <FeaturedTripsCarousel groups={groups} />
     </section>
   )
 }
