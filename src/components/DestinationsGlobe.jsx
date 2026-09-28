@@ -95,6 +95,7 @@ export default function DestinationsGlobe({ groups, compact = false }) {
         onPointClick={(d) => !compact && navigate(d.to)}
         onPointHover={(d) => {
           if (containerRef.current) containerRef.current.style.cursor = d ? 'pointer' : 'grab'
+          if (globeRef.current) globeRef.current.controls().autoRotate = !d
         }}
       />
     </div>
