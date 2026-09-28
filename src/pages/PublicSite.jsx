@@ -5,6 +5,7 @@ import { slugify } from '../lib/slug.js'
 import { getLogoSize } from '../lib/logoSize.js'
 import { getPlatform } from '../components/SocialIcons.jsx'
 import { useSiteContent } from '../lib/useSiteContent.js'
+import DestinationsGlobe from '../components/DestinationsGlobe.jsx'
 
 export default function PublicSite() {
   const { content, loading } = useSiteContent()
@@ -27,6 +28,7 @@ export default function PublicSite() {
       <Header brand={brand} />
       <Hero brand={brand} destinationGroups={destinationGroups} />
       <About about={about} />
+      <DestinationsGlobe groups={destinationGroups} />
       <Destinations groups={destinationGroups} />
       <Services services={services} />
       <Reasons reasons={reasons} consultant={consultant} />
