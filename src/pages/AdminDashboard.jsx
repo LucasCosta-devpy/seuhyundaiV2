@@ -8,6 +8,7 @@ import ImageCropEditor from '../components/ImageCropEditor.jsx'
 import { RegionSummaryCard, DestinationCard } from './PublicSite.jsx'
 import { Banner, ExploreCard } from './DestinationPages.jsx'
 import { getCountryFlag } from '../lib/flags.js'
+import DestinationsGlobe from '../components/DestinationsGlobe.jsx'
 
 const TABS = [
   { key: 'marca', label: 'Marca e Contato', color: 'amber' },
@@ -956,6 +957,31 @@ function CitiesEditor({ cities, onChange }) {
                     <label className="label">Descrição da cidade</label>
                     <textarea className="input text-sm" rows={2} value={city.desc || ''} onChange={(e) => patchCity(ci, { desc: e.target.value })} />
                   </div>
+                  <div>
+                    <label className="label">Coordenadas no mapa (opcional, pra aparecer no globo 3D)</label>
+                    <div className="flex gap-2">
+                      <input
+                        className="input text-sm"
+                        type="number"
+                        step="any"
+                        placeholder="Latitude (ex: -22.9068)"
+                        value={city.lat ?? ''}
+                        onChange={(e) => patchCity(ci, { lat: e.target.value === '' ? undefined : Number(e.target.value) })}
+                      />
+                      <input
+                        className="input text-sm"
+                        type="number"
+                        step="any"
+                        placeholder="Longitude (ex: -43.1729)"
+                        value={city.lng ?? ''}
+                        onChange={(e) => patchCity(ci, { lng: e.target.value === '' ? undefined : Number(e.target.value) })}
+                      />
+                    </div>
+                    <p className="mt-1 text-xs text-gray-400">
+                      Sem coordenadas, a cidade não aparece no globo (o resto do site continua normal). Pra achar: abre o Google Maps,
+                      clica com o botão direito em cima da cidade e copia os dois números que aparecem (latitude, depois longitude).
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
@@ -1041,6 +1067,7 @@ const PREVIEW_LEVELS = [
   { key: 'regiao', label: 'Região' },
   { key: 'pais', label: 'País' },
   { key: 'cidade', label: 'Cidade' },
+  { key: 'globo', label: '🌐 Globo 3D' },
 ]
 
 function DestinationsPreview({ groups }) {
@@ -1151,6 +1178,8 @@ function DestinationsPreview({ groups }) {
         {level === 'cidade' && city && (
           <DestinationCard name={city.name} desc={city.desc} imageUrl={city.imageUrl} imageMode={city.imageMode} images={city.images} photoCaption={city.photoCaption} large />
         )}
+
+        {level === 'globo' && <DestinationsGlobe groups={groups} compact />}
       </div>
     </div>
   )
