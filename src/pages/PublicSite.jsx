@@ -21,12 +21,12 @@ export default function PublicSite() {
     return <div className="flex min-h-screen items-center justify-center text-navy-700">Carregando…</div>
   }
 
-  const { brand, about, destinationGroups, services, reasons, process, pricing, consultant, cta, footer, socialLinks, showGlobe } = content
+  const { brand, hero, about, destinationGroups, services, reasons, process, pricing, consultant, cta, footer, socialLinks, showGlobe } = content
 
   return (
     <div className="min-h-screen bg-white">
       <Header brand={brand} />
-      <Hero brand={brand} destinationGroups={destinationGroups} />
+      <Hero brand={brand} hero={hero} destinationGroups={destinationGroups} />
       <About about={about} />
       {showGlobe && <DestinationsGlobe groups={destinationGroups} />}
       <Destinations groups={destinationGroups} />
@@ -150,7 +150,7 @@ export function Header({ brand }) {
   )
 }
 
-function Hero({ brand, destinationGroups }) {
+function Hero({ brand, hero, destinationGroups }) {
   const logoSize = getLogoSize(brand.logoSize)
   return (
     <section className="relative overflow-hidden bg-navy-900 py-16 sm:py-24">
@@ -179,6 +179,17 @@ function Hero({ brand, destinationGroups }) {
         </h1>
         <p className="mt-4 text-lg text-navy-100 sm:text-xl">{brand.tagline}</p>
         <div className="mx-auto mt-8 h-1 w-24 rounded bg-gradient-to-r from-gold-400 to-gold-600" />
+        {hero?.headline && (
+          <h2 className="mt-8 font-serif text-2xl font-bold text-white sm:text-4xl">{hero.headline}</h2>
+        )}
+        {hero?.subtext && (
+          <p className="mx-auto mt-4 max-w-xl text-navy-100">{hero.subtext}</p>
+        )}
+        {hero?.ctaLabel && (
+          <WhatsAppLink whatsapp={brand.whatsapp} className="btn-gold mt-8 inline-block text-base font-bold uppercase tracking-wide">
+            {hero.ctaLabel}
+          </WhatsAppLink>
+        )}
         <div className="mt-10 flex flex-wrap justify-center gap-2.5">
           {(destinationGroups || []).filter((g) => g.region).map((group) => (
             <Link

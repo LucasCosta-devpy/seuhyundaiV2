@@ -11,6 +11,11 @@ export const defaultContent = {
     instagram: '@rumomaisumarota',
     whatsapp: '5551982710564',
   },
+  hero: {
+    headline: 'Sua próxima viagem começa aqui.',
+    subtext: 'Planejamos cada detalhe para você viajar com tranquilidade e aproveitar mais.',
+    ctaLabel: 'Quero planejar minha viagem',
+  },
   socialLinks: [
     { platform: 'instagram', name: 'Instagram', url: 'https://instagram.com/rumomaisumarota', iconUrl: '' },
   ],

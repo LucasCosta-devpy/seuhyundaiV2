@@ -151,6 +151,11 @@ export default function AdminDashboard() {
                 value={content.brand.whatsapp}
                 onChange={(v) => update(['brand', 'whatsapp'], v.replace(/\D/g, ''))}
               />
+
+              <p className="mt-6 mb-2 text-sm font-semibold text-navy-900">Chamada de destaque (topo do site)</p>
+              <TextField label="Frase de impacto" value={content.hero.headline} onChange={(v) => update(['hero', 'headline'], v)} />
+              <TextField label="Texto de apoio" value={content.hero.subtext} onChange={(v) => update(['hero', 'subtext'], v)} />
+              <TextField label="Texto do botão" value={content.hero.ctaLabel} onChange={(v) => update(['hero', 'ctaLabel'], v)} />
             </Panel>
           )}
 
