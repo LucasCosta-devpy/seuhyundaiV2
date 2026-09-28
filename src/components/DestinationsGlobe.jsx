@@ -83,6 +83,7 @@ export default function DestinationsGlobe({ groups, compact = false }) {
         width={size.width}
         height={size.height}
         backgroundColor="rgba(0,0,0,0)"
+        showAtmosphere={false}
         globeImageUrl="/globe/earth-blue-marble.jpg"
         pointsData={points}
         pointLat="lat"
