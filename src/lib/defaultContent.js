@@ -31,7 +31,14 @@ export const defaultContent = {
     {
       region: 'América do Sul & Brasil',
       items: [
-        { name: 'Brasil', desc: 'Roteiros completos pelo país, praias, capitais e serras.', imageUrl: '' },
+        {
+          name: 'Brasil',
+          desc: 'Roteiros completos pelo país, praias, capitais e serras.',
+          imageUrl: '',
+          subregions: [
+            { name: '[TESTE] Rio de Janeiro', desc: 'Cidade de teste só pra o globo 3D aparecer em ambiente local sem banco de dados conectado.', imageUrl: '', lat: -22.9068, lng: -43.1729 },
+          ],
+        },
         { name: 'Argentina', desc: 'Buenos Aires, Patagônia e Cordilheira dos Andes.', imageUrl: '' },
         { name: 'Uruguai', desc: 'Montevidéu, Punta del Este e vinícolas charmosas.', imageUrl: '' },
         { name: 'Chile', desc: 'Santiago, paisagens andinas e experiências únicas.', imageUrl: '' },
