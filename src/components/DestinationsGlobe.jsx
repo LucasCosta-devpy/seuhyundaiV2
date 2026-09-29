@@ -81,19 +81,17 @@ export default function DestinationsGlobe({ groups, compact = false }) {
       {!compact && (
         <div
           className="pointer-events-none absolute inset-0 -z-10"
-          style={{ background: 'radial-gradient(circle, rgba(58,107,219,0.35), transparent 65%)' }}
+          style={{ background: 'radial-gradient(circle closest-side, rgba(58,107,219,0.35), transparent 100%)' }}
         />
       )}
-      {!compact && <OrbitPlane />}
+      {!compact && <OrbitLayer side="back" />}
       <div className="relative z-10">
         <Globe
           ref={globeRef}
           width={size.width}
           height={size.height}
           backgroundColor="rgba(0,0,0,0)"
-          showAtmosphere
-          atmosphereColor="#5f8fe0"
-          atmosphereAltitude={0.22}
+          showAtmosphere={false}
           globeImageUrl="/globe/earth-blue-marble.jpg"
           pointsData={points}
           pointLat="lat"
@@ -113,6 +111,7 @@ export default function DestinationsGlobe({ groups, compact = false }) {
           }}
         />
       </div>
+      {!compact && <OrbitLayer side="front" />}
     </div>
   )
 
@@ -131,27 +130,38 @@ export default function DestinationsGlobe({ groups, compact = false }) {
   )
 }
 
-// Avião decorativo orbitando o globo numa trajetória tracejada — só efeito visual, não interativo.
-function OrbitPlane() {
+// Órbita tracejada com avião ao redor do globo, em duas camadas (frente/trás) pra dar
+// a ilusão de profundidade: metade do caminho passa por cima da esfera (perto/frente),
+// a outra metade some atrás dela (longe/atrás) e reaparece do outro lado.
+const ORBIT_FULL_PATH = 'M -57.5,236.2 A 260,90 -8 1,1 457.5,163.8 A 260,90 -8 1,1 -57.5,236.2 Z'
+// Mesma elipse, mas só a metade de baixo (frente) e só a metade de cima (trás).
+const ORBIT_FRONT_ARC = 'M -57.5,236.2 A 260,90 -8 0,1 457.5,163.8'
+const ORBIT_BACK_ARC = 'M 457.5,163.8 A 260,90 -8 0,1 -57.5,236.2'
+
+const PLANE_ICON_PATH =
+  'M21,16V14L13,9V3.5C13,2.67 12.33,2 11.5,2C10.67,2 10,2.67 10,3.5V9L2,14V16L10,13.5V19L7.5,20.5V22L11.5,21L15.5,22V20.5L13,19V13.5L21,16Z'
+
+function OrbitLayer({ side }) {
+  const isFront = side === 'front'
+  const arc = isFront ? ORBIT_FRONT_ARC : ORBIT_BACK_ARC
+  // O avião percorre a elipse inteira em 14s; a primeira metade do tempo ele está
+  // na metade de baixo (frente), a segunda metade na metade de cima (trás) — dividido
+  // exatamente ao meio porque a elipse é simétrica, então a troca de opacidade bate
+  // certinho com o ponto em que ele cruza de uma camada pra outra.
+  const opacityValues = isFront ? '1;0' : '0;1'
   return (
     <svg
       viewBox="0 0 400 400"
-      className="pointer-events-none absolute inset-0 z-0 h-full w-full"
+      className={`pointer-events-none absolute inset-0 h-full w-full ${isFront ? 'z-20' : 'z-0'}`}
       style={{ overflow: 'visible' }}
     >
-      <defs>
-        <path id="orbit-path" d="M -57.5,236.2 A 260,90 -8 1,1 457.5,163.8 A 260,90 -8 1,1 -57.5,236.2 Z" />
-      </defs>
-      <use href="#orbit-path" fill="none" stroke="#d4a53f" strokeOpacity="0.45" strokeWidth="1.5" strokeDasharray="6 8" />
-      <g>
+      <path d={arc} fill="none" stroke="#d4a53f" strokeOpacity="0.45" strokeWidth="1.5" strokeDasharray="6 8" />
+      <g opacity={isFront ? 1 : 0}>
+        <animate attributeName="opacity" values={opacityValues} keyTimes="0;0.5" dur="14s" repeatCount="indefinite" calcMode="discrete" />
         <g transform="translate(-12,-12) rotate(90 12 12)">
-          <path
-            d="M21,16V14L13,9V3.5C13,2.67 12.33,2 11.5,2C10.67,2 10,2.67 10,3.5V9L2,14V16L10,13.5V19L7.5,20.5V22L11.5,21L15.5,22V20.5L13,19V13.5L21,16Z"
-            fill="#f0c869"
-            style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,.5))' }}
-          />
+          <path d={PLANE_ICON_PATH} fill="#f0c869" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,.5))' }} />
         </g>
-        <animateMotion dur="14s" repeatCount="indefinite" rotate="auto" path="M -57.5,236.2 A 260,90 -8 1,1 457.5,163.8 A 260,90 -8 1,1 -57.5,236.2 Z" />
+        <animateMotion dur="14s" repeatCount="indefinite" rotate="auto" path={ORBIT_FULL_PATH} />
       </g>
     </svg>
   )
