@@ -77,13 +77,22 @@ export default function DestinationsGlobe({ groups, compact = false }) {
   }
 
   const globeEl = (
-    <div ref={containerRef} className={compact ? 'flex justify-center' : 'mx-auto mt-8 flex max-w-xl justify-center px-4 sm:px-6'}>
+    <div ref={containerRef} className={compact ? 'relative flex justify-center' : 'relative mx-auto mt-8 flex max-w-xl justify-center px-4 sm:px-6'}>
+      {!compact && (
+        <div
+          className="pointer-events-none absolute inset-0 -z-10"
+          style={{ background: 'radial-gradient(circle, rgba(58,107,219,0.35), transparent 65%)' }}
+        />
+      )}
+      {!compact && <OrbitPlane />}
       <Globe
         ref={globeRef}
         width={size.width}
         height={size.height}
         backgroundColor="rgba(0,0,0,0)"
-        showAtmosphere={false}
+        showAtmosphere
+        atmosphereColor="#5f8fe0"
+        atmosphereAltitude={0.22}
         globeImageUrl="/globe/earth-blue-marble.jpg"
         pointsData={points}
         pointLat="lat"
@@ -110,12 +119,32 @@ export default function DestinationsGlobe({ groups, compact = false }) {
   return (
     <section className="bg-navy-900 py-14">
       <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
-        <h2 className="section-title !text-white">Todos os Lugares Que Já Fomos</h2>
-        <p className="mx-auto mt-3 max-w-xl text-navy-200">
-          Gira o globo e clica num ponto pra conhecer o destino. {points.length} cidade{points.length === 1 ? '' : 's'} no mapa.
-        </p>
+        <h2 className="section-title !text-white">
+          Lugares Que Já <span className="text-gold-400">Conhecemos</span>
+        </h2>
+        <p className="mx-auto mt-3 max-w-xl text-navy-200">Gire o globo e clique em um ponto para conhecer o destino.</p>
       </div>
       {globeEl}
     </section>
+  )
+}
+
+// Avião decorativo orbitando o globo numa trajetória tracejada — só efeito visual, não interativo.
+function OrbitPlane() {
+  return (
+    <svg
+      viewBox="0 0 400 400"
+      className="pointer-events-none absolute inset-0 h-full w-full"
+      style={{ zIndex: 5 }}
+    >
+      <defs>
+        <path id="orbit-path" d="M 60,210 A 150,60 -8 1,1 360,190 A 150,60 -8 1,1 60,210 Z" />
+      </defs>
+      <use href="#orbit-path" fill="none" stroke="#d4a53f" strokeOpacity="0.45" strokeWidth="1.5" strokeDasharray="6 8" />
+      <g>
+        <path d="M0,-5 L10,0 L0,5 L-8,2 L-8,-2 Z" fill="#d4a53f" />
+        <animateMotion dur="14s" repeatCount="indefinite" rotate="auto" path="M 60,210 A 150,60 -8 1,1 360,190 A 150,60 -8 1,1 60,210 Z" />
+      </g>
+    </svg>
   )
 }
