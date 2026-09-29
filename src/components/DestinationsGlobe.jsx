@@ -85,32 +85,34 @@ export default function DestinationsGlobe({ groups, compact = false }) {
         />
       )}
       {!compact && <OrbitPlane />}
-      <Globe
-        ref={globeRef}
-        width={size.width}
-        height={size.height}
-        backgroundColor="rgba(0,0,0,0)"
-        showAtmosphere
-        atmosphereColor="#5f8fe0"
-        atmosphereAltitude={0.22}
-        globeImageUrl="/globe/earth-blue-marble.jpg"
-        pointsData={points}
-        pointLat="lat"
-        pointLng="lng"
-        pointColor={() => '#d4a53f'}
-        pointAltitude={0.02}
-        pointRadius={compact ? 0.35 : 0.55}
-        pointLabel={(d) => `<div style="font-family:sans-serif;padding:6px;max-width:160px;">
-          ${d.photoUrl ? `<img src="${d.photoUrl}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;display:block;margin-bottom:6px;" />` : ''}
-          <strong>${d.name}</strong><br/>
-          <span style="opacity:.8">${d.country} · ${d.region}</span>
-        </div>`}
-        onPointClick={(d) => !compact && navigate(d.to)}
-        onPointHover={(d) => {
-          if (containerRef.current) containerRef.current.style.cursor = d ? 'pointer' : 'grab'
-          if (globeRef.current) globeRef.current.controls().autoRotate = !d
-        }}
-      />
+      <div className="relative z-10">
+        <Globe
+          ref={globeRef}
+          width={size.width}
+          height={size.height}
+          backgroundColor="rgba(0,0,0,0)"
+          showAtmosphere
+          atmosphereColor="#5f8fe0"
+          atmosphereAltitude={0.22}
+          globeImageUrl="/globe/earth-blue-marble.jpg"
+          pointsData={points}
+          pointLat="lat"
+          pointLng="lng"
+          pointColor={() => '#d4a53f'}
+          pointAltitude={0.02}
+          pointRadius={compact ? 0.35 : 0.55}
+          pointLabel={(d) => `<div style="font-family:sans-serif;padding:6px;max-width:160px;">
+            ${d.photoUrl ? `<img src="${d.photoUrl}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;display:block;margin-bottom:6px;" />` : ''}
+            <strong>${d.name}</strong><br/>
+            <span style="opacity:.8">${d.country} · ${d.region}</span>
+          </div>`}
+          onPointClick={(d) => !compact && navigate(d.to)}
+          onPointHover={(d) => {
+            if (containerRef.current) containerRef.current.style.cursor = d ? 'pointer' : 'grab'
+            if (globeRef.current) globeRef.current.controls().autoRotate = !d
+          }}
+        />
+      </div>
     </div>
   )
 
@@ -134,11 +136,11 @@ function OrbitPlane() {
   return (
     <svg
       viewBox="0 0 400 400"
-      className="pointer-events-none absolute inset-0 h-full w-full"
-      style={{ zIndex: 5 }}
+      className="pointer-events-none absolute inset-0 z-0 h-full w-full"
+      style={{ overflow: 'visible' }}
     >
       <defs>
-        <path id="orbit-path" d="M 60,210 A 150,60 -8 1,1 360,190 A 150,60 -8 1,1 60,210 Z" />
+        <path id="orbit-path" d="M -57.5,236.2 A 260,90 -8 1,1 457.5,163.8 A 260,90 -8 1,1 -57.5,236.2 Z" />
       </defs>
       <use href="#orbit-path" fill="none" stroke="#d4a53f" strokeOpacity="0.45" strokeWidth="1.5" strokeDasharray="6 8" />
       <g>
@@ -149,7 +151,7 @@ function OrbitPlane() {
             style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,.5))' }}
           />
         </g>
-        <animateMotion dur="14s" repeatCount="indefinite" rotate="auto" path="M 60,210 A 150,60 -8 1,1 360,190 A 150,60 -8 1,1 60,210 Z" />
+        <animateMotion dur="14s" repeatCount="indefinite" rotate="auto" path="M -57.5,236.2 A 260,90 -8 1,1 457.5,163.8 A 260,90 -8 1,1 -57.5,236.2 Z" />
       </g>
     </svg>
   )
