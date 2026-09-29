@@ -118,8 +118,19 @@ export default function DestinationsGlobe({ groups, compact = false }) {
   if (compact) return globeEl
 
   return (
-    <section className="bg-navy-900 py-14">
-      <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
+    <section
+      className="relative overflow-hidden py-14"
+      style={{
+        background:
+          'radial-gradient(ellipse at 50% 0%, #2a4d8f 0%, #16305f 35%, #0d1f42 65%, #081530 100%)',
+      }}
+    >
+      <div className="pointer-events-none absolute inset-0 opacity-40" style={{
+        background:
+          'radial-gradient(circle at 8% 85%, rgba(255,255,255,0.10), transparent 30%), radial-gradient(circle at 92% 80%, rgba(255,255,255,0.08), transparent 30%)',
+      }} />
+      <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
+        <CompassDivider />
         <h2 className="section-title !text-white">
           Lugares Que Já <span className="text-gold-400">Conhecemos</span>
         </h2>
@@ -127,6 +138,20 @@ export default function DestinationsGlobe({ groups, compact = false }) {
       </div>
       {globeEl}
     </section>
+  )
+}
+
+function CompassDivider() {
+  return (
+    <div className="mb-4 flex items-center justify-center gap-3">
+      <span className="h-px w-16 bg-gold-400/70 sm:w-24" />
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" stroke="#d4a53f" strokeWidth="1" />
+        <path d="M12 2 L14 12 L12 22 L10 12 Z" fill="#d4a53f" />
+        <path d="M2 12 L12 10 L22 12 L12 14 Z" fill="#d4a53f" opacity="0.6" />
+      </svg>
+      <span className="h-px w-16 bg-gold-400/70 sm:w-24" />
+    </div>
   )
 }
 
