@@ -12,6 +12,85 @@ function getCityPhoto(city) {
   return city.imageUrl || null
 }
 
+function safeDomId(str) {
+  return str.replace(/[^a-zA-Z0-9_-]/g, '')
+}
+
+// Pino de mapa dourado com brilho neon (glow via filtro SVG) + base iluminada,
+// com balão (foto/nome) que pode ser mostrado tanto no hover do mouse quanto
+// automaticamente (destaque em rodízio).
+function createPinElement(d, { size, onClick, onHoverChange, registerTooltip }) {
+  const wrapper = document.createElement('div')
+  wrapper.style.cursor = 'pointer'
+  wrapper.style.pointerEvents = 'auto'
+  wrapper.style.width = `${size}px`
+  wrapper.style.position = 'relative'
+  // A "ponta" visual do pino (onde ele toca o chão) fica em y=73 de uma
+  // viewBox de altura 90 — por isso a âncora não é -100%, e sim nesse ponto.
+  wrapper.style.transform = `translate(-50%, ${-((73 / 90) * 100).toFixed(2)}%)`
+
+  const h = Math.round((size * 90) / 70)
+  const uid = safeDomId(d.to)
+  const glowId = `pin-glow-${uid}`
+  const goldId = `pin-gold-${uid}`
+
+  wrapper.innerHTML = `
+    <svg width="${size}" height="${h}" viewBox="0 0 70 90" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible;">
+      <defs>
+        <filter id="${glowId}" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="4" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <linearGradient id="${goldId}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#fff7a0"/>
+          <stop offset="35%" stop-color="#ffd21c"/>
+          <stop offset="100%" stop-color="#ff9d00"/>
+        </linearGradient>
+      </defs>
+
+      <path d="M35 5 C20 5 10 16 10 30 C10 48 35 68 35 68 C35 68 60 48 60 30 C60 16 50 5 35 5Z"
+        fill="none" stroke="#ffd21c" stroke-width="5" opacity="0.35" filter="url(#${glowId})" />
+
+      <path d="M35 5 C20 5 10 16 10 30 C10 48 35 68 35 68 C35 68 60 48 60 30 C60 16 50 5 35 5Z"
+        fill="#07172b" stroke="url(#${goldId})" stroke-width="4" filter="url(#${glowId})" />
+
+      <circle cx="35" cy="29" r="9" fill="white" stroke="#ffd21c" stroke-width="3" />
+      <circle cx="32" cy="26" r="3" fill="white" />
+
+      <ellipse cx="35" cy="73" rx="18" ry="5" fill="none" stroke="#ffd21c" stroke-width="3" filter="url(#${glowId})" />
+      <ellipse cx="35" cy="73" rx="10" ry="2.5" fill="#ffd21c" opacity="0.7" />
+    </svg>
+    <div class="pin-tooltip" style="
+      position:absolute; top:calc(81% + 6px); left:50%; transform:translateX(-50%);
+      background:#fff; border-radius:8px; padding:6px; width:150px; text-align:left;
+      font-family:sans-serif; font-size:12px; color:#101a2c; box-shadow:0 4px 12px rgba(0,0,0,.25);
+      opacity:0; pointer-events:none; transition:opacity .2s; z-index:10;
+    ">
+      ${d.photoUrl ? `<img src="${d.photoUrl}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;display:block;margin-bottom:5px;" />` : ''}
+      <strong>${d.name}</strong><br/>
+      <span style="opacity:.7">${d.country} · ${d.region}</span>
+    </div>
+  `
+
+  const tooltip = wrapper.querySelector('.pin-tooltip')
+  registerTooltip(d.to, tooltip)
+
+  wrapper.addEventListener('mouseenter', () => {
+    tooltip.style.opacity = '1'
+    onHoverChange(true, d.to)
+  })
+  wrapper.addEventListener('mouseleave', () => {
+    tooltip.style.opacity = '0'
+    onHoverChange(false, d.to)
+  })
+  wrapper.addEventListener('click', () => onClick(d))
+
+  return wrapper
+}
+
 // Um ponto por cidade com latitude/longitude cadastradas no admin.
 // Cidade sem coordenada simplesmente não entra no globo.
 function buildPoints(groups) {
@@ -44,8 +123,26 @@ export default function DestinationsGlobe({ groups, compact = false }) {
   const containerRef = useRef(null)
   const globeRef = useRef(null)
   const [size, setSize] = useState({ width: 320, height: 320 })
+  const tooltipsRef = useRef({})
+  const hoveringRef = useRef(false)
+  const autoIndexRef = useRef(-1)
 
   const points = useMemo(() => buildPoints(groups), [groups])
+
+  // Destaque automático: enquanto ninguém está com o mouse em cima, vai
+  // revezando a foto de cada cidade sozinho, sem precisar passar o mouse.
+  useEffect(() => {
+    if (compact || points.length === 0) return
+    const id = setInterval(() => {
+      if (hoveringRef.current) return
+      const prev = points[autoIndexRef.current]
+      if (prev && tooltipsRef.current[prev.to]) tooltipsRef.current[prev.to].style.opacity = '0'
+      autoIndexRef.current = (autoIndexRef.current + 1) % points.length
+      const next = points[autoIndexRef.current]
+      if (next && tooltipsRef.current[next.to]) tooltipsRef.current[next.to].style.opacity = '1'
+    }, 2800)
+    return () => clearInterval(id)
+  }, [points, compact])
 
   useEffect(() => {
     function measure() {
@@ -76,6 +173,8 @@ export default function DestinationsGlobe({ groups, compact = false }) {
     ) : null
   }
 
+  const pinSize = compact ? 16 : 18
+
   const globeEl = (
     <div ref={containerRef} className={compact ? 'relative flex justify-center' : 'relative mx-auto mt-8 flex max-w-xl justify-center px-4 sm:px-6'}>
       {!compact && (
@@ -93,22 +192,29 @@ export default function DestinationsGlobe({ groups, compact = false }) {
           backgroundColor="rgba(0,0,0,0)"
           showAtmosphere={false}
           globeImageUrl="/globe/earth-blue-marble.jpg"
-          pointsData={points}
-          pointLat="lat"
-          pointLng="lng"
-          pointColor={() => '#d4a53f'}
-          pointAltitude={0.02}
-          pointRadius={compact ? 0.35 : 0.55}
-          pointLabel={(d) => `<div style="font-family:sans-serif;padding:6px;max-width:160px;">
-            ${d.photoUrl ? `<img src="${d.photoUrl}" style="width:100%;height:90px;object-fit:cover;border-radius:8px;display:block;margin-bottom:6px;" />` : ''}
-            <strong>${d.name}</strong><br/>
-            <span style="opacity:.8">${d.country} · ${d.region}</span>
-          </div>`}
-          onPointClick={(d) => !compact && navigate(d.to)}
-          onPointHover={(d) => {
-            if (containerRef.current) containerRef.current.style.cursor = d ? 'pointer' : 'grab'
-            if (globeRef.current) globeRef.current.controls().autoRotate = !d
-          }}
+          htmlElementsData={points}
+          htmlLat="lat"
+          htmlLng="lng"
+          htmlAltitude={0.01}
+          htmlElement={(d) =>
+            createPinElement(d, {
+              size: pinSize,
+              onClick: (point) => !compact && navigate(point.to),
+              registerTooltip: (key, el) => {
+                tooltipsRef.current[key] = el
+              },
+              onHoverChange: (hovering, key) => {
+                hoveringRef.current = hovering
+                if (containerRef.current) containerRef.current.style.cursor = hovering ? 'pointer' : 'grab'
+                if (globeRef.current) globeRef.current.controls().autoRotate = !hovering
+                if (hovering) {
+                  Object.entries(tooltipsRef.current).forEach(([otherKey, el]) => {
+                    if (otherKey !== key && el) el.style.opacity = '0'
+                  })
+                }
+              },
+            })
+          }
         />
       </div>
       {!compact && <OrbitLayer side="front" />}
