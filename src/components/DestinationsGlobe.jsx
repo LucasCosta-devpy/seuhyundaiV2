@@ -16,6 +16,18 @@ function safeDomId(str) {
   return str.replace(/[^a-zA-Z0-9_-]/g, '')
 }
 
+// Distância angular (graus) entre dois pontos lat/lng na esfera. Usado só pra
+// saber se um ponto está voltado pra câmera (< 90°) ou do lado de trás do
+// globo — uma conta de trigonometria simples, roda só a cada ~3s, não a cada frame.
+function angularDistanceDeg(lat1, lng1, lat2, lng2) {
+  const toRad = Math.PI / 180
+  const phi1 = lat1 * toRad
+  const phi2 = lat2 * toRad
+  const deltaLambda = (lng2 - lng1) * toRad
+  const cosC = Math.sin(phi1) * Math.sin(phi2) + Math.cos(phi1) * Math.cos(phi2) * Math.cos(deltaLambda)
+  return (Math.acos(Math.min(1, Math.max(-1, cosC))) * 180) / Math.PI
+}
+
 // Pino de mapa dourado com brilho neon (glow via filtro SVG) + base iluminada,
 // com balão (foto/nome) que pode ser mostrado tanto no hover do mouse quanto
 // automaticamente (destaque em rodízio).
@@ -136,11 +148,26 @@ export default function DestinationsGlobe({ groups, compact = false }) {
   useEffect(() => {
     if (compact || photoPoints.length === 0) return
     const id = setInterval(() => {
-      if (hoveringRef.current) return
+      if (hoveringRef.current || !globeRef.current) return
+      // Só mostra automaticamente quem está virado pra câmera nesse instante
+      // (senão a foto apareceria com o ponto escondido do outro lado do globo).
+      const pov = globeRef.current.pointOfView()
+      const n = photoPoints.length
+      let foundIdx = -1
+      for (let step = 1; step <= n; step++) {
+        const idx = (autoIndexRef.current + step) % n
+        const candidate = photoPoints[idx]
+        if (angularDistanceDeg(candidate.lat, candidate.lng, pov.lat, pov.lng) < 80) {
+          foundIdx = idx
+          break
+        }
+      }
+      if (foundIdx === -1) return // ninguém visível agora, tenta de novo no próximo tick
+
       const prev = photoPoints[autoIndexRef.current]
       if (prev && tooltipsRef.current[prev.to]) tooltipsRef.current[prev.to].style.opacity = '0'
-      autoIndexRef.current = (autoIndexRef.current + 1) % photoPoints.length
-      const next = photoPoints[autoIndexRef.current]
+      autoIndexRef.current = foundIdx
+      const next = photoPoints[foundIdx]
       if (next && tooltipsRef.current[next.to]) tooltipsRef.current[next.to].style.opacity = '1'
     }, 2800)
     return () => clearInterval(id)
