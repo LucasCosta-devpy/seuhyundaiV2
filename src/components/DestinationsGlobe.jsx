@@ -131,18 +131,20 @@ export default function DestinationsGlobe({ groups, compact = false }) {
 
   // Destaque automático: enquanto ninguém está com o mouse em cima, vai
   // revezando a foto de cada cidade sozinho, sem precisar passar o mouse.
+  // Só entram no rodízio as cidades que têm foto cadastrada.
+  const photoPoints = useMemo(() => points.filter((p) => p.photoUrl), [points])
   useEffect(() => {
-    if (compact || points.length === 0) return
+    if (compact || photoPoints.length === 0) return
     const id = setInterval(() => {
       if (hoveringRef.current) return
-      const prev = points[autoIndexRef.current]
+      const prev = photoPoints[autoIndexRef.current]
       if (prev && tooltipsRef.current[prev.to]) tooltipsRef.current[prev.to].style.opacity = '0'
-      autoIndexRef.current = (autoIndexRef.current + 1) % points.length
-      const next = points[autoIndexRef.current]
+      autoIndexRef.current = (autoIndexRef.current + 1) % photoPoints.length
+      const next = photoPoints[autoIndexRef.current]
       if (next && tooltipsRef.current[next.to]) tooltipsRef.current[next.to].style.opacity = '1'
     }, 2800)
     return () => clearInterval(id)
-  }, [points, compact])
+  }, [photoPoints, compact])
 
   useEffect(() => {
     function measure() {
