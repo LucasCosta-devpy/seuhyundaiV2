@@ -31,7 +31,18 @@ export const defaultContent = {
     {
       region: 'América do Sul & Brasil',
       items: [
-        { name: 'Brasil', desc: 'Roteiros completos pelo país, praias, capitais e serras.', imageUrl: '' },
+        {
+          name: 'Brasil',
+          desc: 'Roteiros completos pelo país, praias, capitais e serras.',
+          imageUrl: '',
+          subregions: [
+            { name: '[TESTE] Rio de Janeiro', desc: '', imageUrl: '', lat: -22.9068, lng: -43.1729 },
+            { name: '[TESTE] Salvador', desc: '', imageUrl: '', lat: -12.9777, lng: -38.5016 },
+            { name: '[TESTE] Fortaleza', desc: '', imageUrl: '', lat: -3.7319, lng: -38.5267 },
+            { name: '[TESTE] Manaus', desc: '', imageUrl: '', lat: -3.1190, lng: -60.0217 },
+            { name: '[TESTE] Florianópolis', desc: '', imageUrl: '', lat: -27.5954, lng: -48.5480 },
+          ],
+        },
         { name: 'Argentina', desc: 'Buenos Aires, Patagônia e Cordilheira dos Andes.', imageUrl: '' },
         { name: 'Uruguai', desc: 'Montevidéu, Punta del Este e vinícolas charmosas.', imageUrl: '' },
         { name: 'Chile', desc: 'Santiago, paisagens andinas e experiências únicas.', imageUrl: '' },
