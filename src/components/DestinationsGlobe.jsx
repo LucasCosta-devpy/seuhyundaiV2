@@ -12,57 +12,59 @@ function getCityPhoto(city) {
   return city.imageUrl || null
 }
 
-let pinStylesInjected = false
-function ensurePinStyles() {
-  if (pinStylesInjected || typeof document === 'undefined') return
-  pinStylesInjected = true
-  const style = document.createElement('style')
-  style.textContent = `
-    @keyframes globePinPulse {
-      0%, 100% { transform: translate(-50%, 0) scale(0.85); opacity: 0.7; }
-      50% { transform: translate(-50%, 0) scale(1.2); opacity: 1; }
-    }
-  `
-  document.head.appendChild(style)
-}
-
 function safeDomId(str) {
   return str.replace(/[^a-zA-Z0-9_-]/g, '')
 }
 
-// Pino de mapa com brilho dourado pulsante + balão (foto/nome) que pode ser
-// mostrado tanto no hover do mouse quanto automaticamente (destaque em rodízio).
+// Pino de mapa dourado com brilho neon (glow via filtro SVG) + base iluminada,
+// com balão (foto/nome) que pode ser mostrado tanto no hover do mouse quanto
+// automaticamente (destaque em rodízio).
 function createPinElement(d, { size, onClick, onHoverChange, registerTooltip }) {
   const wrapper = document.createElement('div')
   wrapper.style.cursor = 'pointer'
   wrapper.style.pointerEvents = 'auto'
-  wrapper.style.transform = 'translate(-50%, -100%)'
   wrapper.style.width = `${size}px`
   wrapper.style.position = 'relative'
+  // A "ponta" visual do pino (onde ele toca o chão) fica em y=73 de uma
+  // viewBox de altura 90 — por isso a âncora não é -100%, e sim nesse ponto.
+  wrapper.style.transform = `translate(-50%, ${-((73 / 90) * 100).toFixed(2)}%)`
 
-  const glowSize = size * 1.5
-  const gradId = `pinGrad-${safeDomId(d.to)}`
+  const h = Math.round((size * 90) / 70)
+  const uid = safeDomId(d.to)
+  const glowId = `pin-glow-${uid}`
+  const goldId = `pin-gold-${uid}`
 
   wrapper.innerHTML = `
-    <div style="
-      position:absolute; left:50%; bottom:1px; width:${glowSize}px; height:${glowSize}px;
-      transform:translate(-50%, 0); border-radius:50%; pointer-events:none;
-      background:radial-gradient(circle, rgba(255,214,110,0.85) 0%, rgba(255,186,60,0.3) 45%, transparent 68%);
-      animation: globePinPulse 2.4s ease-in-out infinite;
-    "></div>
-    <svg width="${size}" height="${size * 1.4}" viewBox="0 0 24 34" xmlns="http://www.w3.org/2000/svg" style="position:relative; display:block; filter: drop-shadow(0 0 3px rgba(255,195,60,.7)) drop-shadow(0 2px 3px rgba(0,0,0,.45));">
+    <svg width="${size}" height="${h}" viewBox="0 0 70 90" xmlns="http://www.w3.org/2000/svg" style="display:block; overflow:visible;">
       <defs>
-        <radialGradient id="${gradId}" cx="35%" cy="28%" r="75%">
-          <stop offset="0%" stop-color="#fff6da"/>
-          <stop offset="45%" stop-color="#ffd35c"/>
-          <stop offset="100%" stop-color="#d98f16"/>
-        </radialGradient>
+        <filter id="${glowId}" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="4" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <linearGradient id="${goldId}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#fff7a0"/>
+          <stop offset="35%" stop-color="#ffd21c"/>
+          <stop offset="100%" stop-color="#ff9d00"/>
+        </linearGradient>
       </defs>
-      <path d="M12 0C5.373 0 0 5.373 0 12c0 9 12 22 12 22s12-13 12-22C24 5.373 18.627 0 12 0z" fill="url(#${gradId})" stroke="#8a5a0f" stroke-width="0.6"/>
-      <circle cx="12" cy="12" r="4" fill="#fffaf0"/>
+
+      <path d="M35 5 C20 5 10 16 10 30 C10 48 35 68 35 68 C35 68 60 48 60 30 C60 16 50 5 35 5Z"
+        fill="none" stroke="#ffd21c" stroke-width="5" opacity="0.35" filter="url(#${glowId})" />
+
+      <path d="M35 5 C20 5 10 16 10 30 C10 48 35 68 35 68 C35 68 60 48 60 30 C60 16 50 5 35 5Z"
+        fill="#07172b" stroke="url(#${goldId})" stroke-width="4" filter="url(#${glowId})" />
+
+      <circle cx="35" cy="29" r="9" fill="white" stroke="#ffd21c" stroke-width="3" />
+      <circle cx="32" cy="26" r="3" fill="white" />
+
+      <ellipse cx="35" cy="73" rx="18" ry="5" fill="none" stroke="#ffd21c" stroke-width="3" filter="url(#${glowId})" />
+      <ellipse cx="35" cy="73" rx="10" ry="2.5" fill="#ffd21c" opacity="0.7" />
     </svg>
     <div class="pin-tooltip" style="
-      position:absolute; top:calc(100% + 6px); left:50%; transform:translateX(-50%);
+      position:absolute; top:calc(81% + 6px); left:50%; transform:translateX(-50%);
       background:#fff; border-radius:8px; padding:6px; width:150px; text-align:left;
       font-family:sans-serif; font-size:12px; color:#101a2c; box-shadow:0 4px 12px rgba(0,0,0,.25);
       opacity:0; pointer-events:none; transition:opacity .2s; z-index:10;
@@ -126,10 +128,6 @@ export default function DestinationsGlobe({ groups, compact = false }) {
   const autoIndexRef = useRef(-1)
 
   const points = useMemo(() => buildPoints(groups), [groups])
-
-  useEffect(() => {
-    ensurePinStyles()
-  }, [])
 
   // Destaque automático: enquanto ninguém está com o mouse em cima, vai
   // revezando a foto de cada cidade sozinho, sem precisar passar o mouse.
