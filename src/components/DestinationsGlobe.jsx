@@ -40,17 +40,17 @@ function createPinElement(d, { size, onClick, onHoverChange, registerTooltip }) 
   wrapper.style.width = `${size}px`
   wrapper.style.position = 'relative'
 
-  const glowSize = size * 2.4
+  const glowSize = size * 1.5
   const gradId = `pinGrad-${safeDomId(d.to)}`
 
   wrapper.innerHTML = `
     <div style="
       position:absolute; left:50%; bottom:1px; width:${glowSize}px; height:${glowSize}px;
       transform:translate(-50%, 0); border-radius:50%; pointer-events:none;
-      background:radial-gradient(circle, rgba(255,214,110,0.9) 0%, rgba(255,186,60,0.4) 35%, transparent 72%);
-      filter:blur(1px); animation: globePinPulse 2.4s ease-in-out infinite;
+      background:radial-gradient(circle, rgba(255,214,110,0.85) 0%, rgba(255,186,60,0.3) 45%, transparent 68%);
+      animation: globePinPulse 2.4s ease-in-out infinite;
     "></div>
-    <svg width="${size}" height="${size * 1.4}" viewBox="0 0 24 34" xmlns="http://www.w3.org/2000/svg" style="position:relative; display:block; filter: drop-shadow(0 0 5px rgba(255,195,60,.85)) drop-shadow(0 2px 3px rgba(0,0,0,.45));">
+    <svg width="${size}" height="${size * 1.4}" viewBox="0 0 24 34" xmlns="http://www.w3.org/2000/svg" style="position:relative; display:block; filter: drop-shadow(0 0 3px rgba(255,195,60,.7)) drop-shadow(0 2px 3px rgba(0,0,0,.45));">
       <defs>
         <radialGradient id="${gradId}" cx="35%" cy="28%" r="75%">
           <stop offset="0%" stop-color="#fff6da"/>
@@ -175,7 +175,7 @@ export default function DestinationsGlobe({ groups, compact = false }) {
     ) : null
   }
 
-  const pinSize = compact ? 20 : 26
+  const pinSize = compact ? 16 : 18
 
   const globeEl = (
     <div ref={containerRef} className={compact ? 'relative flex justify-center' : 'relative mx-auto mt-8 flex max-w-xl justify-center px-4 sm:px-6'}>
