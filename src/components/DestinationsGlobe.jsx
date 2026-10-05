@@ -192,6 +192,7 @@ export default function DestinationsGlobe({ groups, compact = false }) {
           backgroundColor="rgba(0,0,0,0)"
           showAtmosphere={false}
           globeImageUrl="/globe/earth-blue-marble.jpg"
+          bumpImageUrl="/globe/earth-topology.png"
           htmlElementsData={points}
           htmlLat="lat"
           htmlLng="lng"
@@ -231,10 +232,7 @@ export default function DestinationsGlobe({ groups, compact = false }) {
           'radial-gradient(ellipse at 50% 0%, #2a4d8f 0%, #16305f 35%, #0d1f42 65%, #081530 100%)',
       }}
     >
-      <div className="pointer-events-none absolute inset-0 opacity-40" style={{
-        background:
-          'radial-gradient(circle at 8% 85%, rgba(255,255,255,0.10), transparent 30%), radial-gradient(circle at 92% 80%, rgba(255,255,255,0.08), transparent 30%)',
-      }} />
+      <CloudsBackdrop />
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
         <CompassDivider />
         <h2 className="section-title !text-white">
@@ -257,6 +255,37 @@ function CompassDivider() {
         <path d="M2 12 L12 10 L22 12 L12 14 Z" fill="#d4a53f" opacity="0.6" />
       </svg>
       <span className="h-px w-16 bg-gold-400/70 sm:w-24" />
+    </div>
+  )
+}
+
+// Nuvens difusas no fundo escuro da seção (não são as nuvens do globo em si,
+// é só ambientação atrás dele) — manchas brancas bem borradas e sutis.
+function CloudsBackdrop() {
+  const wisps = [
+    { left: '2%', top: '55%', w: 320, h: 120, rotate: -12, opacity: 0.16 },
+    { left: '-4%', top: '78%', w: 260, h: 90, rotate: 8, opacity: 0.18 },
+    { left: '82%', top: '62%', w: 300, h: 110, rotate: 10, opacity: 0.16 },
+    { left: '88%', top: '82%', w: 220, h: 80, rotate: -6, opacity: 0.16 },
+    { left: '10%', top: '8%', w: 240, h: 90, rotate: -4, opacity: 0.06 },
+  ]
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      {wisps.map((w, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full bg-white"
+          style={{
+            left: w.left,
+            top: w.top,
+            width: w.w,
+            height: w.h,
+            opacity: w.opacity,
+            filter: 'blur(30px)',
+            transform: `rotate(${w.rotate}deg)`,
+          }}
+        />
+      ))}
     </div>
   )
 }
