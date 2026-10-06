@@ -76,14 +76,17 @@ function createPinElement(d, { size, onClick, onHoverChange, registerTooltip }) 
       <ellipse cx="35" cy="73" rx="10" ry="2.5" fill="#ffd21c" opacity="0.7" />
     </svg>
     <div class="pin-tooltip" style="
-      position:absolute; top:calc(81% + 6px); left:50%; transform:translateX(-50%);
-      background:#fff; border-radius:8px; padding:6px; width:150px; text-align:left;
-      font-family:sans-serif; font-size:12px; color:#101a2c; box-shadow:0 4px 12px rgba(0,0,0,.25);
-      opacity:0; pointer-events:none; transition:opacity .2s; z-index:10;
+      position:absolute; top:calc(81% + 4px); left:50%; transform:translateX(-50%);
+      display:flex; flex-direction:column; align-items:center; gap:4px;
+      font-family:sans-serif; opacity:0; pointer-events:none; transition:opacity .2s; z-index:10;
     ">
-      ${d.photoUrl ? `<img src="${d.photoUrl}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;display:block;margin-bottom:5px;" />` : ''}
-      <strong>${d.name}</strong><br/>
-      <span style="opacity:.7">${d.country} · ${d.region}</span>
+      ${d.photoUrl ? `<img src="${d.photoUrl}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:3px solid #ffd21c;box-shadow:0 2px 8px rgba(0,0,0,.45);display:block;" />` : ''}
+      <div style="
+        background:#fff; border-radius:999px; padding:3px 10px; white-space:nowrap;
+        font-size:11px; color:#101a2c; box-shadow:0 2px 8px rgba(0,0,0,.3); text-align:center;
+      ">
+        <strong>${d.name}</strong> <span style="opacity:.65">· ${d.country}</span>
+      </div>
     </div>
   `
 
