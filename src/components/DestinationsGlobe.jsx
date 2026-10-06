@@ -80,10 +80,10 @@ function createPinElement(d, { size, onClick, onHoverChange, registerTooltip }) 
       display:flex; flex-direction:column; align-items:center; gap:4px;
       font-family:sans-serif; opacity:0; pointer-events:none; transition:opacity .2s; z-index:10;
     ">
-      ${d.photoUrl ? `<img src="${d.photoUrl}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:3px solid #ffd21c;box-shadow:0 2px 8px rgba(0,0,0,.45);display:block;" />` : ''}
+      ${d.photoUrl ? `<img src="${d.photoUrl}" style="width:88px;height:88px;border-radius:50%;object-fit:cover;border:4px solid #ffd21c;box-shadow:0 3px 10px rgba(0,0,0,.45);display:block;" />` : ''}
       <div style="
-        background:#fff; border-radius:999px; padding:3px 10px; white-space:nowrap;
-        font-size:11px; color:#101a2c; box-shadow:0 2px 8px rgba(0,0,0,.3); text-align:center;
+        background:#fff; border-radius:999px; padding:4px 12px; white-space:nowrap;
+        font-size:13px; color:#101a2c; box-shadow:0 2px 8px rgba(0,0,0,.3); text-align:center;
       ">
         <strong>${d.name}</strong> <span style="opacity:.65">· ${d.country}</span>
       </div>
