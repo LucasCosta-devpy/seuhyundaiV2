@@ -16,6 +16,26 @@ function safeDomId(str) {
   return str.replace(/[^a-zA-Z0-9_-]/g, '')
 }
 
+// Desloca o balão pra esquerda/direita se ele for estourar a borda do globo
+// (senão fica cortado pelo overflow:hidden do canvas quando o pino está perto
+// da lateral). Só roda no momento em que o balão aparece, não a cada frame.
+function repositionTooltip(tooltip, containerEl) {
+  if (!tooltip || !containerEl) return
+  tooltip.style.transform = 'translateX(-50%)'
+  const containerRect = containerEl.getBoundingClientRect()
+  const tooltipRect = tooltip.getBoundingClientRect()
+  const margin = 10
+  let shift = 0
+  if (tooltipRect.right > containerRect.right - margin) {
+    shift = containerRect.right - margin - tooltipRect.right
+  } else if (tooltipRect.left < containerRect.left + margin) {
+    shift = containerRect.left + margin - tooltipRect.left
+  }
+  if (shift !== 0) {
+    tooltip.style.transform = `translateX(calc(-50% + ${shift}px))`
+  }
+}
+
 // Distância angular (graus) entre dois pontos lat/lng na esfera. Usado só pra
 // saber se um ponto está voltado pra câmera (< 90°) ou do lado de trás do
 // globo — uma conta de trigonometria simples, roda só a cada ~3s, não a cada frame.
@@ -31,7 +51,7 @@ function angularDistanceDeg(lat1, lng1, lat2, lng2) {
 // Pino de mapa dourado com brilho neon (glow via filtro SVG) + base iluminada,
 // com balão (foto/nome) que pode ser mostrado tanto no hover do mouse quanto
 // automaticamente (destaque em rodízio).
-function createPinElement(d, { size, onClick, onHoverChange, registerTooltip }) {
+function createPinElement(d, { size, onClick, onHoverChange, registerTooltip, getContainer }) {
   const wrapper = document.createElement('div')
   wrapper.style.cursor = 'pointer'
   wrapper.style.pointerEvents = 'auto'
@@ -95,6 +115,7 @@ function createPinElement(d, { size, onClick, onHoverChange, registerTooltip }) 
 
   wrapper.addEventListener('mouseenter', () => {
     tooltip.style.opacity = '1'
+    repositionTooltip(tooltip, getContainer?.())
     onHoverChange(true, d.to)
   })
   wrapper.addEventListener('mouseleave', () => {
@@ -171,7 +192,10 @@ export default function DestinationsGlobe({ groups, compact = false }) {
       if (prev && tooltipsRef.current[prev.to]) tooltipsRef.current[prev.to].style.opacity = '0'
       autoIndexRef.current = foundIdx
       const next = photoPoints[foundIdx]
-      if (next && tooltipsRef.current[next.to]) tooltipsRef.current[next.to].style.opacity = '1'
+      if (next && tooltipsRef.current[next.to]) {
+        tooltipsRef.current[next.to].style.opacity = '1'
+        repositionTooltip(tooltipsRef.current[next.to], containerRef.current)
+      }
     }, 2800)
     return () => clearInterval(id)
   }, [photoPoints, compact])
@@ -235,6 +259,7 @@ export default function DestinationsGlobe({ groups, compact = false }) {
               registerTooltip: (key, el) => {
                 tooltipsRef.current[key] = el
               },
+              getContainer: () => containerRef.current,
               onHoverChange: (hovering, key) => {
                 hoveringRef.current = hovering
                 if (containerRef.current) containerRef.current.style.cursor = hovering ? 'pointer' : 'grab'
