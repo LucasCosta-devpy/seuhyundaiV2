@@ -36,7 +36,7 @@ export default function LandingConsultoria() {
 
   const { brand, reasons, consultant, pricing } = content
   const logoSize = getLogoSize(brand.logoSize)
-  const message = `Olá! Vim pelo site da ${brand.name} e gostaria de saber sobre a consultoria.`
+  const message = `Olá! Conheci a ${brand.name} pelo site e gostaria de conversar sobre a minha próxima viagem.`
   const highlights = (reasons || []).slice(0, 4)
 
   return (

@@ -21,7 +21,26 @@ export default function PublicSite() {
     return <div className="flex min-h-screen items-center justify-center text-navy-700">Carregando…</div>
   }
 
-  const { brand, hero, about, destinationGroups, services, reasons, process, pricing, consultant, cta, footer, socialLinks, showGlobe } = content
+  const {
+    brand,
+    hero,
+    about,
+    destinationGroups,
+    destinationsTitle,
+    destinationsSubtitle,
+    services,
+    servicesTitle,
+    reasons,
+    reasonsTitle,
+    process,
+    processTitle,
+    pricing,
+    consultant,
+    cta,
+    footer,
+    socialLinks,
+    showGlobe,
+  } = content
 
   return (
     <div className="min-h-screen bg-white">
@@ -29,10 +48,10 @@ export default function PublicSite() {
       <Hero brand={brand} hero={hero} destinationGroups={destinationGroups} />
       <About about={about} />
       {showGlobe && <DestinationsGlobe groups={destinationGroups} />}
-      <Destinations groups={destinationGroups} />
-      <Services services={services} />
-      <Reasons reasons={reasons} consultant={consultant} />
-      <Process process={process} />
+      <Destinations groups={destinationGroups} title={destinationsTitle} subtitle={destinationsSubtitle} />
+      <Services services={services} title={servicesTitle} />
+      <Reasons reasons={reasons} title={reasonsTitle} />
+      <Process process={process} title={processTitle} />
       <Pricing pricing={pricing} brand={brand} />
       <Consultant consultant={consultant} />
       <CTA cta={cta} brand={brand} />
@@ -62,6 +81,7 @@ const NAV_LINKS = [
   { href: '#preco', label: 'Preço' },
   { href: '#consultora', label: 'Consultora' },
   { href: '#contato', label: 'Contato' },
+  { href: '#redes-sociais', label: 'Redes Sociais' },
 ]
 
 export function Header({ brand }) {
@@ -321,13 +341,13 @@ export function RegionSummaryCard({ group, preview = false }) {
   )
 }
 
-function Destinations({ groups }) {
+function Destinations({ groups, title, subtitle }) {
   const validGroups = (groups || []).filter((g) => g.region)
   return (
     <section id="destinos" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-14 sm:px-6">
       <div className="text-center">
-        <h2 className="section-title">Nossos Destinos</h2>
-        <p className="mx-auto mt-3 max-w-xl text-gray-600">Explore o mundo e encontre seu próximo destino.</p>
+        <h2 className="section-title">{title || 'Nossos Destinos'}</h2>
+        <p className="mx-auto mt-3 max-w-xl text-gray-600">{subtitle || 'Explore o mundo e encontre seu próximo destino.'}</p>
       </div>
       {validGroups.length > 0 ? (
         <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -342,11 +362,11 @@ function Destinations({ groups }) {
   )
 }
 
-function Services({ services }) {
+function Services({ services, title }) {
   return (
     <section id="servicos" className="scroll-mt-20 bg-navy-50 py-14">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <h2 className="section-title">O Que Nós Ajudamos a Organizar</h2>
+        <h2 className="section-title">{title || 'O Que Nós Ajudamos a Organizar'}</h2>
         <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
           {(services || []).map((s) => (
             <div key={s.title} className="card p-6">
@@ -360,10 +380,10 @@ function Services({ services }) {
   )
 }
 
-function Reasons({ reasons }) {
+function Reasons({ reasons, title }) {
   return (
     <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-      <h2 className="section-title">Motivos para Você Contratar a Consultoria</h2>
+      <h2 className="section-title">{title || 'Motivos para Você Contratar a Consultoria'}</h2>
       <div className="mt-10 space-y-5">
         {(reasons || []).map((r) => (
           <div key={r.title} className="card p-6">
@@ -376,11 +396,11 @@ function Reasons({ reasons }) {
   )
 }
 
-function Process({ process }) {
+function Process({ process, title }) {
   return (
     <section className="bg-navy-50 py-16">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <h2 className="section-title">Como Funciona a Nossa Consultoria</h2>
+        <h2 className="section-title">{title || 'Como Funciona a Nossa Consultoria'}</h2>
         <div className="mt-10 space-y-5">
           {(process || []).map((step, i) => (
             <div key={step.title} className="card relative p-6">
@@ -438,7 +458,7 @@ function Consultant({ consultant }) {
   return (
     <section id="consultora" className="scroll-mt-20 bg-navy-50 py-16">
       <div className="mx-auto max-w-2xl px-4 text-center sm:px-6">
-        <h2 className="section-title">Conheça a Consultora</h2>
+        <h2 className="section-title">{consultant.sectionTitle || 'Conheça a Consultora'}</h2>
         <div className="mt-8">
           {consultant.photoUrl ? (
             <img
@@ -478,7 +498,7 @@ function CTA({ cta, brand }) {
 
 export function Footer({ brand, footer, socialLinks }) {
   return (
-    <footer className="border-t border-gray-100 py-10 text-center text-sm text-gray-500">
+    <footer id="redes-sociais" className="scroll-mt-20 border-t border-gray-100 py-10 text-center text-sm text-gray-500">
       {socialLinks?.length > 0 && (
         <div className="mb-4 flex justify-center gap-3">
           {socialLinks.map((social, i) => {

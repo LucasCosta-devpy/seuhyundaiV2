@@ -27,6 +27,8 @@ export const defaultContent = {
     ],
   },
   showGlobe: true,
+  destinationsTitle: 'Nossos Destinos',
+  destinationsSubtitle: 'Explore o mundo e encontre seu próximo destino.',
   destinationGroups: [
     {
       region: 'América do Sul & Brasil',
@@ -60,17 +62,20 @@ export const defaultContent = {
       ],
     },
   ],
+  servicesTitle: 'O Que Nós Ajudamos a Organizar',
   services: [
     { title: 'Roteiros Personalizados', desc: 'Planejamento dia a dia adaptado ao seu ritmo e estilo de viagem.' },
     { title: 'Carta Verde (Mercosul)', desc: 'Orientação de rotas de carro e emissão do Seguro Carta Verde obrigatório para circular de veículo pelo Mercosul.' },
     { title: 'Seguro Viagem', desc: 'Indicação e contratação das melhores opções de Seguro Viagem com cobertura médica completa.' },
     { title: 'Onde Comer e Evitar', desc: 'Indicações gastronômicas que cabem no bolso e alertas de armadilhas para turistas.' },
   ],
+  reasonsTitle: 'Motivos para Você Contratar a Consultoria',
   reasons: [
     { title: 'Atendimento Exclusivo', desc: 'Atendimento 100% humanizado e personalizado. Suporte ativo via WhatsApp inclusive durante a sua viagem.' },
     { title: 'Economia Real', desc: 'Qualidade com o melhor custo-benefício. Nossas dicas fazem o valor investido na consultoria se pagar facilmente.' },
     { title: 'Vivência e Experiência', desc: 'Experiência prática em viagens internacionais e nacionais. Conhecimento real de quem esteve presente em cada destino!' },
   ],
+  processTitle: 'Como Funciona a Nossa Consultoria',
   process: [
     { title: 'Conversa Inicial', desc: 'Alinhamento de perfil, escolhas de rotas, orçamento e envio de orientações burocráticas (Carta Verde, Seguro Viagem).' },
     { title: 'Passagem Aérea', desc: 'Acompanhamento semanal de valores para indicar o momento ideal de compra na plataforma da sua preferência.' },
@@ -118,6 +123,7 @@ export const defaultContent = {
     paymentInfo: 'Forma de pagamento: 50% de sinal via Pix no ato da contratação e 50% restantes na entrega final do roteiro em PDF.',
   },
   consultant: {
+    sectionTitle: 'Conheça a Consultora',
     name: 'Patricia Costa',
     role: 'Consultora Rumo Mais Uma Rota',
     photoUrl: '',
