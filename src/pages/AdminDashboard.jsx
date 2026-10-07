@@ -194,7 +194,9 @@ export default function AdminDashboard() {
               >
                 🌐 Globo 3D na home: {content.showGlobe ? 'ativado' : 'desativado'} (clique pra {content.showGlobe ? 'desativar' : 'ativar'})
               </button>
-              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <TextField label="Título da seção" value={content.destinationsTitle} onChange={(v) => update(['destinationsTitle'], v)} />
+              <TextField label="Subtítulo da seção" value={content.destinationsSubtitle} onChange={(v) => update(['destinationsSubtitle'], v)} />
+              <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <DestinationGroupsEditor
                   groups={content.destinationGroups}
                   onChange={(v) => update(['destinationGroups'], v)}
@@ -213,19 +215,28 @@ export default function AdminDashboard() {
 
           {activeTab === 'servicos' && (
             <Panel title="O que ajudamos a organizar">
-              <CardListEditor items={content.services} onChange={(v) => update(['services'], v)} />
+              <TextField label="Título da seção" value={content.servicesTitle} onChange={(v) => update(['servicesTitle'], v)} />
+              <div className="mt-4">
+                <CardListEditor items={content.services} onChange={(v) => update(['services'], v)} />
+              </div>
             </Panel>
           )}
 
           {activeTab === 'motivos' && (
             <Panel title="Motivos para contratar">
-              <CardListEditor items={content.reasons} onChange={(v) => update(['reasons'], v)} />
+              <TextField label="Título da seção" value={content.reasonsTitle} onChange={(v) => update(['reasonsTitle'], v)} />
+              <div className="mt-4">
+                <CardListEditor items={content.reasons} onChange={(v) => update(['reasons'], v)} />
+              </div>
             </Panel>
           )}
 
           {activeTab === 'processo' && (
             <Panel title="Como funciona (passo a passo)">
-              <CardListEditor items={content.process} onChange={(v) => update(['process'], v)} />
+              <TextField label="Título da seção" value={content.processTitle} onChange={(v) => update(['processTitle'], v)} />
+              <div className="mt-4">
+                <CardListEditor items={content.process} onChange={(v) => update(['process'], v)} />
+              </div>
             </Panel>
           )}
 
@@ -243,6 +254,7 @@ export default function AdminDashboard() {
 
           {activeTab === 'consultora' && (
             <Panel title="Consultora(a)">
+              <TextField label="Título da seção" value={content.consultant.sectionTitle} onChange={(v) => update(['consultant', 'sectionTitle'], v)} />
               <TextField label="Nome" value={content.consultant.name} onChange={(v) => update(['consultant', 'name'], v)} />
               <ImageField label="Foto" shape="portrait" value={content.consultant.photoUrl} onChange={(v) => update(['consultant', 'photoUrl'], v)} />
               <TextArea label="Biografia" value={content.consultant.bio} onChange={(v) => update(['consultant', 'bio'], v)} />

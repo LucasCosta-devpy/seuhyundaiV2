@@ -1,6 +1,8 @@
 function buildLink(whatsapp, message) {
   const digits = (whatsapp || '').replace(/\D/g, '')
-  const text = encodeURIComponent(message || 'Olá! Vim pelo site e gostaria de saber mais sobre a consultoria de viagens.')
+  const text = encodeURIComponent(
+    message || 'Olá! Conheci a Rumo Mais Uma Rota pelo site e gostaria de conversar sobre a minha próxima viagem.'
+  )
   return `https://wa.me/${digits}?text=${text}`
 }
 
