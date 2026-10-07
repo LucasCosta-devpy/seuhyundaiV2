@@ -80,7 +80,6 @@ const NAV_LINKS = [
   { href: '#servicos', label: 'Serviços' },
   { href: '#preco', label: 'Preço' },
   { href: '#consultora', label: 'Consultora' },
-  { href: '#contato', label: 'Contato' },
   { href: '#redes-sociais', label: 'Redes Sociais' },
 ]
 
