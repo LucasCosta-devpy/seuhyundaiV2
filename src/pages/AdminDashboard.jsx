@@ -196,7 +196,11 @@ export default function AdminDashboard() {
                   <p className="mb-2 text-sm font-semibold text-navy-900">👁 Pré-visualização no site</p>
                   <p className="mb-3 text-xs text-gray-400">Atualiza ao vivo enquanto você edita, antes mesmo de salvar.</p>
                   <div className="max-h-[75vh] overflow-y-auto rounded-xl border border-gray-200 bg-white p-3">
-                    <DestinationsPreview groups={content.destinationGroups} />
+                    <DestinationsPreview
+                      groups={content.destinationGroups}
+                      globeTitle={content.globeTitle}
+                      globeSubtitle={content.globeSubtitle}
+                    />
                   </div>
                 </div>
               </div>
@@ -223,7 +227,12 @@ export default function AdminDashboard() {
               </p>
               <p className="mb-2 text-sm font-semibold text-navy-900">👁 Pré-visualização</p>
               <div className="overflow-hidden rounded-xl border border-gray-200 bg-navy-900">
-                <DestinationsPreview groups={content.destinationGroups} initialLevel="globo" />
+                <DestinationsPreview
+                  groups={content.destinationGroups}
+                  initialLevel="globo"
+                  globeTitle={content.globeTitle}
+                  globeSubtitle={content.globeSubtitle}
+                />
               </div>
             </Panel>
           )}
@@ -1113,7 +1122,7 @@ const PREVIEW_LEVELS = [
   { key: 'globo', label: '🌐 Globo 3D' },
 ]
 
-function DestinationsPreview({ groups, initialLevel = 'home' }) {
+function DestinationsPreview({ groups, initialLevel = 'home', globeTitle, globeSubtitle }) {
   const validGroups = (groups || []).filter((g) => g.region)
   const [level, setLevel] = useState(initialLevel)
   const [regionIdx, setRegionIdx] = useState(0)
@@ -1222,7 +1231,7 @@ function DestinationsPreview({ groups, initialLevel = 'home' }) {
           <DestinationCard name={city.name} desc={city.desc} imageUrl={city.imageUrl} imageMode={city.imageMode} images={city.images} photoCaption={city.photoCaption} large />
         )}
 
-        {level === 'globo' && <DestinationsGlobe groups={groups} compact />}
+        {level === 'globo' && <DestinationsGlobe groups={groups} title={globeTitle} subtitle={globeSubtitle} />}
       </div>
     </div>
   )
