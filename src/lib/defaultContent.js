@@ -10,6 +10,7 @@ export const defaultContent = {
     logoOffsetY: 0,
     instagram: '@rumomaisumarota',
     whatsapp: '5551982710564',
+    whatsappMessage: 'Olá! Conheci a Rumo Mais Uma Rota pelo site e gostaria de conversar sobre a minha próxima viagem.',
   },
   hero: {
     headline: 'Sua próxima viagem começa aqui.',

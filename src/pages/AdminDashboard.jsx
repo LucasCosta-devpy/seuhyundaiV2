@@ -152,6 +152,11 @@ export default function AdminDashboard() {
                 value={content.brand.whatsapp}
                 onChange={(v) => update(['brand', 'whatsapp'], v.replace(/\D/g, ''))}
               />
+              <TextArea
+                label="Mensagem padrão ao clicar em 'Falar no WhatsApp'"
+                value={content.brand.whatsappMessage}
+                onChange={(v) => update(['brand', 'whatsappMessage'], v)}
+              />
 
               <p className="mt-6 mb-2 text-sm font-semibold text-navy-900">Chamada de destaque (topo do site)</p>
               <TextField label="Frase de impacto" value={content.hero.headline} onChange={(v) => update(['hero', 'headline'], v)} />
