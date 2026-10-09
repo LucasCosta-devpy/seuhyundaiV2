@@ -40,6 +40,8 @@ export default function PublicSite() {
     footer,
     socialLinks,
     showGlobe,
+    globeTitle,
+    globeSubtitle,
   } = content
 
   return (
@@ -47,7 +49,7 @@ export default function PublicSite() {
       <Header brand={brand} />
       <Hero brand={brand} hero={hero} destinationGroups={destinationGroups} />
       <About about={about} />
-      {showGlobe && <DestinationsGlobe groups={destinationGroups} />}
+      {showGlobe && <DestinationsGlobe groups={destinationGroups} title={globeTitle} subtitle={globeSubtitle} />}
       <Destinations groups={destinationGroups} title={destinationsTitle} subtitle={destinationsSubtitle} />
       <Services services={services} title={servicesTitle} />
       <Reasons reasons={reasons} title={reasonsTitle} />

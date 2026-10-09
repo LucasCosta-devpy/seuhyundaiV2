@@ -15,6 +15,7 @@ const TABS = [
   { key: 'social', label: 'Redes Sociais', color: 'pink' },
   { key: 'sobre', label: 'Sobre', color: 'emerald' },
   { key: 'destinos', label: 'Destinos', color: 'rose' },
+  { key: 'globo', label: 'Globo 3D', color: 'sky' },
   { key: 'servicos', label: 'Serviços', color: 'violet' },
   { key: 'motivos', label: 'Motivos', color: 'teal' },
   { key: 'processo', label: 'Como funciona', color: 'orange' },
@@ -183,17 +184,6 @@ export default function AdminDashboard() {
               <p className="-mt-2 mb-2 text-xs text-gray-400">
                 Os botões que aparecem no topo do site (embaixo do título) são gerados automaticamente a partir do nome de cada região aqui embaixo — adicionar ou remover uma região adiciona ou remove o botão sozinho, sem precisar configurar em outro lugar.
               </p>
-              <button
-                type="button"
-                onClick={() => update(['showGlobe'], !content.showGlobe)}
-                className={`mb-4 flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold ${
-                  content.showGlobe
-                    ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
-                    : 'border-gray-300 bg-gray-50 text-gray-500'
-                }`}
-              >
-                🌐 Globo 3D na home: {content.showGlobe ? 'ativado' : 'desativado'} (clique pra {content.showGlobe ? 'desativar' : 'ativar'})
-              </button>
               <TextField label="Título da seção" value={content.destinationsTitle} onChange={(v) => update(['destinationsTitle'], v)} />
               <TextField label="Subtítulo da seção" value={content.destinationsSubtitle} onChange={(v) => update(['destinationsSubtitle'], v)} />
               <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -209,6 +199,31 @@ export default function AdminDashboard() {
                     <DestinationsPreview groups={content.destinationGroups} />
                   </div>
                 </div>
+              </div>
+            </Panel>
+          )}
+
+          {activeTab === 'globo' && (
+            <Panel title="Globo 3D">
+              <button
+                type="button"
+                onClick={() => update(['showGlobe'], !content.showGlobe)}
+                className={`mb-4 flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold ${
+                  content.showGlobe
+                    ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
+                    : 'border-gray-300 bg-gray-50 text-gray-500'
+                }`}
+              >
+                🌐 Globo 3D na home: {content.showGlobe ? 'ativado' : 'desativado'} (clique pra {content.showGlobe ? 'desativar' : 'ativar'})
+              </button>
+              <TextField label="Título da seção" value={content.globeTitle} onChange={(v) => update(['globeTitle'], v)} />
+              <TextField label="Subtítulo da seção" value={content.globeSubtitle} onChange={(v) => update(['globeSubtitle'], v)} />
+              <p className="-mt-1 mb-4 text-xs text-gray-400">
+                A última palavra do título fica em destaque dourado, igual no site.
+              </p>
+              <p className="mb-2 text-sm font-semibold text-navy-900">👁 Pré-visualização</p>
+              <div className="overflow-hidden rounded-xl border border-gray-200 bg-navy-900">
+                <DestinationsPreview groups={content.destinationGroups} initialLevel="globo" />
               </div>
             </Panel>
           )}
@@ -1098,9 +1113,9 @@ const PREVIEW_LEVELS = [
   { key: 'globo', label: '🌐 Globo 3D' },
 ]
 
-function DestinationsPreview({ groups }) {
+function DestinationsPreview({ groups, initialLevel = 'home' }) {
   const validGroups = (groups || []).filter((g) => g.region)
-  const [level, setLevel] = useState('home')
+  const [level, setLevel] = useState(initialLevel)
   const [regionIdx, setRegionIdx] = useState(0)
   const [countryIdx, setCountryIdx] = useState(0)
   const [cityIdx, setCityIdx] = useState(0)
