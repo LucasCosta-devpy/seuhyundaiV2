@@ -154,7 +154,7 @@ function buildPoints(groups) {
   return points
 }
 
-export default function DestinationsGlobe({ groups, compact = false }) {
+export default function DestinationsGlobe({ groups, compact = false, title, subtitle }) {
   const navigate = useNavigate()
   const containerRef = useRef(null)
   const globeRef = useRef(null)
@@ -295,12 +295,29 @@ export default function DestinationsGlobe({ groups, compact = false }) {
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
         <CompassDivider />
         <h2 className="section-title !text-white">
-          Lugares Que Já <span className="text-gold-400">Conhecemos</span>
+          {renderGoldTitle(title || 'Lugares Que Já Conhecemos')}
         </h2>
-        <p className="mx-auto mt-3 max-w-xl text-navy-200">Gire o globo e clique em um ponto para conhecer o destino.</p>
+        <p className="mx-auto mt-3 max-w-xl text-navy-200">
+          {subtitle || 'Gire o globo e clique em um ponto para conhecer o destino.'}
+        </p>
       </div>
       {globeEl}
     </section>
+  )
+}
+
+// Destaca a última palavra do título em dourado (ex: "Lugares Que Já Conhecemos"
+// vira "Lugares Que Já" branco + "Conhecemos" dourado), pra manter o visual
+// mesmo quando o texto é editado no admin.
+function renderGoldTitle(title) {
+  const words = title.trim().split(/\s+/)
+  const lastWord = words.pop()
+  const rest = words.join(' ')
+  return (
+    <>
+      {rest ? `${rest} ` : ''}
+      <span className="text-gold-400">{lastWord}</span>
+    </>
   )
 }
 

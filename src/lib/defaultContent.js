@@ -27,6 +27,8 @@ export const defaultContent = {
     ],
   },
   showGlobe: true,
+  globeTitle: 'Lugares Que Já Conhecemos',
+  globeSubtitle: 'Gire o globo e clique em um ponto para conhecer o destino.',
   destinationsTitle: 'Nossos Destinos',
   destinationsSubtitle: 'Explore o mundo e encontre seu próximo destino.',
   destinationGroups: [
