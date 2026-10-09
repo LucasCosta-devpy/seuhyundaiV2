@@ -58,7 +58,7 @@ export default function PublicSite() {
       <Consultant consultant={consultant} />
       <CTA cta={cta} brand={brand} />
       <Footer brand={brand} footer={footer} socialLinks={socialLinks} />
-      <WhatsAppFloatButton whatsapp={brand.whatsapp} />
+      <WhatsAppFloatButton whatsapp={brand.whatsapp} message={brand.whatsappMessage} />
     </div>
   )
 }
@@ -134,7 +134,7 @@ export function Header({ brand }) {
         </nav>
 
         <div className="flex items-center gap-2">
-          <WhatsAppLink whatsapp={brand.whatsapp} className="btn-navy !py-2 !px-4 text-sm hidden sm:inline-flex">
+          <WhatsAppLink whatsapp={brand.whatsapp} message={brand.whatsappMessage} className="btn-navy !py-2 !px-4 text-sm hidden sm:inline-flex">
             Falar no WhatsApp
           </WhatsAppLink>
           <button
@@ -161,7 +161,7 @@ export function Header({ brand }) {
                 {link.label}
               </a>
             ))}
-            <WhatsAppLink whatsapp={brand.whatsapp} className="btn-navy mt-2 !py-2 !px-4 text-center text-sm">
+            <WhatsAppLink whatsapp={brand.whatsapp} message={brand.whatsappMessage} className="btn-navy mt-2 !py-2 !px-4 text-center text-sm">
               Falar no WhatsApp
             </WhatsAppLink>
           </div>
@@ -207,7 +207,7 @@ function Hero({ brand, hero, destinationGroups }) {
           <p className="mx-auto mt-4 max-w-xl text-navy-100">{hero.subtext}</p>
         )}
         {hero?.ctaLabel && (
-          <WhatsAppLink whatsapp={brand.whatsapp} className="btn-gold mt-8 inline-block text-base font-bold uppercase tracking-wide">
+          <WhatsAppLink whatsapp={brand.whatsapp} message={brand.whatsappMessage} className="btn-gold mt-8 inline-block text-base font-bold uppercase tracking-wide">
             {hero.ctaLabel}
           </WhatsAppLink>
         )}
@@ -448,7 +448,7 @@ function Pricing({ pricing, brand }) {
       <div className="mx-auto mt-8 max-w-xl border-l-4 border-gold-400 bg-gold-50 p-4 text-left text-sm text-navy-800">
         <strong>Forma de pagamento:</strong> {pricing.paymentInfo?.replace('Forma de pagamento:', '').trim()}
       </div>
-      <WhatsAppLink whatsapp={brand.whatsapp} className="btn-gold mt-8">
+      <WhatsAppLink whatsapp={brand.whatsapp} message={brand.whatsappMessage} className="btn-gold mt-8">
         Falar no WhatsApp
       </WhatsAppLink>
     </section>
@@ -489,7 +489,7 @@ function CTA({ cta, brand }) {
       <div className="card p-10">
         <h2 className="section-title">{cta.title}</h2>
         <p className="mx-auto mt-4 max-w-xl text-gray-600">{cta.desc}</p>
-        <WhatsAppLink whatsapp={brand.whatsapp} className="btn-gold mt-8">
+        <WhatsAppLink whatsapp={brand.whatsapp} message={brand.whatsappMessage} className="btn-gold mt-8">
           Falar no WhatsApp
         </WhatsAppLink>
       </div>

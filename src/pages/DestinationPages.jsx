@@ -127,7 +127,7 @@ export function RegionPage() {
         </>
       )}
       <Footer brand={brand} footer={footer} socialLinks={socialLinks} />
-      <WhatsAppFloatButton whatsapp={brand.whatsapp} />
+      <WhatsAppFloatButton whatsapp={brand.whatsapp} message={brand.whatsappMessage} />
     </div>
   )
 }
@@ -180,7 +180,7 @@ export function CountryPage() {
         </>
       )}
       <Footer brand={brand} footer={footer} socialLinks={socialLinks} />
-      <WhatsAppFloatButton whatsapp={brand.whatsapp} />
+      <WhatsAppFloatButton whatsapp={brand.whatsapp} message={brand.whatsappMessage} />
     </div>
   )
 }
@@ -229,7 +229,7 @@ export function CityPage() {
         </>
       )}
       <Footer brand={brand} footer={footer} socialLinks={socialLinks} />
-      <WhatsAppFloatButton whatsapp={brand.whatsapp} />
+      <WhatsAppFloatButton whatsapp={brand.whatsapp} message={brand.whatsappMessage} />
     </div>
   )
 }

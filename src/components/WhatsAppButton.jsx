@@ -6,11 +6,11 @@ function buildLink(whatsapp, message) {
   return `https://wa.me/${digits}?text=${text}`
 }
 
-export function WhatsAppFloatButton({ whatsapp }) {
+export function WhatsAppFloatButton({ whatsapp, message }) {
   if (!whatsapp) return null
   return (
     <a
-      href={buildLink(whatsapp)}
+      href={buildLink(whatsapp, message)}
       target="_blank"
       rel="noopener noreferrer"
       className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-green-500 text-white shadow-xl transition-transform hover:scale-110"
