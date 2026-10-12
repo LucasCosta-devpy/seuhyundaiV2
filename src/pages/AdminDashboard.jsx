@@ -5,7 +5,21 @@ import { defaultContent } from '../lib/defaultContent.js'
 import { LOGO_SIZES, getLogoSize } from '../lib/logoSize.js'
 import { SOCIAL_PLATFORMS, getPlatform } from '../components/SocialIcons.jsx'
 import ImageCropEditor from '../components/ImageCropEditor.jsx'
-import { RegionSummaryCard, DestinationCard, Pricing } from './PublicSite.jsx'
+import {
+  RegionSummaryCard,
+  DestinationCard,
+  Header,
+  Hero,
+  About,
+  Services,
+  Reasons,
+  Process,
+  Pricing,
+  Consultant,
+  CTA,
+  Footer,
+} from './PublicSite.jsx'
+import { InlineEditor } from '../components/Editable.jsx'
 import { Banner, ExploreCard } from './DestinationPages.jsx'
 import { getCountryFlag } from '../lib/flags.js'
 import DestinationsGlobe from '../components/DestinationsGlobe.jsx'
@@ -132,55 +146,62 @@ export default function AdminDashboard() {
           <div className={`min-w-0 flex-1 rounded-2xl border-t-4 bg-white p-6 shadow-sm ${TAB_STYLES[TABS.find((t) => t.key === activeTab).color].top}`}>
           {activeTab === 'marca' && (
             <Panel title="Marca e Contato">
-              <TextField label="Nome do negócio" value={content.brand.name} onChange={(v) => update(['brand', 'name'], v)} />
-              <TextField label="Slogan" value={content.brand.tagline} onChange={(v) => update(['brand', 'tagline'], v)} />
-              <ImageField label="Logo" shape="logo" value={content.brand.logoUrl} onChange={(v) => update(['brand', 'logoUrl'], v)} />
-              <LogoSizeField
-                logoUrl={content.brand.logoUrl}
-                value={content.brand.logoSize}
-                onChange={(v) => update(['brand', 'logoSize'], v)}
-                scale={content.brand.logoScale}
-                onScaleChange={(v) => update(['brand', 'logoScale'], v)}
-                offsetX={content.brand.logoOffsetX}
-                offsetY={content.brand.logoOffsetY}
-                onOffsetXChange={(v) => update(['brand', 'logoOffsetX'], v)}
-                onOffsetYChange={(v) => update(['brand', 'logoOffsetY'], v)}
-              />
-              <TextField label="Instagram (ex: @seuinstagram)" value={content.brand.instagram} onChange={(v) => update(['brand', 'instagram'], v)} />
-              <TextField
-                label="WhatsApp (com DDI e DDD, só números, ex: 5551987654321)"
-                value={content.brand.whatsapp}
-                onChange={(v) => update(['brand', 'whatsapp'], v.replace(/\D/g, ''))}
-              />
-              <TextArea
-                label="Mensagem padrão ao clicar em 'Falar no WhatsApp'"
-                value={content.brand.whatsappMessage}
-                onChange={(v) => update(['brand', 'whatsappMessage'], v)}
-              />
+              <InlineEditor update={update}>
+                <Header brand={content.brand} />
+                <Hero brand={content.brand} hero={content.hero} destinationGroups={content.destinationGroups} />
+              </InlineEditor>
 
-              <p className="mt-6 mb-2 text-sm font-semibold text-navy-900">Chamada de destaque (topo do site)</p>
-              <TextField label="Frase de impacto" value={content.hero.headline} onChange={(v) => update(['hero', 'headline'], v)} />
-              <TextField label="Texto de apoio" value={content.hero.subtext} onChange={(v) => update(['hero', 'subtext'], v)} />
-              <TextField label="Texto do botão" value={content.hero.ctaLabel} onChange={(v) => update(['hero', 'ctaLabel'], v)} />
+              <div className="rounded-xl border border-gray-200 p-4">
+                <p className="mb-3 text-sm font-semibold text-navy-900">Logo e contatos</p>
+                <div className="space-y-4">
+                  <ImageField label="Logo" shape="logo" value={content.brand.logoUrl} onChange={(v) => update(['brand', 'logoUrl'], v)} />
+                  <LogoSizeField
+                    logoUrl={content.brand.logoUrl}
+                    value={content.brand.logoSize}
+                    onChange={(v) => update(['brand', 'logoSize'], v)}
+                    scale={content.brand.logoScale}
+                    onScaleChange={(v) => update(['brand', 'logoScale'], v)}
+                    offsetX={content.brand.logoOffsetX}
+                    offsetY={content.brand.logoOffsetY}
+                    onOffsetXChange={(v) => update(['brand', 'logoOffsetX'], v)}
+                    onOffsetYChange={(v) => update(['brand', 'logoOffsetY'], v)}
+                  />
+                  <TextField label="Instagram (ex: @seuinstagram)" value={content.brand.instagram} onChange={(v) => update(['brand', 'instagram'], v)} />
+                  <TextField
+                    label="WhatsApp (com DDI e DDD, só números, ex: 5551987654321)"
+                    value={content.brand.whatsapp}
+                    onChange={(v) => update(['brand', 'whatsapp'], v.replace(/\D/g, ''))}
+                  />
+                  <TextArea
+                    label="Mensagem padrão ao clicar em 'Falar no WhatsApp'"
+                    value={content.brand.whatsappMessage}
+                    onChange={(v) => update(['brand', 'whatsappMessage'], v)}
+                  />
+                </div>
+              </div>
             </Panel>
           )}
 
           {activeTab === 'social' && (
             <Panel title="Redes Sociais">
-              <SocialLinksEditor
-                items={content.socialLinks}
-                onChange={(v) => update(['socialLinks'], v)}
-              />
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <SocialLinksEditor items={content.socialLinks} onChange={(v) => update(['socialLinks'], v)} />
+                <div className="lg:sticky lg:top-24 lg:self-start">
+                  <p className="mb-2 text-sm font-semibold text-navy-900">👁 Pré-visualização no site</p>
+                  <p className="mb-3 text-xs text-gray-400">Atualiza ao vivo enquanto você edita, antes mesmo de salvar.</p>
+                  <div className="overflow-hidden rounded-xl border border-gray-200 bg-white" onClickCapture={(e) => e.target.closest('a') && e.preventDefault()}>
+                    <Footer brand={content.brand} footer={content.footer} socialLinks={content.socialLinks} />
+                  </div>
+                </div>
+              </div>
             </Panel>
           )}
 
           {activeTab === 'sobre' && (
             <Panel title="Sobre">
-              <TextField label="Título" value={content.about.title} onChange={(v) => update(['about', 'title'], v)} />
-              <ParagraphListEditor
-                items={content.about.paragraphs}
-                onChange={(v) => update(['about', 'paragraphs'], v)}
-              />
+              <InlineEditor update={update}>
+                <About about={content.about} />
+              </InlineEditor>
             </Panel>
           )}
 
@@ -217,7 +238,7 @@ export default function AdminDashboard() {
               <button
                 type="button"
                 onClick={() => update(['showGlobe'], !content.showGlobe)}
-                className={`mb-4 flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold ${
+                className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold ${
                   content.showGlobe
                     ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
                     : 'border-gray-300 bg-gray-50 text-gray-500'
@@ -225,83 +246,61 @@ export default function AdminDashboard() {
               >
                 🌐 Globo 3D na home: {content.showGlobe ? 'ativado' : 'desativado'} (clique pra {content.showGlobe ? 'desativar' : 'ativar'})
               </button>
-              <TextField label="Título da seção" value={content.globeTitle} onChange={(v) => update(['globeTitle'], v)} />
-              <TextField label="Subtítulo da seção" value={content.globeSubtitle} onChange={(v) => update(['globeSubtitle'], v)} />
-              <p className="-mt-1 mb-4 text-xs text-gray-400">
-                A última palavra do título fica em destaque dourado, igual no site.
-              </p>
-              <p className="mb-2 text-sm font-semibold text-navy-900">👁 Pré-visualização</p>
-              <div className="overflow-hidden rounded-xl border border-gray-200 bg-navy-900">
-                <DestinationsPreview
-                  groups={content.destinationGroups}
-                  initialLevel="globo"
-                  globeTitle={content.globeTitle}
-                  globeSubtitle={content.globeSubtitle}
-                />
-              </div>
+              <InlineEditor update={update}>
+                <DestinationsGlobe groups={content.destinationGroups} title={content.globeTitle} subtitle={content.globeSubtitle} />
+              </InlineEditor>
             </Panel>
           )}
 
           {activeTab === 'servicos' && (
             <Panel title="O que ajudamos a organizar">
-              <TextField label="Título da seção" value={content.servicesTitle} onChange={(v) => update(['servicesTitle'], v)} />
-              <div className="mt-4">
-                <CardListEditor items={content.services} onChange={(v) => update(['services'], v)} />
-              </div>
+              <InlineEditor update={update}>
+                <Services services={content.services} title={content.servicesTitle} />
+              </InlineEditor>
             </Panel>
           )}
 
           {activeTab === 'motivos' && (
             <Panel title="Motivos para contratar">
-              <TextField label="Título da seção" value={content.reasonsTitle} onChange={(v) => update(['reasonsTitle'], v)} />
-              <div className="mt-4">
-                <CardListEditor items={content.reasons} onChange={(v) => update(['reasons'], v)} />
-              </div>
+              <InlineEditor update={update}>
+                <Reasons reasons={content.reasons} title={content.reasonsTitle} />
+              </InlineEditor>
             </Panel>
           )}
 
           {activeTab === 'processo' && (
             <Panel title="Como funciona (passo a passo)">
-              <TextField label="Título da seção" value={content.processTitle} onChange={(v) => update(['processTitle'], v)} />
-              <div className="mt-4">
-                <CardListEditor items={content.process} onChange={(v) => update(['process'], v)} />
-              </div>
+              <InlineEditor update={update}>
+                <Process process={content.process} title={content.processTitle} />
+              </InlineEditor>
             </Panel>
           )}
 
           {activeTab === 'preco' && (
             <Panel title="Investimento / Preço">
-              <TextField label="Título da seção" value={content.pricing.title} onChange={(v) => update(['pricing', 'title'], v)} />
-              <TextArea label="Texto de introdução" value={content.pricing.intro} onChange={(v) => update(['pricing', 'intro'], v)} />
-              <PricingPlansEditor
-                plans={content.pricing.plans}
-                onChange={(v) => update(['pricing', 'plans'], v)}
-              />
-              <TextArea label="Forma de pagamento" value={content.pricing.paymentInfo} onChange={(v) => update(['pricing', 'paymentInfo'], v)} />
-
-              <p className="mb-2 mt-6 text-sm font-semibold text-navy-900">👁 Pré-visualização no site</p>
-              <p className="mb-3 text-xs text-gray-400">Atualiza ao vivo enquanto você edita, antes mesmo de salvar.</p>
-              <div className="max-h-[75vh] overflow-y-auto rounded-xl border border-gray-200 bg-white p-3">
+              <InlineEditor update={update}>
                 <Pricing pricing={content.pricing} brand={content.brand} />
-              </div>
+              </InlineEditor>
             </Panel>
           )}
 
           {activeTab === 'consultora' && (
             <Panel title="Consultora(a)">
-              <TextField label="Título da seção" value={content.consultant.sectionTitle} onChange={(v) => update(['consultant', 'sectionTitle'], v)} />
-              <TextField label="Nome" value={content.consultant.name} onChange={(v) => update(['consultant', 'name'], v)} />
-              <ImageField label="Foto" shape="portrait" value={content.consultant.photoUrl} onChange={(v) => update(['consultant', 'photoUrl'], v)} />
-              <TextArea label="Biografia" value={content.consultant.bio} onChange={(v) => update(['consultant', 'bio'], v)} />
-              <TextField label="Frase de destaque" value={content.consultant.quote} onChange={(v) => update(['consultant', 'quote'], v)} />
+              <InlineEditor update={update}>
+                <Consultant consultant={content.consultant} />
+              </InlineEditor>
+              <div className="rounded-xl border border-gray-200 p-4">
+                <ImageField label="Foto da consultora" shape="portrait" value={content.consultant.photoUrl} onChange={(v) => update(['consultant', 'photoUrl'], v)} />
+              </div>
             </Panel>
           )}
 
           {activeTab === 'final' && (
             <Panel title="Chamada final e rodapé">
-              <TextField label="Título da chamada final" value={content.cta.title} onChange={(v) => update(['cta', 'title'], v)} />
-              <TextArea label="Texto da chamada final" value={content.cta.desc} onChange={(v) => update(['cta', 'desc'], v)} />
-              <TextField label="Texto do rodapé" value={content.footer.text} onChange={(v) => update(['footer', 'text'], v)} />
+              <InlineEditor update={update}>
+                <CTA cta={content.cta} brand={content.brand} />
+                <Footer brand={content.brand} footer={content.footer} socialLinks={content.socialLinks} />
+              </InlineEditor>
             </Panel>
           )}
           </div>
@@ -587,108 +586,6 @@ function ImageField({ label, value, onChange, shape = 'photo' }) {
   )
 }
 
-
-function ParagraphListEditor({ items, onChange }) {
-  function update(i, v) {
-    const next = [...items]
-    next[i] = v
-    onChange(next)
-  }
-  function remove(i) {
-    onChange(items.filter((_, idx) => idx !== i))
-  }
-  function add() {
-    onChange([...(items || []), ''])
-  }
-  return (
-    <div className="space-y-3">
-      {(items || []).map((p, i) => (
-        <div key={i} className="flex gap-2">
-          <textarea className="input" rows={2} value={p} onChange={(e) => update(i, e.target.value)} />
-          <button onClick={() => remove(i)} className="text-red-500 hover:text-red-700">Remover</button>
-        </div>
-      ))}
-      <button onClick={add} className="text-sm font-semibold text-navy-700 hover:underline">+ Adicionar parágrafo</button>
-    </div>
-  )
-}
-
-function CardListEditor({ items, onChange }) {
-  function update(i, field, v) {
-    const next = [...items]
-    next[i] = { ...next[i], [field]: v }
-    onChange(next)
-  }
-  function remove(i) {
-    onChange(items.filter((_, idx) => idx !== i))
-  }
-  function add() {
-    onChange([...(items || []), { title: '', desc: '' }])
-  }
-  return (
-    <div className="space-y-4">
-      {(items || []).map((item, i) => (
-        <div key={i} className="rounded-lg border border-gray-200 p-4">
-          <TextField label="Título" value={item.title} onChange={(v) => update(i, 'title', v)} />
-          <div className="mt-2">
-            <TextArea label="Descrição" value={item.desc} onChange={(v) => update(i, 'desc', v)} />
-          </div>
-          <button onClick={() => remove(i)} className="mt-2 text-sm text-red-500 hover:text-red-700">Remover item</button>
-        </div>
-      ))}
-      <button onClick={add} className="text-sm font-semibold text-navy-700 hover:underline">+ Adicionar item</button>
-    </div>
-  )
-}
-
-function PricingPlansEditor({ plans, onChange }) {
-  function update(i, field, v) {
-    const next = [...(plans || [])]
-    next[i] = { ...next[i], [field]: v }
-    onChange(next)
-  }
-  function updateBullets(i, bullets) {
-    update(i, 'bullets', bullets)
-  }
-  function remove(i) {
-    onChange((plans || []).filter((_, idx) => idx !== i))
-  }
-  function add() {
-    onChange([...(plans || []), { name: '', priceLabel: '', priceNote: '', tagline: '', bullets: [] }])
-  }
-
-  return (
-    <div>
-      <p className="label !mb-2">Planos</p>
-      <div className="space-y-4">
-        {(plans || []).map((plan, i) => (
-          <div key={i} className="rounded-lg border border-gray-200 p-4">
-            <TextField label="Nome do plano" value={plan.name} onChange={(v) => update(i, 'name', v)} />
-            <div className="mt-2">
-              <TextField label="Valor exibido" value={plan.priceLabel} onChange={(v) => update(i, 'priceLabel', v)} />
-            </div>
-            <div className="mt-2">
-              <TextField
-                label="Observação do valor (opcional, ex: 'Orçamento personalizado...')"
-                value={plan.priceNote}
-                onChange={(v) => update(i, 'priceNote', v)}
-              />
-            </div>
-            <div className="mt-2">
-              <TextArea label="Frase curta (pra quem é esse plano)" value={plan.tagline} onChange={(v) => update(i, 'tagline', v)} />
-            </div>
-            <div className="mt-2">
-              <p className="label !mb-2">Tópicos (o que inclui)</p>
-              <ParagraphListEditor items={plan.bullets} onChange={(v) => updateBullets(i, v)} />
-            </div>
-            <button onClick={() => remove(i)} className="mt-2 text-sm text-red-500 hover:text-red-700">Remover plano</button>
-          </div>
-        ))}
-        <button onClick={add} className="text-sm font-semibold text-navy-700 hover:underline">+ Adicionar plano</button>
-      </div>
-    </div>
-  )
-}
 
 function SocialLinksEditor({ items, onChange }) {
   function update(i, field, v) {

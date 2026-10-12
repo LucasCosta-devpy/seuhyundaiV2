@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Globe from 'react-globe.gl'
 import { slugify } from '../lib/slug.js'
+import { EditableText, useEditor } from './Editable.jsx'
 
 function getCityPhoto(city) {
   if (city.imageMode === 'carousel') {
@@ -156,6 +157,7 @@ function buildPoints(groups) {
 
 export default function DestinationsGlobe({ groups, compact = false, title, subtitle }) {
   const navigate = useNavigate()
+  const editing = !!useEditor()
   const containerRef = useRef(null)
   const globeRef = useRef(null)
   const [size, setSize] = useState({ width: 320, height: 320 })
@@ -223,7 +225,8 @@ export default function DestinationsGlobe({ groups, compact = false, title, subt
     globe.pointOfView({ lat: -10, lng: -45, altitude: 1.4 })
   }, [])
 
-  if (points.length === 0) {
+  const noPoints = points.length === 0
+  if (noPoints && !editing) {
     return compact ? (
       <p className="text-xs text-gray-400">Nenhuma cidade com coordenadas cadastradas ainda — adicione latitude/longitude em alguma cidade pra ela aparecer aqui.</p>
     ) : null
@@ -294,14 +297,30 @@ export default function DestinationsGlobe({ groups, compact = false, title, subt
       }} />
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
         <CompassDivider />
-        <h2 className="section-title !text-white">
-          {renderGoldTitle(title || 'Lugares Que Já Conhecemos')}
-        </h2>
-        <p className="mx-auto mt-3 max-w-xl text-navy-200">
-          {subtitle || 'Gire o globo e clique em um ponto para conhecer o destino.'}
-        </p>
+        {editing ? (
+          <h2 className="section-title !text-white">
+            <EditableText path={['globeTitle']} value={title || 'Lugares Que Já Conhecemos'} />
+            <span className="mt-1 block text-xs font-normal normal-case tracking-normal text-navy-200">
+              (a última palavra do título aparece em dourado no site)
+            </span>
+          </h2>
+        ) : (
+          <h2 className="section-title !text-white">{renderGoldTitle(title || 'Lugares Que Já Conhecemos')}</h2>
+        )}
+        <EditableText
+          as="p"
+          path={['globeSubtitle']}
+          value={subtitle || 'Gire o globo e clique em um ponto para conhecer o destino.'}
+          className="mx-auto mt-3 max-w-xl text-navy-200"
+        />
       </div>
-      {globeEl}
+      {noPoints ? (
+        <p className="relative mx-auto mt-8 max-w-md rounded-xl border border-dashed border-white/30 p-6 text-center text-sm text-navy-200">
+          O globo aparece aqui assim que alguma cidade tiver latitude/longitude cadastradas (aba Destinos).
+        </p>
+      ) : (
+        globeEl
+      )}
     </section>
   )
 }

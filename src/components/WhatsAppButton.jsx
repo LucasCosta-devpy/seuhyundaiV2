@@ -1,3 +1,5 @@
+import { useEditor } from './Editable.jsx'
+
 function buildLink(whatsapp, message) {
   const digits = (whatsapp || '').replace(/\D/g, '')
   const text = encodeURIComponent(
@@ -22,7 +24,10 @@ export function WhatsAppFloatButton({ whatsapp, message }) {
 }
 
 export function WhatsAppLink({ whatsapp, message, className, children }) {
+  const editing = !!useEditor()
   if (!whatsapp) return null
+  // No painel admin o botão vira só visual, pra dar pra editar o texto dele sem abrir o WhatsApp.
+  if (editing) return <span className={className}>{children}</span>
   return (
     <a href={buildLink(whatsapp, message)} target="_blank" rel="noopener noreferrer" className={className}>
       {children}
