@@ -5,7 +5,7 @@ import { defaultContent } from '../lib/defaultContent.js'
 import { LOGO_SIZES, getLogoSize } from '../lib/logoSize.js'
 import { SOCIAL_PLATFORMS, getPlatform } from '../components/SocialIcons.jsx'
 import ImageCropEditor from '../components/ImageCropEditor.jsx'
-import { RegionSummaryCard, DestinationCard } from './PublicSite.jsx'
+import { RegionSummaryCard, DestinationCard, Pricing } from './PublicSite.jsx'
 import { Banner, ExploreCard } from './DestinationPages.jsx'
 import { getCountryFlag } from '../lib/flags.js'
 import DestinationsGlobe from '../components/DestinationsGlobe.jsx'
@@ -278,6 +278,12 @@ export default function AdminDashboard() {
                 onChange={(v) => update(['pricing', 'plans'], v)}
               />
               <TextArea label="Forma de pagamento" value={content.pricing.paymentInfo} onChange={(v) => update(['pricing', 'paymentInfo'], v)} />
+
+              <p className="mb-2 mt-6 text-sm font-semibold text-navy-900">👁 Pré-visualização no site</p>
+              <p className="mb-3 text-xs text-gray-400">Atualiza ao vivo enquanto você edita, antes mesmo de salvar.</p>
+              <div className="max-h-[75vh] overflow-y-auto rounded-xl border border-gray-200 bg-white p-3">
+                <Pricing pricing={content.pricing} brand={content.brand} />
+              </div>
             </Panel>
           )}
 

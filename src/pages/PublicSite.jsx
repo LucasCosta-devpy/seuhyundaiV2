@@ -418,7 +418,7 @@ function Process({ process, title }) {
   )
 }
 
-function Pricing({ pricing, brand }) {
+export function Pricing({ pricing, brand }) {
   return (
     <section id="preco" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-16 text-center sm:px-6">
       <h2 className="section-title">{pricing.title || 'Investimento na Consultoria'}</h2>
