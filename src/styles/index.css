@@ -55,3 +55,43 @@
   background: linear-gradient(45deg, #c1902c, #101a2c);
   border-radius: 4px;
 }
+
+/* Edição direta no painel admin (ver components/Editable.jsx) */
+[data-editable] {
+  cursor: text;
+  caret-color: #2563eb;
+  outline: 1px dashed transparent;
+  outline-offset: 3px;
+  border-radius: 4px;
+  transition: outline-color 0.15s;
+  min-width: 2ch;
+}
+[data-editable]:hover {
+  outline-color: rgba(37, 99, 235, 0.55);
+}
+[data-editable]:focus {
+  outline: 2px solid rgba(37, 99, 235, 0.9);
+}
+[data-editable]:empty::before {
+  content: attr(data-placeholder);
+  opacity: 0.45;
+  font-style: italic;
+  font-weight: 400;
+}
+.edit-item {
+  position: relative;
+}
+.edit-item-controls {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 20;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.edit-item:hover > .edit-item-controls,
+.edit-item:focus-within > .edit-item-controls {
+  opacity: 1;
+}

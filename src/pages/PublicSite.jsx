@@ -6,6 +6,7 @@ import { getLogoSize } from '../lib/logoSize.js'
 import { getPlatform } from '../components/SocialIcons.jsx'
 import { useSiteContent } from '../lib/useSiteContent.js'
 import DestinationsGlobe from '../components/DestinationsGlobe.jsx'
+import { EditableText, useEditor, useListEditing, ItemControls, AddItemButton } from '../components/Editable.jsx'
 
 export default function PublicSite() {
   const { content, loading } = useSiteContent()
@@ -171,8 +172,9 @@ export function Header({ brand }) {
   )
 }
 
-function Hero({ brand, hero, destinationGroups }) {
+export function Hero({ brand, hero, destinationGroups }) {
   const logoSize = getLogoSize(brand.logoSize)
+  const editing = !!useEditor()
   return (
     <section className="relative overflow-hidden bg-navy-900 py-16 sm:py-24">
       <div
@@ -195,20 +197,23 @@ function Hero({ brand, hero, destinationGroups }) {
         ) : (
           <div className={`mx-auto mb-8 rounded-full border-4 border-gold-400 flex items-center justify-center text-5xl font-serif font-bold text-gold-400 shadow-2xl sm:text-7xl ${logoSize.hero}`}>R</div>
         )}
-        <h1 className="bg-gradient-to-r from-gold-200 via-gold-400 to-gold-200 bg-clip-text font-serif text-4xl font-bold tracking-wide text-transparent sm:text-7xl">
-          {brand.name}
-        </h1>
-        <p className="mt-4 text-lg text-navy-100 sm:text-xl">{brand.tagline}</p>
+        <EditableText
+          as="h1"
+          path={['brand', 'name']}
+          value={brand.name}
+          className="bg-gradient-to-r from-gold-200 via-gold-400 to-gold-200 bg-clip-text font-serif text-4xl font-bold tracking-wide text-transparent sm:text-7xl"
+        />
+        <EditableText as="p" path={['brand', 'tagline']} value={brand.tagline} className="mt-4 text-lg text-navy-100 sm:text-xl" />
         <div className="mx-auto mt-8 h-1 w-24 rounded bg-gradient-to-r from-gold-400 to-gold-600" />
-        {hero?.headline && (
-          <h2 className="mt-8 font-serif text-2xl font-bold text-white sm:text-4xl">{hero.headline}</h2>
+        {(hero?.headline || editing) && (
+          <EditableText as="h2" path={['hero', 'headline']} value={hero?.headline} className="mt-8 font-serif text-2xl font-bold text-white sm:text-4xl" />
         )}
-        {hero?.subtext && (
-          <p className="mx-auto mt-4 max-w-xl text-navy-100">{hero.subtext}</p>
+        {(hero?.subtext || editing) && (
+          <EditableText as="p" path={['hero', 'subtext']} value={hero?.subtext} className="mx-auto mt-4 max-w-xl text-navy-100" />
         )}
-        {hero?.ctaLabel && (
+        {(hero?.ctaLabel || editing) && (
           <WhatsAppLink whatsapp={brand.whatsapp} message={brand.whatsappMessage} className="btn-gold mt-8 inline-block text-base font-bold uppercase tracking-wide">
-            {hero.ctaLabel}
+            <EditableText path={['hero', 'ctaLabel']} value={hero?.ctaLabel} />
           </WhatsAppLink>
         )}
         <div className="mt-10 flex flex-wrap justify-center gap-2.5">
@@ -227,14 +232,20 @@ function Hero({ brand, hero, destinationGroups }) {
   )
 }
 
-function About({ about }) {
+export function About({ about }) {
+  const paragraphs = about.paragraphs || []
+  const list = useListEditing(['about', 'paragraphs'], paragraphs)
   return (
     <section id="sobre" className="mx-auto max-w-3xl scroll-mt-20 px-4 py-14 text-center sm:px-6">
-      <h2 className="section-title">{about.title}</h2>
+      <EditableText as="h2" path={['about', 'title']} value={about.title} className="section-title" />
       <div className="mt-6 space-y-4 text-gray-600">
-        {(about.paragraphs || []).map((p, i) => (
-          <p key={i}>{p}</p>
+        {paragraphs.map((p, i) => (
+          <div key={i} className="edit-item">
+            <ItemControls list={list} index={i} total={paragraphs.length} />
+            <EditableText as="p" path={['about', 'paragraphs', i]} value={p} />
+          </div>
         ))}
+        <AddItemButton list={list} item="" label="Adicionar parágrafo" className="w-full" />
       </div>
     </section>
   )
@@ -342,13 +353,18 @@ export function RegionSummaryCard({ group, preview = false }) {
   )
 }
 
-function Destinations({ groups, title, subtitle }) {
+export function Destinations({ groups, title, subtitle }) {
   const validGroups = (groups || []).filter((g) => g.region)
   return (
     <section id="destinos" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-14 sm:px-6">
       <div className="text-center">
-        <h2 className="section-title">{title || 'Nossos Destinos'}</h2>
-        <p className="mx-auto mt-3 max-w-xl text-gray-600">{subtitle || 'Explore o mundo e encontre seu próximo destino.'}</p>
+        <EditableText as="h2" path={['destinationsTitle']} value={title || 'Nossos Destinos'} className="section-title" />
+        <EditableText
+          as="p"
+          path={['destinationsSubtitle']}
+          value={subtitle || 'Explore o mundo e encontre seu próximo destino.'}
+          className="mx-auto mt-3 max-w-xl text-gray-600"
+        />
       </div>
       {validGroups.length > 0 ? (
         <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -363,55 +379,67 @@ function Destinations({ groups, title, subtitle }) {
   )
 }
 
-function Services({ services, title }) {
+export function Services({ services, title }) {
+  const items = services || []
+  const list = useListEditing(['services'], items)
   return (
     <section id="servicos" className="scroll-mt-20 bg-navy-50 py-14">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <h2 className="section-title">{title || 'O Que Nós Ajudamos a Organizar'}</h2>
+        <EditableText as="h2" path={['servicesTitle']} value={title || 'O Que Nós Ajudamos a Organizar'} className="section-title" />
         <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {(services || []).map((s) => (
-            <div key={s.title} className="card p-6">
-              <h4 className="font-serif text-lg font-bold text-navy-900">{s.title}</h4>
-              <p className="mt-2 text-sm text-gray-600">{s.desc}</p>
+          {items.map((s, i) => (
+            <div key={i} className="card edit-item p-6">
+              <ItemControls list={list} index={i} total={items.length} />
+              <EditableText as="h4" path={['services', i, 'title']} value={s.title} className="block font-serif text-lg font-bold text-navy-900" />
+              <EditableText as="p" path={['services', i, 'desc']} value={s.desc} className="mt-2 text-sm text-gray-600" />
             </div>
           ))}
+          <AddItemButton list={list} item={{ title: '', desc: '' }} label="Adicionar card" className="min-h-[7rem]" />
         </div>
       </div>
     </section>
   )
 }
 
-function Reasons({ reasons, title }) {
+export function Reasons({ reasons, title }) {
+  const items = reasons || []
+  const list = useListEditing(['reasons'], items)
   return (
     <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-      <h2 className="section-title">{title || 'Motivos para Você Contratar a Consultoria'}</h2>
+      <EditableText as="h2" path={['reasonsTitle']} value={title || 'Motivos para Você Contratar a Consultoria'} className="section-title" />
       <div className="mt-10 space-y-5">
-        {(reasons || []).map((r) => (
-          <div key={r.title} className="card p-6">
-            <h4 className="font-serif text-lg font-bold text-navy-900">{r.title}</h4>
-            <p className="mt-2 text-sm text-gray-600">{r.desc}</p>
+        {items.map((r, i) => (
+          <div key={i} className="card edit-item p-6">
+            <ItemControls list={list} index={i} total={items.length} />
+            <EditableText as="h4" path={['reasons', i, 'title']} value={r.title} className="block font-serif text-lg font-bold text-navy-900" />
+            <EditableText as="p" path={['reasons', i, 'desc']} value={r.desc} className="mt-2 text-sm text-gray-600" />
           </div>
         ))}
+        <AddItemButton list={list} item={{ title: '', desc: '' }} label="Adicionar motivo" className="w-full" />
       </div>
     </section>
   )
 }
 
-function Process({ process, title }) {
+export function Process({ process, title }) {
+  const items = process || []
+  const list = useListEditing(['process'], items)
   return (
     <section className="bg-navy-50 py-16">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <h2 className="section-title">{title || 'Como Funciona a Nossa Consultoria'}</h2>
+        <EditableText as="h2" path={['processTitle']} value={title || 'Como Funciona a Nossa Consultoria'} className="section-title" />
         <div className="mt-10 space-y-5">
-          {(process || []).map((step, i) => (
-            <div key={step.title} className="card relative p-6">
+          {items.map((step, i) => (
+            <div key={i} className="card edit-item relative p-6">
+              <ItemControls list={list} index={i} total={items.length} className="!right-16" />
               <span className="absolute -top-3 right-4 rounded-full bg-gold-500 px-2.5 py-1 text-xs font-bold text-white">
                 {i + 1}ª
               </span>
-              <h4 className="font-serif text-lg font-bold text-navy-900">{step.title}</h4>
-              <p className="mt-2 text-sm text-gray-600">{step.desc}</p>
+              <EditableText as="h4" path={['process', i, 'title']} value={step.title} className="block font-serif text-lg font-bold text-navy-900" />
+              <EditableText as="p" path={['process', i, 'desc']} value={step.desc} className="mt-2 text-sm text-gray-600" />
             </div>
           ))}
+          <AddItemButton list={list} item={{ title: '', desc: '' }} label="Adicionar passo" className="w-full" />
         </div>
       </div>
     </section>
@@ -419,34 +447,34 @@ function Process({ process, title }) {
 }
 
 export function Pricing({ pricing, brand }) {
+  const editing = !!useEditor()
+  const plans = pricing.plans || []
+  const planList = useListEditing(['pricing', 'plans'], plans)
   return (
     <section id="preco" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-16 text-center sm:px-6">
-      <h2 className="section-title">{pricing.title || 'Investimento na Consultoria'}</h2>
-      <p className="mx-auto mt-4 max-w-xl text-gray-600">
-        {pricing.intro || 'Trabalhamos com um valor justo e acessível para entregar um planejamento completo, seguro e detalhado para a sua viagem dos sonhos.'}
-      </p>
+      <EditableText as="h2" path={['pricing', 'title']} value={pricing.title || 'Investimento na Consultoria'} className="section-title" />
+      <EditableText
+        as="p"
+        path={['pricing', 'intro']}
+        value={pricing.intro || 'Trabalhamos com um valor justo e acessível para entregar um planejamento completo, seguro e detalhado para a sua viagem dos sonhos.'}
+        className="mx-auto mt-4 max-w-xl text-gray-600"
+      />
 
       <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
-        {(pricing.plans || []).map((plan) => (
-          <div key={plan.name} className="flex flex-col rounded-2xl border-2 border-gold-400 bg-white p-6 text-left shadow-sm">
-            <h3 className="text-base font-bold uppercase tracking-wide text-navy-700">{plan.name}</h3>
-            <p className="mt-3 font-serif text-3xl font-extrabold text-gold-600">{plan.priceLabel}</p>
-            {plan.priceNote && <p className="mt-1 text-xs italic text-gray-400">{plan.priceNote}</p>}
-            <p className="mt-4 text-sm leading-relaxed text-gray-600">{plan.tagline}</p>
-            <ul className="mt-5 flex-1 space-y-3 text-sm text-navy-800">
-              {(plan.bullets || []).map((bullet, i) => (
-                <li key={i} className="flex gap-2 leading-relaxed">
-                  <span className="mt-0.5 flex-shrink-0 text-gold-500">✓</span>
-                  <span>{bullet}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+        {plans.map((plan, pi) => (
+          <PricingPlanCard key={pi} plan={plan} index={pi} total={plans.length} planList={planList} editing={editing} />
         ))}
+        <AddItemButton
+          list={planList}
+          item={{ name: '', priceLabel: '', priceNote: '', tagline: '', bullets: [] }}
+          label="Adicionar plano"
+          className="min-h-[10rem]"
+        />
       </div>
 
       <div className="mx-auto mt-8 max-w-xl border-l-4 border-gold-400 bg-gold-50 p-4 text-left text-sm text-navy-800">
-        <strong>Forma de pagamento:</strong> {pricing.paymentInfo?.replace('Forma de pagamento:', '').trim()}
+        <strong>Forma de pagamento:</strong>{' '}
+        <EditableText path={['pricing', 'paymentInfo']} value={pricing.paymentInfo?.replace('Forma de pagamento:', '').trim()} />
       </div>
       <WhatsAppLink whatsapp={brand.whatsapp} message={brand.whatsappMessage} className="btn-gold mt-8">
         Falar no WhatsApp
@@ -455,11 +483,65 @@ export function Pricing({ pricing, brand }) {
   )
 }
 
-function Consultant({ consultant }) {
+function PricingPlanCard({ plan, index, total, planList, editing }) {
+  const bullets = plan.bullets || []
+  const bulletList = useListEditing(['pricing', 'plans', index, 'bullets'], bullets)
+  const base = ['pricing', 'plans', index]
+  return (
+    <div className="edit-item flex flex-col rounded-2xl border-2 border-gold-400 bg-white p-6 text-left shadow-sm">
+      <ItemControls list={planList} index={index} total={total} />
+      <EditableText as="h3" path={[...base, 'name']} value={plan.name} className="block text-base font-bold uppercase tracking-wide text-navy-700" />
+      <EditableText as="p" path={[...base, 'priceLabel']} value={plan.priceLabel} className="mt-3 font-serif text-3xl font-extrabold text-gold-600" />
+      {(plan.priceNote || editing) && (
+        <EditableText
+          as="p"
+          path={[...base, 'priceNote']}
+          value={plan.priceNote}
+          placeholder="Observação do valor (opcional)"
+          className="mt-1 text-xs italic text-gray-400"
+        />
+      )}
+      <EditableText as="p" path={[...base, 'tagline']} value={plan.tagline} className="mt-4 text-sm leading-relaxed text-gray-600" />
+      <ul className="mt-5 flex-1 space-y-3 text-sm text-navy-800">
+        {bullets.map((bullet, i) => (
+          <li key={i} className="edit-item flex gap-2 leading-relaxed">
+            <span className="mt-0.5 flex-shrink-0 text-gold-500">✓</span>
+            <EditableText path={[...base, 'bullets', i]} value={bullet} className="min-w-0 flex-1" />
+            {bulletList && (
+              <button
+                type="button"
+                title="Remover tópico"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => bulletList.remove(i)}
+                className="flex-shrink-0 self-start rounded-full px-1.5 text-xs text-red-500 opacity-40 hover:bg-red-50 hover:opacity-100"
+              >
+                ✕
+              </button>
+            )}
+          </li>
+        ))}
+        {bulletList && (
+          <li>
+            <button
+              type="button"
+              onClick={() => bulletList.add('')}
+              className="text-xs font-semibold text-blue-700 hover:underline"
+            >
+              + Adicionar tópico
+            </button>
+          </li>
+        )}
+      </ul>
+    </div>
+  )
+}
+
+export function Consultant({ consultant }) {
+  const editing = !!useEditor()
   return (
     <section id="consultora" className="scroll-mt-20 bg-navy-50 py-16">
       <div className="mx-auto max-w-2xl px-4 text-center sm:px-6">
-        <h2 className="section-title">{consultant.sectionTitle || 'Conheça a Consultora'}</h2>
+        <EditableText as="h2" path={['consultant', 'sectionTitle']} value={consultant.sectionTitle || 'Conheça a Consultora'} className="section-title" />
         <div className="mt-8">
           {consultant.photoUrl ? (
             <img
@@ -472,10 +554,12 @@ function Consultant({ consultant }) {
               {consultant.name?.[0]}
             </div>
           )}
-          <h3 className="mt-4 font-serif text-2xl font-bold text-navy-900">{consultant.name}</h3>
-          <p className="mt-4 text-gray-600">{consultant.bio}</p>
-          {consultant.quote && (
-            <p className="mt-6 border-t border-gray-200 pt-6 font-serif italic text-lg text-navy-800">&ldquo;{consultant.quote}&rdquo;</p>
+          <EditableText as="h3" path={['consultant', 'name']} value={consultant.name} className="mt-4 block font-serif text-2xl font-bold text-navy-900" />
+          <EditableText as="p" path={['consultant', 'bio']} value={consultant.bio} className="mt-4 text-gray-600" />
+          {(consultant.quote || editing) && (
+            <p className="mt-6 border-t border-gray-200 pt-6 font-serif italic text-lg text-navy-800">
+              &ldquo;<EditableText path={['consultant', 'quote']} value={consultant.quote} />&rdquo;
+            </p>
           )}
         </div>
       </div>
@@ -483,12 +567,12 @@ function Consultant({ consultant }) {
   )
 }
 
-function CTA({ cta, brand }) {
+export function CTA({ cta, brand }) {
   return (
     <section id="contato" className="mx-auto max-w-3xl scroll-mt-20 px-4 py-16 text-center sm:px-6">
       <div className="card p-10">
-        <h2 className="section-title">{cta.title}</h2>
-        <p className="mx-auto mt-4 max-w-xl text-gray-600">{cta.desc}</p>
+        <EditableText as="h2" path={['cta', 'title']} value={cta.title} className="section-title" />
+        <EditableText as="p" path={['cta', 'desc']} value={cta.desc} className="mx-auto mt-4 max-w-xl text-gray-600" />
         <WhatsAppLink whatsapp={brand.whatsapp} message={brand.whatsappMessage} className="btn-gold mt-8">
           Falar no WhatsApp
         </WhatsAppLink>
@@ -524,7 +608,9 @@ export function Footer({ brand, footer, socialLinks }) {
           })}
         </div>
       )}
-      <p>© {new Date().getFullYear()} {brand.name}. {footer.text}</p>
+      <p>
+        © {new Date().getFullYear()} {brand.name}. <EditableText path={['footer', 'text']} value={footer.text} />
+      </p>
       <p className="mt-2">
         {brand.instagram && <span>{brand.instagram}</span>}
         {brand.instagram && brand.whatsapp && <span className="mx-2">|</span>}
