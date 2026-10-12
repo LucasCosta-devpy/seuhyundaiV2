@@ -140,6 +140,18 @@ export const defaultContent = {
     title: 'Pronto para dar o próximo passo?',
     desc: 'Deixe a burocracia, os seguros e o planejamento pesado com a gente. Foque apenas em arrumar as malas e aproveitar o destino!',
   },
+  // Página de anúncios (/consultoria). {preco} em pricingText vira o valor do 1º plano (aba Preço).
+  landing: {
+    headline: 'Planeje a Viagem dos Seus Sonhos Com Quem Entende do Assunto',
+    ctaLabel: '🟢 Quero Planejar Minha Viagem',
+    ctaNote: 'Resposta rápida direto no WhatsApp',
+    reasonsTitle: 'Por que contratar uma consultoria de viagem?',
+    reasonsCount: 4,
+    pricingTitle: 'Investimento',
+    pricingText: 'Planos a partir de {preco}, sob medida pra sua viagem.',
+    finalTitle: 'Pronto para começar a planejar?',
+    finalDesc: 'Fala agora mesmo com a gente no WhatsApp, sem compromisso.',
+  },
   footer: {
     text: 'Todos os direitos reservados. | Transformando rotas em memórias inesquecíveis.',
   },
