@@ -10,6 +10,8 @@ export const defaultContent = {
     logoOffsetY: 0,
     instagram: '@rumomaisumarota',
     whatsapp: '5551982710564',
+    whatsappLabel: 'Falar no WhatsApp',
+    navLabels: ['Sobre', 'Destinos', 'Serviços', 'Preço', 'Consultora', 'Redes Sociais'],
     whatsappMessage: 'Olá! Conheci a Rumo Mais Uma Rota pelo site e gostaria de conversar sobre a minha próxima viagem.',
   },
   hero: {
@@ -89,6 +91,7 @@ export const defaultContent = {
   ],
   pricing: {
     title: 'Investimento na Consultoria',
+    paymentLabel: 'Forma de pagamento:',
     intro: 'Escolha o nível de planejamento ideal para a complexidade da sua viagem.',
     plans: [
       {

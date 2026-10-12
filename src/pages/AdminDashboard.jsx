@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getContent, saveContent, uploadImage, deleteImage, clearToken, getToken } from '../lib/api.js'
 import { defaultContent } from '../lib/defaultContent.js'
+import { mergeContent } from '../lib/mergeContent.js'
 import { LOGO_SIZES, getLogoSize } from '../lib/logoSize.js'
 import { SOCIAL_PLATFORMS, getPlatform } from '../components/SocialIcons.jsx'
 import ImageCropEditor from '../components/ImageCropEditor.jsx'
@@ -77,7 +78,7 @@ export default function AdminDashboard() {
       return
     }
     getContent()
-      .then((data) => setContent({ ...defaultContent, ...data }))
+      .then((data) => setContent(mergeContent(defaultContent, data)))
       .catch(() => setContent(defaultContent))
   }, [])
 
