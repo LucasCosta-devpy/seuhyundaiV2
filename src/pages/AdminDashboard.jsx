@@ -7,7 +7,8 @@ import { LOGO_SIZES, getLogoSize } from '../lib/logoSize.js'
 import { SOCIAL_PLATFORMS, getPlatform } from '../components/SocialIcons.jsx'
 import ImageCropEditor from '../components/ImageCropEditor.jsx'
 import {
-  RegionSummaryCard,
+  Destinations,
+  OpenLevelButton,
   DestinationCard,
   Header,
   Hero,
@@ -20,10 +21,11 @@ import {
   CTA,
   Footer,
 } from './PublicSite.jsx'
-import { InlineEditor } from '../components/Editable.jsx'
+import { InlineEditor, useListEditing, ItemControls, AddItemButton } from '../components/Editable.jsx'
 import { Banner, ExploreCard } from './DestinationPages.jsx'
 import { DestinationPagesPreview } from './DestinationPages.jsx'
 import { getCountryFlag } from '../lib/flags.js'
+import { withConfirmRemove } from '../lib/confirmRemove.js'
 import DestinationsGlobe from '../components/DestinationsGlobe.jsx'
 import { LandingView } from './LandingConsultoria.jsx'
 
@@ -215,27 +217,31 @@ export default function AdminDashboard() {
             <Panel title="Destinos (agrupados por região)">
               <p className="-mt-2 mb-2 text-xs text-gray-400">
                 Os botões que aparecem no topo do site (embaixo do título) são gerados automaticamente a partir do nome de cada região aqui embaixo — adicionar ou remover uma região adiciona ou remove o botão sozinho, sem precisar configurar em outro lugar.
+                Atenção: renomear uma região, país ou cidade também muda o endereço (URL) dela no site.
               </p>
-              <TextField label="Título da seção" value={content.destinationsTitle} onChange={(v) => update(['destinationsTitle'], v)} />
-              <TextField label="Subtítulo da seção" value={content.destinationsSubtitle} onChange={(v) => update(['destinationsSubtitle'], v)} />
-              <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <InlineEditor update={update}>
+                <DestinationsPreview
+                  groups={content.destinationGroups}
+                  title={content.destinationsTitle}
+                  subtitle={content.destinationsSubtitle}
+                  globeTitle={content.globeTitle}
+                  globeSubtitle={content.globeSubtitle}
+                  seeMoreLabel={content.destinationPages?.seeMoreLabel}
+                />
+              </InlineEditor>
+
+              <details className="rounded-xl border border-gray-200 p-4">
+                <summary className="cursor-pointer text-sm font-semibold text-navy-900">
+                  Fotos, capas e coordenadas do globo (edição avançada)
+                </summary>
+                <p className="mb-4 mt-3 text-xs text-gray-400">
+                  É aqui que se sobem as fotos das cidades, as capas de região e país e as coordenadas (latitude/longitude) do globo 3D. Textos, ordem e o que existe (adicionar/remover) dá pra mudar direto na prévia acima; o que você mexer lá aparece aqui e vice-versa.
+                </p>
                 <DestinationGroupsEditor
                   groups={content.destinationGroups}
                   onChange={(v) => update(['destinationGroups'], v)}
                 />
-
-                <div className="lg:sticky lg:top-24 lg:self-start">
-                  <p className="mb-2 text-sm font-semibold text-navy-900">👁 Pré-visualização no site</p>
-                  <p className="mb-3 text-xs text-gray-400">Atualiza ao vivo enquanto você edita, antes mesmo de salvar.</p>
-                  <div className="max-h-[75vh] overflow-y-auto rounded-xl border border-gray-200 bg-white p-3">
-                    <DestinationsPreview
-                      groups={content.destinationGroups}
-                      globeTitle={content.globeTitle}
-                      globeSubtitle={content.globeSubtitle}
-                    />
-                  </div>
-                </div>
-              </div>
+              </details>
             </Panel>
           )}
 
@@ -1071,22 +1077,30 @@ const PREVIEW_LEVELS = [
   { key: 'globo', label: '🌐 Globo 3D' },
 ]
 
-function DestinationsPreview({ groups, initialLevel = 'home', globeTitle, globeSubtitle }) {
-  const validGroups = (groups || []).filter((g) => g.region)
+// Prévia editável da aba Destinos. Precisa estar dentro de <InlineEditor> (que liga a edição direta).
+// Aqui NÃO se filtra por nome: os índices (gi/ci/ki) são sempre os da lista original em
+// content.destinationGroups, senão a edição cairia no item errado.
+function DestinationsPreview({ groups: rawGroups, initialLevel = 'home', title, subtitle, globeTitle, globeSubtitle, seeMoreLabel }) {
+  const groups = rawGroups || []
   const [level, setLevel] = useState(initialLevel)
   const [regionIdx, setRegionIdx] = useState(0)
   const [countryIdx, setCountryIdx] = useState(0)
   const [cityIdx, setCityIdx] = useState(0)
 
-  if (validGroups.length === 0) {
-    return <p className="text-sm text-gray-400">Nenhuma região cadastrada ainda. A prévia aparece aqui assim que você adicionar uma.</p>
-  }
+  const gi = Math.min(regionIdx, groups.length - 1)
+  const region = groups[gi]
+  const countries = region ? region.items || [] : []
+  const ci = Math.min(countryIdx, countries.length - 1)
+  const country = countries[ci]
+  const cities = country ? country.subregions || [] : []
+  const ki = Math.min(cityIdx, cities.length - 1)
+  const city = cities[ki]
 
-  const region = validGroups[Math.min(regionIdx, validGroups.length - 1)]
-  const countries = (region.items || []).filter((c) => c.name)
-  const country = countries[Math.min(countryIdx, Math.max(countries.length - 1, 0))]
-  const cities = country ? (country.subregions || []).filter((c) => c.name) : []
-  const city = cities[Math.min(cityIdx, Math.max(cities.length - 1, 0))]
+  // Se o nível aberto deixou de existir (ex.: apagou o último país), cai pro nível de cima.
+  let shown = level
+  if (shown === 'cidade' && !city) shown = 'pais'
+  if (shown === 'pais' && !country) shown = 'regiao'
+  if (shown === 'regiao' && !region) shown = 'home'
 
   function selectRegion(i) {
     setRegionIdx(i)
@@ -1097,91 +1111,178 @@ function DestinationsPreview({ groups, initialLevel = 'home', globeTitle, globeS
     setCountryIdx(i)
     setCityIdx(0)
   }
+  function openRegion(i) {
+    selectRegion(i)
+    setLevel('regiao')
+  }
+  function openCountry(i) {
+    selectCountry(i)
+    setLevel('pais')
+  }
+  function openCity(i) {
+    setCityIdx(i)
+    setLevel('cidade')
+  }
 
   return (
     <div>
-      <div className="mb-3 flex flex-wrap gap-1.5">
-        {PREVIEW_LEVELS.map((l) => {
-          const disabled = (l.key === 'pais' && countries.length === 0) || (l.key === 'cidade' && cities.length === 0)
-          return (
-            <button
-              key={l.key}
-              type="button"
-              disabled={disabled}
-              onClick={() => setLevel(l.key)}
-              className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
-                level === l.key ? 'bg-navy-800 text-white' : disabled ? 'cursor-not-allowed bg-gray-100 text-gray-300' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {l.label}
-            </button>
-          )
-        })}
+      <div className="border-b border-gray-200 bg-gray-50 p-3">
+        <div className="flex flex-wrap gap-1.5">
+          {PREVIEW_LEVELS.map((l) => {
+            const disabled = (l.key === 'regiao' && !region) || (l.key === 'pais' && !country) || (l.key === 'cidade' && !city)
+            return (
+              <button
+                key={l.key}
+                type="button"
+                disabled={disabled}
+                onClick={() => setLevel(l.key)}
+                className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+                  shown === l.key ? 'bg-navy-800 text-white' : disabled ? 'cursor-not-allowed bg-gray-100 text-gray-300' : 'bg-white text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {l.label}
+              </button>
+            )
+          })}
+        </div>
+
+        {shown !== 'home' && shown !== 'globo' && (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {groups.length > 1 && (
+              <select className="input w-auto text-xs" value={gi} onChange={(e) => selectRegion(Number(e.target.value))}>
+                {groups.map((g, i) => (
+                  <option key={i} value={i}>{g.region || 'Nova região (sem nome)'}</option>
+                ))}
+              </select>
+            )}
+            {(shown === 'pais' || shown === 'cidade') && countries.length > 1 && (
+              <select className="input w-auto text-xs" value={ci} onChange={(e) => selectCountry(Number(e.target.value))}>
+                {countries.map((c, i) => (
+                  <option key={i} value={i}>{c.name || 'Novo país (sem nome)'}</option>
+                ))}
+              </select>
+            )}
+            {shown === 'cidade' && cities.length > 1 && (
+              <select className="input w-auto text-xs" value={ki} onChange={(e) => setCityIdx(Number(e.target.value))}>
+                {cities.map((c, i) => (
+                  <option key={i} value={i}>{c.name || 'Nova cidade (sem nome)'}</option>
+                ))}
+              </select>
+            )}
+          </div>
+        )}
       </div>
 
-      {level !== 'home' && validGroups.length > 1 && (
-        <select className="input mb-2 text-xs" value={regionIdx} onChange={(e) => selectRegion(Number(e.target.value))}>
-          {validGroups.map((g, i) => (
-            <option key={i} value={i}>{g.region}</option>
-          ))}
-        </select>
-      )}
-      {(level === 'pais' || level === 'cidade') && countries.length > 1 && (
-        <select className="input mb-2 text-xs" value={countryIdx} onChange={(e) => selectCountry(Number(e.target.value))}>
-          {countries.map((c, i) => (
-            <option key={i} value={i}>{c.name}</option>
-          ))}
-        </select>
-      )}
-      {level === 'cidade' && cities.length > 1 && (
-        <select className="input mb-3 text-xs" value={cityIdx} onChange={(e) => setCityIdx(Number(e.target.value))}>
-          {cities.map((c, i) => (
-            <option key={i} value={i}>{c.name}</option>
-          ))}
-        </select>
-      )}
+      {shown === 'home' && <Destinations groups={groups} title={title} subtitle={subtitle} onOpenRegion={openRegion} />}
 
-      <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
-        {level === 'home' && (
-          <div className="grid grid-cols-1 gap-3">
-            {validGroups.map((g, i) => (
-              <RegionSummaryCard key={i} group={g} preview />
-            ))}
+      {shown === 'regiao' && <PreviewRegionLevel gi={gi} group={region} seeMoreLabel={seeMoreLabel} onOpenCountry={openCountry} />}
+
+      {shown === 'pais' && <PreviewCountryLevel gi={gi} ci={ci} country={country} onOpenCity={openCity} />}
+
+      {shown === 'cidade' && (
+        <section className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+          <div className="overflow-hidden rounded-2xl shadow-sm">
+            <DestinationCard
+              name={city.name}
+              desc={city.desc}
+              imageUrl={city.imageUrl}
+              imageMode={city.imageMode}
+              images={city.images}
+              photoCaption={city.photoCaption}
+              path={['destinationGroups', gi, 'items', ci, 'subregions', ki]}
+              large
+            />
           </div>
-        )}
+          <p className="mt-4 text-sm text-gray-500">
+            {getCountryFlag(country.name, '')} {country.name} · {region.region}
+          </p>
+        </section>
+      )}
 
-        {level === 'regiao' && (
-          <div>
-            <Banner title={region.region} desc={region.desc} coverUrl={region.coverUrl} height="h-28" />
-            <p className="mt-3 text-xs font-semibold text-navy-900">Países de {region.region}</p>
-            <div className="mt-2 grid grid-cols-1 gap-3">
-              {countries.map((c, i) => (
-                <ExploreCard key={i} name={c.name} coverUrl={c.coverUrl} subtitle={c.desc} flag={getCountryFlag(c.name, '')} preview />
-              ))}
-              {countries.length === 0 && <p className="text-xs text-gray-400">Nenhum país cadastrado ainda nesta região.</p>}
+      {shown === 'globo' && <DestinationsGlobe groups={groups} title={globeTitle} subtitle={globeSubtitle} />}
+    </div>
+  )
+}
+
+// Nível "Região" da prévia: banner da região + cards dos países (editar, mover, remover, adicionar).
+function PreviewRegionLevel({ gi, group, seeMoreLabel, onOpenCountry }) {
+  const countries = group.items || []
+  const list = useListEditing(['destinationGroups', gi, 'items'], countries)
+  const removeList = withConfirmRemove(list, (i) => `Remover o país "${countries[i]?.name || 'sem nome'}" e todas as cidades dele?`)
+  return (
+    <div>
+      <Banner
+        title={group.region}
+        desc={group.desc}
+        coverUrl={group.coverUrl}
+        path={['destinationGroups', gi]}
+        titleKey="region"
+      />
+      <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <p className="text-sm font-semibold text-navy-900">Países de {group.region || 'esta região'}</p>
+        <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {countries.map((c, ci) => (
+            <div key={ci} className="edit-item">
+              <ItemControls list={removeList} index={ci} total={countries.length} />
+              <OpenLevelButton onClick={() => onOpenCountry(ci)} />
+              <ExploreCard
+                name={c.name}
+                coverUrl={c.coverUrl}
+                subtitle={c.desc}
+                flag={getCountryFlag(c.name, '')}
+                seeMoreLabel={seeMoreLabel}
+                path={['destinationGroups', gi, 'items', ci]}
+              />
             </div>
-          </div>
-        )}
+          ))}
+          <AddItemButton list={list} item={{ name: 'Novo país', desc: '', subregions: [] }} label="Adicionar país" className="min-h-[11rem]" />
+        </div>
+      </section>
+    </div>
+  )
+}
 
-        {level === 'pais' && country && (
-          <div>
-            <Banner title={country.name} desc={country.desc} coverUrl={country.coverUrl} flag={getCountryFlag(country.name, '')} height="h-24" />
-            <p className="mt-3 text-xs font-semibold text-navy-900">Cidades de {country.name}</p>
-            <div className="mt-2 grid grid-cols-1 gap-3">
-              {cities.map((c, i) => (
-                <DestinationCard key={i} name={c.name} desc={c.desc} imageUrl={c.imageUrl} imageMode={c.imageMode} images={c.images} photoCaption={c.photoCaption} />
-              ))}
-              {cities.length === 0 && <p className="text-xs text-gray-400">Nenhuma cidade cadastrada ainda neste país.</p>}
+// Nível "País" da prévia: banner do país + cards das cidades (editar, mover, remover, adicionar).
+function PreviewCountryLevel({ gi, ci, country, onOpenCity }) {
+  const cities = country.subregions || []
+  const base = ['destinationGroups', gi, 'items', ci]
+  const list = useListEditing([...base, 'subregions'], cities)
+  const removeList = withConfirmRemove(list, (i) => `Remover a cidade "${cities[i]?.name || 'sem nome'}"?`)
+  return (
+    <div>
+      <Banner
+        title={country.name}
+        desc={country.desc}
+        coverUrl={country.coverUrl}
+        flag={getCountryFlag(country.name, '')}
+        path={base}
+      />
+      <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <p className="text-sm font-semibold text-navy-900">Cidades de {country.name || 'este país'}</p>
+        <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {cities.map((c, ki) => (
+            <div key={ki} className="edit-item">
+              <ItemControls list={removeList} index={ki} total={cities.length} />
+              <OpenLevelButton onClick={() => onOpenCity(ki)} />
+              <DestinationCard
+                name={c.name}
+                desc={c.desc}
+                imageUrl={c.imageUrl}
+                imageMode={c.imageMode}
+                images={c.images}
+                photoCaption={c.photoCaption}
+                path={[...base, 'subregions', ki]}
+              />
             </div>
-          </div>
-        )}
-
-        {level === 'cidade' && city && (
-          <DestinationCard name={city.name} desc={city.desc} imageUrl={city.imageUrl} imageMode={city.imageMode} images={city.images} photoCaption={city.photoCaption} large />
-        )}
-
-        {level === 'globo' && <DestinationsGlobe groups={groups} title={globeTitle} subtitle={globeSubtitle} />}
-      </div>
+          ))}
+          <AddItemButton
+            list={list}
+            item={{ name: 'Nova cidade', desc: '', imageMode: 'carousel', images: [], imageUrl: '' }}
+            label="Adicionar cidade"
+            className="min-h-[10rem]"
+          />
+        </div>
+      </section>
     </div>
   )
 }

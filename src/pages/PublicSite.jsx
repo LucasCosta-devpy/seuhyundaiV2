@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { WhatsAppFloatButton, WhatsAppLink, formatPhoneDisplay } from '../components/WhatsAppButton.jsx'
 import { slugify } from '../lib/slug.js'
+import { withConfirmRemove } from '../lib/confirmRemove.js'
 import { getLogoSize } from '../lib/logoSize.js'
 import { getPlatform } from '../components/SocialIcons.jsx'
 import { useSiteContent } from '../lib/useSiteContent.js'
@@ -301,7 +302,9 @@ export function DestinationCarousel({ images, name }) {
   )
 }
 
-export function DestinationCard({ name, desc, imageUrl, imageMode, images: itemImages, photoCaption, large = false }) {
+// Com `path` (prévia do admin) nome e descrição viram editáveis: path = caminho da cidade no conteúdo.
+export function DestinationCard({ name, desc, imageUrl, imageMode, images: itemImages, photoCaption, large = false, path }) {
+  const editing = !!useEditor() && !!path
   const rawImages =
     imageMode === 'carousel'
       ? (itemImages || []).filter((img) => (typeof img === 'string' ? img : img?.url))
@@ -309,6 +312,8 @@ export function DestinationCard({ name, desc, imageUrl, imageMode, images: itemI
         ? [{ url: imageUrl, caption: photoCaption }]
         : []
   const images = rawImages.map((img) => (typeof img === 'string' ? { url: img, caption: '' } : img))
+  const nameClass = `font-serif font-bold text-navy-900 ${large ? 'text-2xl' : 'text-lg'}`
+  const descClass = `mt-1 text-gray-600 ${large ? '' : 'text-sm'}`
 
   return (
     <div className="card overflow-hidden">
@@ -320,22 +325,39 @@ export function DestinationCard({ name, desc, imageUrl, imageMode, images: itemI
         )}
       </div>
       <div className={`border-t-2 border-gold-400 ${large ? 'p-6' : 'p-4'}`}>
-        <h4 className={`font-serif font-bold text-navy-900 ${large ? 'text-2xl' : 'text-lg'}`}>{name}</h4>
-        <p className={`mt-1 text-gray-600 ${large ? '' : 'text-sm'}`}>{desc}</p>
+        {editing ? (
+          <>
+            <EditableText as="h4" path={[...path, 'name']} value={name} placeholder="Nome da cidade" className={nameClass} />
+            <EditableText as="p" path={[...path, 'desc']} value={desc} placeholder="Descrição da cidade" className={descClass} />
+          </>
+        ) : (
+          <>
+            <h4 className={nameClass}>{name}</h4>
+            <p className={descClass}>{desc}</p>
+          </>
+        )}
       </div>
     </div>
   )
 }
 
 
-export function RegionSummaryCard({ group, preview = false }) {
+// Com `path` (prévia do admin) nome e descrição viram editáveis: path = caminho da região no conteúdo.
+export function RegionSummaryCard({ group, preview = false, path }) {
+  const inEditor = !!useEditor()
+  const editing = inEditor && !!path
   const countryCount = (group.items || []).filter((c) => c.name).length
-  const Tag = preview ? 'div' : Link
-  const linkProps = preview ? {} : { to: `/destinos/${slugify(group.region)}` }
+  // Dentro do admin nunca é link: clicar no texto edita (a navegação é pelo botão "Abrir").
+  const Tag = preview || inEditor ? 'div' : Link
+  const linkProps = Tag === 'div' ? {} : { to: `/destinos/${slugify(group.region)}` }
   return (
     <Tag
       {...linkProps}
-      className="group relative block h-56 overflow-hidden rounded-2xl bg-navy-900 shadow-md transition-transform hover:scale-[1.02]"
+      className={
+        editing
+          ? 'group relative block min-h-[14rem] overflow-hidden rounded-2xl bg-navy-900 shadow-md'
+          : 'group relative block h-56 overflow-hidden rounded-2xl bg-navy-900 shadow-md transition-transform hover:scale-[1.02]'
+      }
     >
       {group.coverUrl ? (
         <img src={group.coverUrl} alt={group.region} className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
@@ -343,9 +365,18 @@ export function RegionSummaryCard({ group, preview = false }) {
         <div className="absolute inset-0 bg-gradient-to-br from-navy-800 to-navy-900" />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/40 to-navy-900/10" />
-      <div className="absolute inset-0 flex flex-col justify-end p-5">
-        <h3 className="font-serif text-2xl font-bold text-white">{group.region}</h3>
-        {group.desc && <p className="mt-1 line-clamp-2 text-sm text-navy-100">{group.desc}</p>}
+      <div className={editing ? 'relative flex min-h-[14rem] flex-col justify-end p-5' : 'absolute inset-0 flex flex-col justify-end p-5'}>
+        {editing ? (
+          <>
+            <EditableText as="h3" path={[...path, 'region']} value={group.region} placeholder="Nome da região" className="font-serif text-2xl font-bold text-white" />
+            <EditableText as="p" path={[...path, 'desc']} value={group.desc} placeholder="Descrição (opcional)" className="mt-1 text-sm text-navy-100" />
+          </>
+        ) : (
+          <>
+            <h3 className="font-serif text-2xl font-bold text-white">{group.region}</h3>
+            {group.desc && <p className="mt-1 line-clamp-2 text-sm text-navy-100">{group.desc}</p>}
+          </>
+        )}
         <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-gold-300">
           {countryCount > 0 ? `${countryCount} país${countryCount === 1 ? '' : 'es'}` : 'Explorar região'}
           <span className="transition-transform group-hover:translate-x-1">→</span>
@@ -355,8 +386,31 @@ export function RegionSummaryCard({ group, preview = false }) {
   )
 }
 
-export function Destinations({ groups, title, subtitle }) {
-  const validGroups = (groups || []).filter((g) => g.region)
+// Botão pequeno (só no admin) pra "entrar" num nível da prévia, já que o card em si é texto editável.
+export function OpenLevelButton({ onClick, label = 'Abrir' }) {
+  return (
+    <div className="edit-item-controls !left-1.5 !right-auto" onMouseDown={(e) => e.preventDefault()}>
+      <button
+        type="button"
+        onClick={onClick}
+        title="Abrir este item na prévia"
+        className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-navy-700 shadow ring-1 ring-black/10 hover:bg-navy-50"
+      >
+        {label} →
+      </button>
+    </div>
+  )
+}
+
+// `onOpenRegion` só existe na prévia do admin (botão "Abrir" de cada região).
+export function Destinations({ groups, title, subtitle, onOpenRegion }) {
+  const editing = !!useEditor()
+  const allGroups = groups || []
+  const list = useListEditing(['destinationGroups'], allGroups)
+  const removeList = withConfirmRemove(list, (i) => `Remover a região "${allGroups[i]?.region || 'sem nome'}" com todos os países e cidades dela?`)
+  // Índices sempre os ORIGINAIS de destinationGroups. No site só entram regiões com nome;
+  // no admin entram todas (senão a região sumiria da tela ao apagar o nome pra reescrever).
+  const entries = allGroups.map((group, gi) => ({ group, gi })).filter(({ group }) => editing || group.region)
   return (
     <section id="destinos" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-14 sm:px-6">
       <div className="text-center">
@@ -368,11 +422,25 @@ export function Destinations({ groups, title, subtitle }) {
           className="mx-auto mt-3 max-w-xl text-gray-600"
         />
       </div>
-      {validGroups.length > 0 ? (
+      {entries.length > 0 || editing ? (
         <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {validGroups.map((group, gi) => (
-            <RegionSummaryCard key={gi} group={group} />
-          ))}
+          {entries.map(({ group, gi }) =>
+            editing ? (
+              <div key={gi} className="edit-item">
+                <ItemControls list={removeList} index={gi} total={allGroups.length} />
+                {onOpenRegion && <OpenLevelButton onClick={() => onOpenRegion(gi)} />}
+                <RegionSummaryCard group={group} path={['destinationGroups', gi]} />
+              </div>
+            ) : (
+              <RegionSummaryCard key={gi} group={group} />
+            ),
+          )}
+          <AddItemButton
+            list={list}
+            item={{ region: 'Nova região', desc: '', coverUrl: '', items: [] }}
+            label="Adicionar região"
+            className="min-h-[14rem]"
+          />
         </div>
       ) : (
         <p className="mt-10 text-center text-gray-400">Nenhuma região cadastrada ainda.</p>
