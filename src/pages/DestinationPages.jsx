@@ -55,35 +55,68 @@ function Breadcrumbs({ items, dp }) {
   )
 }
 
-export function Banner({ title, desc, coverUrl, flag, height = 'h-72 sm:h-96' }) {
+// Com `path` (prévia do admin na aba Destinos) título e descrição viram editáveis.
+// path = caminho do item no conteúdo; titleKey = campo do nome ('region' na região, 'name' no país).
+export function Banner({ title, desc, coverUrl, flag, height = 'h-72 sm:h-96', path, titleKey = 'name' }) {
+  const editing = !!useEditor() && !!path
+  const titleClass = 'font-serif text-3xl font-bold text-white sm:text-5xl'
   if (coverUrl) {
     return (
-      <div className={`relative mx-auto mt-4 max-w-6xl overflow-hidden ${height}`}>
+      <div className={`relative mx-auto mt-4 max-w-6xl overflow-hidden ${editing ? '' : height}`}>
         <img src={coverUrl} alt={title} className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-navy-900/60 via-navy-900/10 to-transparent" />
-        <div className="relative flex h-full flex-col justify-end p-5 sm:p-10">
+        <div className={editing ? 'relative flex min-h-[10rem] flex-col justify-end p-5 sm:p-10' : 'relative flex h-full flex-col justify-end p-5 sm:p-10'}>
           <p className="text-xs font-semibold uppercase tracking-wide text-gold-300">{flag}</p>
-          <h1 className="font-serif text-3xl font-bold text-white sm:text-5xl">{title}</h1>
-          {desc && <p className="mt-2 max-w-2xl text-navy-100 sm:text-lg">{desc}</p>}
+          {editing ? (
+            <>
+              <EditableText as="h1" path={[...path, titleKey]} value={title} placeholder="Título" className={titleClass} />
+              <EditableText as="p" path={[...path, 'desc']} value={desc} placeholder="Descrição (opcional)" className="mt-2 max-w-2xl text-navy-100 sm:text-lg" />
+            </>
+          ) : (
+            <>
+              <h1 className={titleClass}>{title}</h1>
+              {desc && <p className="mt-2 max-w-2xl text-navy-100 sm:text-lg">{desc}</p>}
+            </>
+          )}
         </div>
       </div>
     )
   }
+  const plainTitleClass =
+    'flex items-center gap-2 border-l-4 border-gold-400 pl-4 font-serif text-3xl font-bold text-navy-900 sm:text-4xl'
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <h1 className="flex items-center gap-2 border-l-4 border-gold-400 pl-4 font-serif text-3xl font-bold text-navy-900 sm:text-4xl">
-        {title}
-      </h1>
-      {desc && <p className="mt-3 max-w-2xl pl-4 text-gray-600">{desc}</p>}
+      {editing ? (
+        <>
+          <EditableText as="h1" path={[...path, titleKey]} value={title} placeholder="Título" className={plainTitleClass} />
+          <EditableText as="p" path={[...path, 'desc']} value={desc} placeholder="Descrição (opcional)" className="mt-3 max-w-2xl pl-4 text-gray-600" />
+        </>
+      ) : (
+        <>
+          <h1 className={plainTitleClass}>{title}</h1>
+          {desc && <p className="mt-3 max-w-2xl pl-4 text-gray-600">{desc}</p>}
+        </>
+      )}
     </div>
   )
 }
 
-export function ExploreCard({ to, name, coverUrl, subtitle, flag, preview = false, seeMoreLabel = defaultContent.destinationPages.seeMoreLabel }) {
-  const Tag = preview ? 'div' : Link
-  const linkProps = preview ? {} : { to }
+// Com `path` (prévia do admin na aba Destinos) nome e descrição do país viram editáveis.
+export function ExploreCard({ to, name, coverUrl, subtitle, flag, preview = false, seeMoreLabel = defaultContent.destinationPages.seeMoreLabel, path }) {
+  const inEditor = !!useEditor()
+  const editing = inEditor && !!path
+  // Dentro do admin nunca é link: clicar no texto edita.
+  const Tag = preview || inEditor ? 'div' : Link
+  const linkProps = Tag === 'div' ? {} : { to }
   return (
-    <Tag {...linkProps} className="group relative block h-44 overflow-hidden rounded-xl bg-navy-900 shadow-sm transition-transform hover:scale-[1.02]">
+    <Tag
+      {...linkProps}
+      className={
+        editing
+          ? 'group relative block min-h-[11rem] overflow-hidden rounded-xl bg-navy-900 shadow-sm'
+          : 'group relative block h-44 overflow-hidden rounded-xl bg-navy-900 shadow-sm transition-transform hover:scale-[1.02]'
+      }
+    >
       {coverUrl ? (
         <img src={coverUrl} alt={name} className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
       ) : (
@@ -92,12 +125,16 @@ export function ExploreCard({ to, name, coverUrl, subtitle, flag, preview = fals
         </div>
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/20 to-transparent" />
-      <div className="absolute inset-0 flex flex-col justify-end p-4">
+      <div className={editing ? 'relative flex min-h-[11rem] flex-col justify-end p-4' : 'absolute inset-0 flex flex-col justify-end p-4'}>
         <h3 className="flex items-center gap-1.5 font-serif text-lg font-bold text-white">
           {flag && <span>{flag}</span>}
-          {name}
+          {editing ? <EditableText path={[...path, 'name']} value={name} placeholder="Nome do país" className="min-w-0 flex-1" /> : name}
         </h3>
-        {subtitle && <p className="mt-0.5 line-clamp-2 text-xs text-navy-100">{subtitle}</p>}
+        {editing ? (
+          <EditableText as="p" path={[...path, 'desc']} value={subtitle} placeholder="Descrição (opcional)" className="mt-0.5 text-xs text-navy-100" />
+        ) : (
+          subtitle && <p className="mt-0.5 line-clamp-2 text-xs text-navy-100">{subtitle}</p>
+        )}
         <span className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-gold-300">
           <EditableText path={['destinationPages', 'seeMoreLabel']} value={seeMoreLabel} />
           <span className="transition-transform group-hover:translate-x-1">→</span>
