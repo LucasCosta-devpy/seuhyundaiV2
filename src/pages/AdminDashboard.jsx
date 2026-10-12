@@ -21,6 +21,7 @@ import {
 } from './PublicSite.jsx'
 import { InlineEditor } from '../components/Editable.jsx'
 import { Banner, ExploreCard } from './DestinationPages.jsx'
+import { DestinationPagesPreview } from './DestinationPages.jsx'
 import { getCountryFlag } from '../lib/flags.js'
 import DestinationsGlobe from '../components/DestinationsGlobe.jsx'
 
@@ -30,6 +31,7 @@ const TABS = [
   { key: 'sobre', label: 'Sobre', color: 'emerald' },
   { key: 'destinos', label: 'Destinos', color: 'rose' },
   { key: 'globo', label: 'Globo 3D', color: 'sky' },
+  { key: 'paginas', label: 'Páginas de destino', color: 'lime' },
   { key: 'servicos', label: 'Serviços', color: 'violet' },
   { key: 'motivos', label: 'Motivos', color: 'teal' },
   { key: 'processo', label: 'Como funciona', color: 'orange' },
@@ -46,6 +48,7 @@ const TAB_STYLES = {
   rose: { active: 'bg-rose-500 border-rose-500 text-white', inactive: 'border-rose-200 text-rose-700 hover:bg-rose-50', top: 'border-t-rose-500' },
   violet: { active: 'bg-violet-500 border-violet-500 text-white', inactive: 'border-violet-200 text-violet-700 hover:bg-violet-50', top: 'border-t-violet-500' },
   teal: { active: 'bg-teal-500 border-teal-500 text-white', inactive: 'border-teal-200 text-teal-700 hover:bg-teal-50', top: 'border-t-teal-500' },
+  lime: { active: 'bg-lime-500 border-lime-500 text-white', inactive: 'border-lime-200 text-lime-700 hover:bg-lime-50', top: 'border-t-lime-500' },
   orange: { active: 'bg-orange-500 border-orange-500 text-white', inactive: 'border-orange-200 text-orange-700 hover:bg-orange-50', top: 'border-t-orange-500' },
   indigo: { active: 'bg-indigo-500 border-indigo-500 text-white', inactive: 'border-indigo-200 text-indigo-700 hover:bg-indigo-50', top: 'border-t-indigo-500' },
   fuchsia: { active: 'bg-fuchsia-500 border-fuchsia-500 text-white', inactive: 'border-fuchsia-200 text-fuchsia-700 hover:bg-fuchsia-50', top: 'border-t-fuchsia-500' },
@@ -248,6 +251,14 @@ export default function AdminDashboard() {
               </button>
               <InlineEditor update={update}>
                 <DestinationsGlobe groups={content.destinationGroups} title={content.globeTitle} subtitle={content.globeSubtitle} />
+              </InlineEditor>
+            </Panel>
+          )}
+
+          {activeTab === 'paginas' && (
+            <Panel title="Páginas de destino (região, país e cidade)">
+              <InlineEditor update={update}>
+                <DestinationPagesPreview groups={content.destinationGroups} destinationPages={content.destinationPages} />
               </InlineEditor>
             </Panel>
           )}

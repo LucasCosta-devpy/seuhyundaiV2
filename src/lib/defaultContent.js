@@ -65,6 +65,21 @@ export const defaultContent = {
       ],
     },
   ],
+  // Textos fixos das páginas de região, país e cidade. {regiao} e {pais} são trocados automaticamente.
+  destinationPages: {
+    homeLabel: 'Início',
+    backHomeLabel: 'Voltar pro início',
+    regionTitle: 'Países de {regiao}',
+    regionSubtitle: 'Escolha um país para descobrir suas cidades e destinos.',
+    regionEmpty: 'Nenhum país cadastrado ainda nesta região.',
+    countryTitle: 'Cidades de {pais}',
+    countrySubtitle: 'Descubra os destinos mais incríveis por lá.',
+    countryEmpty: 'Nenhuma cidade cadastrada ainda neste país.',
+    seeMoreLabel: 'Ver mais',
+    regionNotFound: 'Região não encontrada.',
+    countryNotFound: 'País não encontrado.',
+    cityNotFound: 'Destino não encontrado.',
+  },
   servicesTitle: 'O Que Nós Ajudamos a Organizar',
   services: [
     { title: 'Roteiros Personalizados', desc: 'Planejamento dia a dia adaptado ao seu ritmo e estilo de viagem.' },
