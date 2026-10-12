@@ -23,6 +23,7 @@ import { InlineEditor } from '../components/Editable.jsx'
 import { Banner, ExploreCard } from './DestinationPages.jsx'
 import { getCountryFlag } from '../lib/flags.js'
 import DestinationsGlobe from '../components/DestinationsGlobe.jsx'
+import { LandingView } from './LandingConsultoria.jsx'
 
 const TABS = [
   { key: 'marca', label: 'Marca e Contato', color: 'amber' },
@@ -36,6 +37,7 @@ const TABS = [
   { key: 'preco', label: 'Preço', color: 'indigo' },
   { key: 'consultora', label: 'Consultora', color: 'fuchsia' },
   { key: 'final', label: 'Chamada final', color: 'cyan' },
+  { key: 'landing', label: 'Página de anúncios', color: 'emerald' },
 ]
 
 const TAB_STYLES = {
@@ -301,6 +303,33 @@ export default function AdminDashboard() {
                 <CTA cta={content.cta} brand={content.brand} />
                 <Footer brand={content.brand} footer={content.footer} socialLinks={content.socialLinks} />
               </InlineEditor>
+            </Panel>
+          )}
+
+          {activeTab === 'landing' && (
+            <Panel title="Página de anúncios (/consultoria)">
+              <p className="-mt-2 mb-2 text-xs text-gray-400">
+                Página que abre pra quem chega pelos anúncios. Os textos próprios dela (título, botão verde, avisos, chamada final) só mudam aqui. O valor do investimento vem da aba Preço (1º plano), e logo, frase de efeito, motivos, citação da consultora e rodapé são os mesmos do site: editar aqui também muda lá.
+              </p>
+              <InlineEditor update={update}>
+                <LandingView content={content} />
+              </InlineEditor>
+
+              <div className="rounded-xl border border-gray-200 p-4">
+                <label className="label">Quantos motivos mostrar nessa página (hoje {content.reasons?.length || 0} cadastrados na aba Motivos)</label>
+                <input
+                  type="number"
+                  min="0"
+                  max={content.reasons?.length || 0}
+                  className="input w-28"
+                  value={content.landing?.reasonsCount ?? defaultContent.landing.reasonsCount}
+                  onChange={(e) => update(['landing', 'reasonsCount'], e.target.value === '' ? '' : Number(e.target.value))}
+                />
+              </div>
+
+              <a href="/consultoria" target="_blank" rel="noreferrer" className="inline-block text-sm text-navy-600 underline">
+                Abrir /consultoria em nova aba
+              </a>
             </Panel>
           )}
           </div>
