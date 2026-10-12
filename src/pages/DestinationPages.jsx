@@ -1,14 +1,46 @@
 import { Link, useParams } from 'react-router-dom'
 import { Header, Footer, DestinationCard } from './PublicSite.jsx'
 import { WhatsAppFloatButton } from '../components/WhatsAppButton.jsx'
+import { EditableText, useEditor } from '../components/Editable.jsx'
 import { useSiteContent } from '../lib/useSiteContent.js'
+import { defaultContent } from '../lib/defaultContent.js'
 import { slugify } from '../lib/slug.js'
 import { getCountryFlag } from '../lib/flags.js'
 
-function Breadcrumbs({ items }) {
+// Mescla os textos salvos com os padrões (o conteúdo antigo salvo no banco não tem esse bloco).
+function withDefaults(saved) {
+  return { ...defaultContent.destinationPages, ...saved }
+}
+
+// Troca {regiao} e {pais} pelos nomes de verdade (só no site público).
+function fillTokens(text, vars) {
+  return (text || '').replace(/\{(regiao|pais)\}/g, (match, key) => (vars && vars[key] != null ? vars[key] : match))
+}
+
+// Texto editável das páginas de destino. No admin mostra o modelo cru (com {regiao}/{pais});
+// no site público já troca pelos nomes.
+function DpText({ dp, field, vars, ...rest }) {
+  const editor = useEditor()
+  const raw = dp[field] || ''
+  return <EditableText path={['destinationPages', field]} value={editor ? raw : fillTokens(raw, vars)} {...rest} />
+}
+
+function TokenHint({ token, what }) {
+  const editor = useEditor()
+  if (!editor) return null
+  return (
+    <p className="mt-1 text-xs text-blue-600">
+      Dica: <strong>{token}</strong> é trocado automaticamente pelo nome {what} em cada página.
+    </p>
+  )
+}
+
+function Breadcrumbs({ items, dp }) {
+  const editor = useEditor()
+  const home = <DpText dp={dp} field="homeLabel" />
   return (
     <nav className="mx-auto max-w-6xl px-4 pt-4 text-sm text-gray-500 sm:px-6">
-      <Link to="/" className="hover:text-navy-700">Início</Link>
+      {editor ? <span>{home}</span> : <Link to="/" className="hover:text-navy-700">{home}</Link>}
       {items.map((item, i) => (
         <span key={i}>
           <span className="mx-1.5">/</span>
@@ -47,7 +79,7 @@ export function Banner({ title, desc, coverUrl, flag, height = 'h-72 sm:h-96' })
   )
 }
 
-export function ExploreCard({ to, name, coverUrl, subtitle, flag, preview = false }) {
+export function ExploreCard({ to, name, coverUrl, subtitle, flag, preview = false, seeMoreLabel = defaultContent.destinationPages.seeMoreLabel }) {
   const Tag = preview ? 'div' : Link
   const linkProps = preview ? {} : { to }
   return (
@@ -67,7 +99,8 @@ export function ExploreCard({ to, name, coverUrl, subtitle, flag, preview = fals
         </h3>
         {subtitle && <p className="mt-0.5 line-clamp-2 text-xs text-navy-100">{subtitle}</p>}
         <span className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-gold-300">
-          Ver mais <span className="transition-transform group-hover:translate-x-1">→</span>
+          <EditableText path={['destinationPages', 'seeMoreLabel']} value={seeMoreLabel} />
+          <span className="transition-transform group-hover:translate-x-1">→</span>
         </span>
       </div>
     </Tag>
@@ -78,12 +111,165 @@ function Loading() {
   return <div className="flex min-h-screen items-center justify-center text-navy-700">Carregando…</div>
 }
 
-function NotFoundBlock({ backTo, backLabel, message }) {
+// Mensagem(ns) de "não encontrado" + botão de voltar. No admin vários campos aparecem juntos.
+function NotFoundBlock({ dp, fields, backTo = '/', compact = false }) {
+  const editor = useEditor()
+  const back = <DpText dp={dp} field="backHomeLabel" />
   return (
-    <div className="mx-auto max-w-2xl px-4 py-20 text-center sm:px-6">
-      <p className="text-lg text-gray-600">{message}</p>
-      <Link to={backTo} className="btn-navy mt-6 inline-flex">{backLabel}</Link>
+    <div className={`mx-auto max-w-2xl px-4 text-center sm:px-6 ${compact ? 'py-8' : 'py-20'}`}>
+      {fields.map((field, i) => (
+        <DpText key={i} dp={dp} field={field} as="p" className={`text-lg text-gray-600 ${i > 0 ? 'mt-2' : ''}`} />
+      ))}
+      {editor ? (
+        <span className="btn-navy mt-6 inline-flex">{back}</span>
+      ) : (
+        <Link to={backTo} className="btn-navy mt-6 inline-flex">{back}</Link>
+      )}
     </div>
+  )
+}
+
+// Mensagem de lista vazia. Fica sempre visível no admin (pra poder editar), mesmo com itens na lista.
+function EmptyMessage({ dp, field, isEmpty, hint }) {
+  const editor = useEditor()
+  if (isEmpty) return <DpText dp={dp} field={field} as="p" className="text-sm text-gray-400" />
+  if (!editor) return null
+  return (
+    <div className="col-span-full rounded-lg border border-dashed border-gray-300 p-3">
+      <p className="mb-1 text-xs text-gray-400">{hint}</p>
+      <DpText dp={dp} field={field} as="p" className="text-sm text-gray-400" />
+    </div>
+  )
+}
+
+// Miolo da página de região (sem Header/Footer). Usado pela página real e pela prévia do admin.
+export function RegionView({ group, dp, bannerHeight }) {
+  const editor = useEditor()
+  const regionSlug = slugify(group.region)
+  const countries = (group.items || []).filter((c) => c.name)
+  return (
+    <>
+      <Breadcrumbs dp={dp} items={[{ label: group.region }]} />
+      <Banner title={group.region} desc={group.desc} coverUrl={group.coverUrl} height={bannerHeight} />
+
+      <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <DpText dp={dp} field="regionTitle" vars={{ regiao: group.region }} as="h2" className="font-serif text-xl font-bold text-navy-900" />
+        <TokenHint token="{regiao}" what="da região" />
+        {(editor || dp.regionSubtitle) && (
+          <DpText dp={dp} field="regionSubtitle" as="p" className="mt-1 text-sm text-gray-500" />
+        )}
+        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {countries.map((country, ci) => (
+            <ExploreCard
+              key={ci}
+              to={`/destinos/${regionSlug}/${slugify(country.name)}`}
+              name={country.name}
+              coverUrl={country.coverUrl}
+              subtitle={country.desc}
+              flag={getCountryFlag(country.name, '')}
+              seeMoreLabel={dp.seeMoreLabel}
+              preview={!!editor}
+            />
+          ))}
+          <EmptyMessage
+            dp={dp}
+            field="regionEmpty"
+            isEmpty={countries.length === 0}
+            hint="Aparece só quando a região não tiver nenhum país cadastrado:"
+          />
+        </div>
+      </section>
+    </>
+  )
+}
+
+// Miolo da página de país (sem Header/Footer).
+export function CountryView({ group, country, dp, bannerHeight }) {
+  const editor = useEditor()
+  const regionSlug = slugify(group.region)
+  const countrySlug = slugify(country.name)
+  const cities = (country.subregions || []).filter((c) => c.name)
+  return (
+    <>
+      <Breadcrumbs dp={dp} items={[{ label: group.region, to: `/destinos/${regionSlug}` }, { label: country.name }]} />
+      <Banner
+        title={country.name}
+        desc={country.desc}
+        coverUrl={country.coverUrl}
+        flag={getCountryFlag(country.name, '')}
+        height={bannerHeight}
+      />
+
+      <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <DpText dp={dp} field="countryTitle" vars={{ pais: country.name }} as="h2" className="font-serif text-xl font-bold text-navy-900" />
+        <TokenHint token="{pais}" what="do país" />
+        {(editor || dp.countrySubtitle) && (
+          <DpText dp={dp} field="countrySubtitle" as="p" className="mt-1 text-sm text-gray-500" />
+        )}
+        <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {cities.map((city, i) => {
+            const card = (
+              <DestinationCard
+                name={city.name}
+                desc={city.desc}
+                imageUrl={city.imageUrl}
+                imageMode={city.imageMode}
+                images={city.images}
+                photoCaption={city.photoCaption}
+              />
+            )
+            return editor ? (
+              <div key={i}>{card}</div>
+            ) : (
+              <Link key={i} to={`/destinos/${regionSlug}/${countrySlug}/${slugify(city.name)}`} className="block">
+                {card}
+              </Link>
+            )
+          })}
+          <EmptyMessage
+            dp={dp}
+            field="countryEmpty"
+            isEmpty={cities.length === 0}
+            hint="Aparece só quando o país não tiver nenhuma cidade cadastrada:"
+          />
+        </div>
+      </section>
+    </>
+  )
+}
+
+// Miolo da página de cidade (sem Header/Footer).
+export function CityView({ group, country, city, dp }) {
+  const regionSlug = slugify(group.region)
+  const countrySlug = slugify(country.name)
+  return (
+    <>
+      <Breadcrumbs
+        dp={dp}
+        items={[
+          { label: group.region, to: `/destinos/${regionSlug}` },
+          { label: country.name, to: `/destinos/${regionSlug}/${countrySlug}` },
+          { label: city.name },
+        ]}
+      />
+
+      <section className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+        <div className="overflow-hidden rounded-2xl shadow-sm">
+          <DestinationCard
+            name={city.name}
+            desc={city.desc}
+            imageUrl={city.imageUrl}
+            imageMode={city.imageMode}
+            images={city.images}
+            photoCaption={city.photoCaption}
+            large
+          />
+        </div>
+        <p className="mt-4 text-sm text-gray-500">
+          {getCountryFlag(country.name, '')} {country.name} · {group.region}
+        </p>
+      </section>
+    </>
   )
 }
 
@@ -93,38 +279,16 @@ export function RegionPage() {
   if (loading) return <Loading />
 
   const { brand, footer, socialLinks, destinationGroups } = content
+  const dp = withDefaults(content.destinationPages)
   const group = (destinationGroups || []).find((g) => slugify(g.region) === regionSlug)
 
   return (
     <div className="min-h-screen bg-white">
       <Header brand={brand} />
       {!group ? (
-        <NotFoundBlock backTo="/" backLabel="Voltar pro início" message="Região não encontrada." />
+        <NotFoundBlock dp={dp} fields={['regionNotFound']} />
       ) : (
-        <>
-          <Breadcrumbs items={[{ label: group.region }]} />
-          <Banner title={group.region} desc={group.desc} coverUrl={group.coverUrl} />
-
-          <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-            <h2 className="font-serif text-xl font-bold text-navy-900">Países de {group.region}</h2>
-            <p className="mt-1 text-sm text-gray-500">Escolha um país para descobrir suas cidades e destinos.</p>
-            <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {(group.items || []).filter((c) => c.name).map((country, ci) => (
-                <ExploreCard
-                  key={ci}
-                  to={`/destinos/${regionSlug}/${slugify(country.name)}`}
-                  name={country.name}
-                  coverUrl={country.coverUrl}
-                  subtitle={country.desc}
-                  flag={getCountryFlag(country.name, '')}
-                />
-              ))}
-              {(group.items || []).filter((c) => c.name).length === 0 && (
-                <p className="text-sm text-gray-400">Nenhum país cadastrado ainda nesta região.</p>
-              )}
-            </div>
-          </section>
-        </>
+        <RegionView group={group} dp={dp} />
       )}
       <Footer brand={brand} footer={footer} socialLinks={socialLinks} />
       <WhatsAppFloatButton whatsapp={brand.whatsapp} message={brand.whatsappMessage} />
@@ -138,6 +302,7 @@ export function CountryPage() {
   if (loading) return <Loading />
 
   const { brand, footer, socialLinks, destinationGroups } = content
+  const dp = withDefaults(content.destinationPages)
   const group = (destinationGroups || []).find((g) => slugify(g.region) === regionSlug)
   const country = group && (group.items || []).find((c) => slugify(c.name) === countrySlug)
 
@@ -145,39 +310,9 @@ export function CountryPage() {
     <div className="min-h-screen bg-white">
       <Header brand={brand} />
       {!group || !country ? (
-        <NotFoundBlock backTo="/" backLabel="Voltar pro início" message="País não encontrado." />
+        <NotFoundBlock dp={dp} fields={['countryNotFound']} />
       ) : (
-        <>
-          <Breadcrumbs items={[{ label: group.region, to: `/destinos/${regionSlug}` }, { label: country.name }]} />
-          <Banner
-            title={country.name}
-            desc={country.desc}
-            coverUrl={country.coverUrl}
-            flag={getCountryFlag(country.name, '')}
-          />
-
-          <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-            <h2 className="font-serif text-xl font-bold text-navy-900">Cidades de {country.name}</h2>
-            <p className="mt-1 text-sm text-gray-500">Descubra os destinos mais incríveis por lá.</p>
-            <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {(country.subregions || []).filter((c) => c.name).map((city, i) => (
-                <Link key={i} to={`/destinos/${regionSlug}/${countrySlug}/${slugify(city.name)}`} className="block">
-                  <DestinationCard
-                    name={city.name}
-                    desc={city.desc}
-                    imageUrl={city.imageUrl}
-                    imageMode={city.imageMode}
-                    images={city.images}
-                    photoCaption={city.photoCaption}
-                  />
-                </Link>
-              ))}
-              {(country.subregions || []).filter((c) => c.name).length === 0 && (
-                <p className="text-sm text-gray-400">Nenhuma cidade cadastrada ainda neste país.</p>
-              )}
-            </div>
-          </section>
-        </>
+        <CountryView group={group} country={country} dp={dp} />
       )}
       <Footer brand={brand} footer={footer} socialLinks={socialLinks} />
       <WhatsAppFloatButton whatsapp={brand.whatsapp} message={brand.whatsappMessage} />
@@ -191,6 +326,7 @@ export function CityPage() {
   if (loading) return <Loading />
 
   const { brand, footer, socialLinks, destinationGroups } = content
+  const dp = withDefaults(content.destinationPages)
   const group = (destinationGroups || []).find((g) => slugify(g.region) === regionSlug)
   const country = group && (group.items || []).find((c) => slugify(c.name) === countrySlug)
   const city = country && (country.subregions || []).find((c) => slugify(c.name) === citySlug)
@@ -199,37 +335,62 @@ export function CityPage() {
     <div className="min-h-screen bg-white">
       <Header brand={brand} />
       {!group || !country || !city ? (
-        <NotFoundBlock backTo="/" backLabel="Voltar pro início" message="Destino não encontrado." />
+        <NotFoundBlock dp={dp} fields={['cityNotFound']} />
       ) : (
-        <>
-          <Breadcrumbs
-            items={[
-              { label: group.region, to: `/destinos/${regionSlug}` },
-              { label: country.name, to: `/destinos/${regionSlug}/${countrySlug}` },
-              { label: city.name },
-            ]}
-          />
-
-          <section className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-            <div className="overflow-hidden rounded-2xl shadow-sm">
-              <DestinationCard
-                name={city.name}
-                desc={city.desc}
-                imageUrl={city.imageUrl}
-                imageMode={city.imageMode}
-                images={city.images}
-                photoCaption={city.photoCaption}
-                large
-              />
-            </div>
-            <p className="mt-4 text-sm text-gray-500">
-              {getCountryFlag(country.name, '')} {country.name} · {group.region}
-            </p>
-          </section>
-        </>
+        <CityView group={group} country={country} city={city} dp={dp} />
       )}
       <Footer brand={brand} footer={footer} socialLinks={socialLinks} />
       <WhatsAppFloatButton whatsapp={brand.whatsapp} message={brand.whatsappMessage} />
+    </div>
+  )
+}
+
+const SAMPLE_COUNTRY = {
+  name: 'País de exemplo',
+  desc: 'Exemplo de descrição de um país.',
+  subregions: [
+    { name: 'Cidade de exemplo', desc: 'Exemplo de descrição de uma cidade.' },
+    { name: 'Outra cidade de exemplo', desc: 'Exemplo de descrição de uma cidade.' },
+  ],
+}
+const SAMPLE_GROUP = { region: 'Região de exemplo', desc: 'Exemplo de descrição de uma região.', items: [SAMPLE_COUNTRY] }
+
+function PreviewLabel({ children }) {
+  return (
+    <p className="border-y border-gray-200 bg-gray-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
+      {children}
+    </p>
+  )
+}
+
+// Prévia usada no admin: página de região, página de país e mensagens de "não encontrado".
+// Precisa estar dentro de <InlineEditor> (que liga a edição direta).
+export function DestinationPagesPreview({ groups, destinationPages }) {
+  const dp = withDefaults(destinationPages)
+  const list = (groups || []).filter((g) => g.region)
+  const group =
+    list.find((g) => (g.items || []).some((c) => c.name)) || list[0] || SAMPLE_GROUP
+  const countries = (group.items || []).filter((c) => c.name)
+  const country = countries.find((c) => (c.subregions || []).some((s) => s.name)) || countries[0] || SAMPLE_COUNTRY
+  const isSample = group === SAMPLE_GROUP
+
+  return (
+    <div>
+      <p className="bg-white px-4 py-2 text-xs text-gray-500">
+        {isSample
+          ? 'Você ainda não tem regiões cadastradas — estas páginas usam dados de exemplo. '
+          : `Mostrando "${group.region}" e "${country.name}" só como exemplo. `}
+        Os textos editados aqui valem para todas as regiões e países.
+      </p>
+
+      <PreviewLabel>Página de uma região</PreviewLabel>
+      <RegionView group={group} dp={dp} bannerHeight="h-48" />
+
+      <PreviewLabel>Página de um país</PreviewLabel>
+      <CountryView group={group} country={country} dp={dp} bannerHeight="h-48" />
+
+      <PreviewLabel>Quando o endereço não existe</PreviewLabel>
+      <NotFoundBlock dp={dp} fields={['regionNotFound', 'countryNotFound', 'cityNotFound']} compact />
     </div>
   )
 }
