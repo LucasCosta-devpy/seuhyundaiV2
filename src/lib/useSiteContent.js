@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getContent } from './api.js'
 import { defaultContent } from './defaultContent.js'
+import { mergeContent } from './mergeContent.js'
 
 export function useSiteContent() {
   const [content, setContent] = useState(defaultContent)
@@ -8,7 +9,7 @@ export function useSiteContent() {
 
   useEffect(() => {
     getContent()
-      .then((data) => setContent({ ...defaultContent, ...data }))
+      .then((data) => setContent(mergeContent(defaultContent, data)))
       .catch(() => setContent(defaultContent))
       .finally(() => setLoading(false))
   }, [])

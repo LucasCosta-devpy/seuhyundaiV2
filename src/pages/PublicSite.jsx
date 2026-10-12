@@ -90,6 +90,9 @@ export function Header({ brand }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
+  const editing = !!useEditor()
+  const NavItem = editing ? 'span' : 'a'
+  const whatsappLabel = brand.whatsappLabel || 'Falar no WhatsApp'
 
   function goToSection(e, hash) {
     e.preventDefault()
@@ -122,21 +125,20 @@ export function Header({ brand }) {
         </div>
 
         <nav className="hidden items-center gap-6 lg:flex">
-          {NAV_LINKS.map((link) => (
-            <a
+          {NAV_LINKS.map((link, i) => (
+            <NavItem
               key={link.href}
-              href={`/${link.href}`}
-              onClick={(e) => goToSection(e, link.href)}
+              {...(editing ? {} : { href: `/${link.href}`, onClick: (e) => goToSection(e, link.href) })}
               className="text-sm font-medium text-navy-700 transition-colors hover:text-gold-600"
             >
-              {link.label}
-            </a>
+              <EditableText path={['brand', 'navLabels', i]} value={brand.navLabels?.[i] || link.label} />
+            </NavItem>
           ))}
         </nav>
 
         <div className="flex items-center gap-2">
           <WhatsAppLink whatsapp={brand.whatsapp} message={brand.whatsappMessage} className="btn-navy !py-2 !px-4 text-sm hidden sm:inline-flex">
-            Falar no WhatsApp
+            <EditableText path={['brand', 'whatsappLabel']} value={whatsappLabel} />
           </WhatsAppLink>
           <button
             type="button"
@@ -152,18 +154,18 @@ export function Header({ brand }) {
       {menuOpen && (
         <nav className="border-t border-gray-100 bg-white px-4 py-3 lg:hidden">
           <div className="flex flex-col gap-1">
-            {NAV_LINKS.map((link) => (
+            {NAV_LINKS.map((link, i) => (
               <a
                 key={link.href}
                 href={`/${link.href}`}
                 onClick={(e) => goToSection(e, link.href)}
                 className="rounded-lg px-3 py-2 text-sm font-medium text-navy-700 hover:bg-navy-50"
               >
-                {link.label}
+                {brand.navLabels?.[i] || link.label}
               </a>
             ))}
             <WhatsAppLink whatsapp={brand.whatsapp} message={brand.whatsappMessage} className="btn-navy mt-2 !py-2 !px-4 text-center text-sm">
-              Falar no WhatsApp
+              {whatsappLabel}
             </WhatsAppLink>
           </div>
         </nav>
@@ -473,11 +475,13 @@ export function Pricing({ pricing, brand }) {
       </div>
 
       <div className="mx-auto mt-8 max-w-xl border-l-4 border-gold-400 bg-gold-50 p-4 text-left text-sm text-navy-800">
-        <strong>Forma de pagamento:</strong>{' '}
+        <strong>
+          <EditableText path={['pricing', 'paymentLabel']} value={pricing.paymentLabel || 'Forma de pagamento:'} />
+        </strong>{' '}
         <EditableText path={['pricing', 'paymentInfo']} value={pricing.paymentInfo?.replace('Forma de pagamento:', '').trim()} />
       </div>
       <WhatsAppLink whatsapp={brand.whatsapp} message={brand.whatsappMessage} className="btn-gold mt-8">
-        Falar no WhatsApp
+        <EditableText path={['brand', 'whatsappLabel']} value={brand.whatsappLabel || 'Falar no WhatsApp'} />
       </WhatsAppLink>
     </section>
   )
@@ -574,7 +578,7 @@ export function CTA({ cta, brand }) {
         <EditableText as="h2" path={['cta', 'title']} value={cta.title} className="section-title" />
         <EditableText as="p" path={['cta', 'desc']} value={cta.desc} className="mx-auto mt-4 max-w-xl text-gray-600" />
         <WhatsAppLink whatsapp={brand.whatsapp} message={brand.whatsappMessage} className="btn-gold mt-8">
-          Falar no WhatsApp
+          <EditableText path={['brand', 'whatsappLabel']} value={brand.whatsappLabel || 'Falar no WhatsApp'} />
         </WhatsAppLink>
       </div>
     </section>

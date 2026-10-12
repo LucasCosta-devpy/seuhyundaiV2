@@ -10,6 +10,8 @@ export const defaultContent = {
     logoOffsetY: 0,
     instagram: '@rumomaisumarota',
     whatsapp: '5551982710564',
+    whatsappLabel: 'Falar no WhatsApp',
+    navLabels: ['Sobre', 'Destinos', 'Serviços', 'Preço', 'Consultora', 'Redes Sociais'],
     whatsappMessage: 'Olá! Conheci a Rumo Mais Uma Rota pelo site e gostaria de conversar sobre a minha próxima viagem.',
   },
   hero: {
@@ -65,6 +67,21 @@ export const defaultContent = {
       ],
     },
   ],
+  // Textos fixos das páginas de região, país e cidade. {regiao} e {pais} são trocados automaticamente.
+  destinationPages: {
+    homeLabel: 'Início',
+    backHomeLabel: 'Voltar pro início',
+    regionTitle: 'Países de {regiao}',
+    regionSubtitle: 'Escolha um país para descobrir suas cidades e destinos.',
+    regionEmpty: 'Nenhum país cadastrado ainda nesta região.',
+    countryTitle: 'Cidades de {pais}',
+    countrySubtitle: 'Descubra os destinos mais incríveis por lá.',
+    countryEmpty: 'Nenhuma cidade cadastrada ainda neste país.',
+    seeMoreLabel: 'Ver mais',
+    regionNotFound: 'Região não encontrada.',
+    countryNotFound: 'País não encontrado.',
+    cityNotFound: 'Destino não encontrado.',
+  },
   servicesTitle: 'O Que Nós Ajudamos a Organizar',
   services: [
     { title: 'Roteiros Personalizados', desc: 'Planejamento dia a dia adaptado ao seu ritmo e estilo de viagem.' },
@@ -89,6 +106,7 @@ export const defaultContent = {
   ],
   pricing: {
     title: 'Investimento na Consultoria',
+    paymentLabel: 'Forma de pagamento:',
     intro: 'Escolha o nível de planejamento ideal para a complexidade da sua viagem.',
     plans: [
       {
@@ -136,6 +154,18 @@ export const defaultContent = {
   cta: {
     title: 'Pronto para dar o próximo passo?',
     desc: 'Deixe a burocracia, os seguros e o planejamento pesado com a gente. Foque apenas em arrumar as malas e aproveitar o destino!',
+  },
+  // Página de anúncios (/consultoria). {preco} em pricingText vira o valor do 1º plano (aba Preço).
+  landing: {
+    headline: 'Planeje a Viagem dos Seus Sonhos Com Quem Entende do Assunto',
+    ctaLabel: '🟢 Quero Planejar Minha Viagem',
+    ctaNote: 'Resposta rápida direto no WhatsApp',
+    reasonsTitle: 'Por que contratar uma consultoria de viagem?',
+    reasonsCount: 4,
+    pricingTitle: 'Investimento',
+    pricingText: 'Planos a partir de {preco}, sob medida pra sua viagem.',
+    finalTitle: 'Pronto para começar a planejar?',
+    finalDesc: 'Fala agora mesmo com a gente no WhatsApp, sem compromisso.',
   },
   footer: {
     text: 'Todos os direitos reservados. | Transformando rotas em memórias inesquecíveis.',

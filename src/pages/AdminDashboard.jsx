@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getContent, saveContent, uploadImage, deleteImage, clearToken, getToken } from '../lib/api.js'
 import { defaultContent } from '../lib/defaultContent.js'
+import { mergeContent } from '../lib/mergeContent.js'
 import { LOGO_SIZES, getLogoSize } from '../lib/logoSize.js'
 import { SOCIAL_PLATFORMS, getPlatform } from '../components/SocialIcons.jsx'
 import ImageCropEditor from '../components/ImageCropEditor.jsx'
@@ -21,8 +22,10 @@ import {
 } from './PublicSite.jsx'
 import { InlineEditor } from '../components/Editable.jsx'
 import { Banner, ExploreCard } from './DestinationPages.jsx'
+import { DestinationPagesPreview } from './DestinationPages.jsx'
 import { getCountryFlag } from '../lib/flags.js'
 import DestinationsGlobe from '../components/DestinationsGlobe.jsx'
+import { LandingView } from './LandingConsultoria.jsx'
 
 const TABS = [
   { key: 'marca', label: 'Marca e Contato', color: 'amber' },
@@ -30,12 +33,14 @@ const TABS = [
   { key: 'sobre', label: 'Sobre', color: 'emerald' },
   { key: 'destinos', label: 'Destinos', color: 'rose' },
   { key: 'globo', label: 'Globo 3D', color: 'sky' },
+  { key: 'paginas', label: 'Páginas de destino', color: 'lime' },
   { key: 'servicos', label: 'Serviços', color: 'violet' },
   { key: 'motivos', label: 'Motivos', color: 'teal' },
   { key: 'processo', label: 'Como funciona', color: 'orange' },
   { key: 'preco', label: 'Preço', color: 'indigo' },
   { key: 'consultora', label: 'Consultora', color: 'fuchsia' },
   { key: 'final', label: 'Chamada final', color: 'cyan' },
+  { key: 'landing', label: 'Página de anúncios', color: 'emerald' },
 ]
 
 const TAB_STYLES = {
@@ -46,6 +51,7 @@ const TAB_STYLES = {
   rose: { active: 'bg-rose-500 border-rose-500 text-white', inactive: 'border-rose-200 text-rose-700 hover:bg-rose-50', top: 'border-t-rose-500' },
   violet: { active: 'bg-violet-500 border-violet-500 text-white', inactive: 'border-violet-200 text-violet-700 hover:bg-violet-50', top: 'border-t-violet-500' },
   teal: { active: 'bg-teal-500 border-teal-500 text-white', inactive: 'border-teal-200 text-teal-700 hover:bg-teal-50', top: 'border-t-teal-500' },
+  lime: { active: 'bg-lime-500 border-lime-500 text-white', inactive: 'border-lime-200 text-lime-700 hover:bg-lime-50', top: 'border-t-lime-500' },
   orange: { active: 'bg-orange-500 border-orange-500 text-white', inactive: 'border-orange-200 text-orange-700 hover:bg-orange-50', top: 'border-t-orange-500' },
   indigo: { active: 'bg-indigo-500 border-indigo-500 text-white', inactive: 'border-indigo-200 text-indigo-700 hover:bg-indigo-50', top: 'border-t-indigo-500' },
   fuchsia: { active: 'bg-fuchsia-500 border-fuchsia-500 text-white', inactive: 'border-fuchsia-200 text-fuchsia-700 hover:bg-fuchsia-50', top: 'border-t-fuchsia-500' },
@@ -77,7 +83,7 @@ export default function AdminDashboard() {
       return
     }
     getContent()
-      .then((data) => setContent({ ...defaultContent, ...data }))
+      .then((data) => setContent(mergeContent(defaultContent, data)))
       .catch(() => setContent(defaultContent))
   }, [])
 
@@ -252,6 +258,14 @@ export default function AdminDashboard() {
             </Panel>
           )}
 
+          {activeTab === 'paginas' && (
+            <Panel title="Páginas de destino (região, país e cidade)">
+              <InlineEditor update={update}>
+                <DestinationPagesPreview groups={content.destinationGroups} destinationPages={content.destinationPages} />
+              </InlineEditor>
+            </Panel>
+          )}
+
           {activeTab === 'servicos' && (
             <Panel title="O que ajudamos a organizar">
               <InlineEditor update={update}>
@@ -301,6 +315,33 @@ export default function AdminDashboard() {
                 <CTA cta={content.cta} brand={content.brand} />
                 <Footer brand={content.brand} footer={content.footer} socialLinks={content.socialLinks} />
               </InlineEditor>
+            </Panel>
+          )}
+
+          {activeTab === 'landing' && (
+            <Panel title="Página de anúncios (/consultoria)">
+              <p className="-mt-2 mb-2 text-xs text-gray-400">
+                Página que abre pra quem chega pelos anúncios. Os textos próprios dela (título, botão verde, avisos, chamada final) só mudam aqui. O valor do investimento vem da aba Preço (1º plano), e logo, frase de efeito, motivos, citação da consultora e rodapé são os mesmos do site: editar aqui também muda lá.
+              </p>
+              <InlineEditor update={update}>
+                <LandingView content={content} />
+              </InlineEditor>
+
+              <div className="rounded-xl border border-gray-200 p-4">
+                <label className="label">Quantos motivos mostrar nessa página (hoje {content.reasons?.length || 0} cadastrados na aba Motivos)</label>
+                <input
+                  type="number"
+                  min="0"
+                  max={content.reasons?.length || 0}
+                  className="input w-28"
+                  value={content.landing?.reasonsCount ?? defaultContent.landing.reasonsCount}
+                  onChange={(e) => update(['landing', 'reasonsCount'], e.target.value === '' ? '' : Number(e.target.value))}
+                />
+              </div>
+
+              <a href="/consultoria" target="_blank" rel="noreferrer" className="inline-block text-sm text-navy-600 underline">
+                Abrir /consultoria em nova aba
+              </a>
             </Panel>
           )}
           </div>
