@@ -30,6 +30,7 @@ export default function PublicSite() {
     destinationGroups,
     destinationsTitle,
     destinationsSubtitle,
+    destinationsLabels,
     services,
     servicesTitle,
     reasons,
@@ -52,7 +53,7 @@ export default function PublicSite() {
       <Hero brand={brand} hero={hero} destinationGroups={destinationGroups} />
       <About about={about} />
       {showGlobe && <DestinationsGlobe groups={destinationGroups} title={globeTitle} subtitle={globeSubtitle} />}
-      <Destinations groups={destinationGroups} title={destinationsTitle} subtitle={destinationsSubtitle} />
+      <Destinations groups={destinationGroups} title={destinationsTitle} subtitle={destinationsSubtitle} labels={destinationsLabels} />
       <Services services={services} title={servicesTitle} />
       <Reasons reasons={reasons} title={reasonsTitle} />
       <Process process={process} title={processTitle} />
@@ -343,7 +344,7 @@ export function DestinationCard({ name, desc, imageUrl, imageMode, images: itemI
 
 
 // Com `path` (prévia do admin) nome e descrição viram editáveis: path = caminho da região no conteúdo.
-export function RegionSummaryCard({ group, preview = false, path }) {
+export function RegionSummaryCard({ group, preview = false, path, labels }) {
   const inEditor = !!useEditor()
   const editing = inEditor && !!path
   const countryCount = (group.items || []).filter((c) => c.name).length
@@ -378,7 +379,9 @@ export function RegionSummaryCard({ group, preview = false, path }) {
           </>
         )}
         <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-gold-300">
-          {countryCount > 0 ? `${countryCount} país${countryCount === 1 ? '' : 'es'}` : 'Explorar região'}
+          {countryCount > 0
+            ? `${countryCount} ${countryCount === 1 ? labels?.countrySingular || 'país' : labels?.countryPlural || 'países'}`
+            : labels?.cardCta || 'Explorar região'}
           <span className="transition-transform group-hover:translate-x-1">→</span>
         </span>
       </div>
@@ -403,7 +406,7 @@ export function OpenLevelButton({ onClick, label = 'Abrir' }) {
 }
 
 // `onOpenRegion` só existe na prévia do admin (botão "Abrir" de cada região).
-export function Destinations({ groups, title, subtitle, onOpenRegion }) {
+export function Destinations({ groups, title, subtitle, labels, onOpenRegion }) {
   const editing = !!useEditor()
   const allGroups = groups || []
   const list = useListEditing(['destinationGroups'], allGroups)
@@ -429,10 +432,10 @@ export function Destinations({ groups, title, subtitle, onOpenRegion }) {
               <div key={gi} className="edit-item">
                 <ItemControls list={removeList} index={gi} total={allGroups.length} />
                 {onOpenRegion && <OpenLevelButton onClick={() => onOpenRegion(gi)} />}
-                <RegionSummaryCard group={group} path={['destinationGroups', gi]} />
+                <RegionSummaryCard group={group} path={['destinationGroups', gi]} labels={labels} />
               </div>
             ) : (
-              <RegionSummaryCard key={gi} group={group} />
+              <RegionSummaryCard key={gi} group={group} labels={labels} />
             ),
           )}
           <AddItemButton
@@ -443,7 +446,7 @@ export function Destinations({ groups, title, subtitle, onOpenRegion }) {
           />
         </div>
       ) : (
-        <p className="mt-10 text-center text-gray-400">Nenhuma região cadastrada ainda.</p>
+        <p className="mt-10 text-center text-gray-400">{labels?.empty || 'Nenhuma região cadastrada ainda.'}</p>
       )}
     </section>
   )

@@ -34,6 +34,12 @@ export const defaultContent = {
   globeSubtitle: 'Gire o globo e clique em um ponto para conhecer o destino.',
   destinationsTitle: 'Nossos Destinos',
   destinationsSubtitle: 'Explore o mundo e encontre seu próximo destino.',
+  destinationsLabels: {
+    cardCta: 'Explorar região',
+    countrySingular: 'país',
+    countryPlural: 'países',
+    empty: 'Nenhuma região cadastrada ainda.',
+  },
   destinationGroups: [
     {
       region: 'América do Sul & Brasil',

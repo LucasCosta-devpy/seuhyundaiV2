@@ -154,6 +154,9 @@ export default function AdminDashboard() {
           <div className={`min-w-0 flex-1 rounded-2xl border-t-4 bg-white p-6 shadow-sm ${TAB_STYLES[TABS.find((t) => t.key === activeTab).color].top}`}>
           {activeTab === 'marca' && (
             <Panel title="Marca e Contato">
+              <p className="-mt-2 text-xs text-gray-400">
+                Dica: os nomes do menu (Sobre, Destinos, Serviços…) e o texto do botão de WhatsApp do topo também se editam clicando neles aqui na prévia.
+              </p>
               <InlineEditor update={update}>
                 <Header brand={content.brand} />
                 <Hero brand={content.brand} hero={content.hero} destinationGroups={content.destinationGroups} />
@@ -219,11 +222,21 @@ export default function AdminDashboard() {
                 Os botões que aparecem no topo do site (embaixo do título) são gerados automaticamente a partir do nome de cada região aqui embaixo — adicionar ou remover uma região adiciona ou remove o botão sozinho, sem precisar configurar em outro lugar.
                 Atenção: renomear uma região, país ou cidade também muda o endereço (URL) dela no site.
               </p>
+              <div className="rounded-xl border border-gray-200 p-4">
+                <p className="mb-3 text-sm font-semibold text-navy-900">Textos dos cards de região</p>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <TextField label="Texto do card sem países" value={content.destinationsLabels?.cardCta} onChange={(v) => update(['destinationsLabels', 'cardCta'], v)} />
+                  <TextField label="Mensagem quando não há nenhuma região" value={content.destinationsLabels?.empty} onChange={(v) => update(['destinationsLabels', 'empty'], v)} />
+                  <TextField label="Palavra no singular (ex: 1 país)" value={content.destinationsLabels?.countrySingular} onChange={(v) => update(['destinationsLabels', 'countrySingular'], v)} />
+                  <TextField label="Palavra no plural (ex: 5 países)" value={content.destinationsLabels?.countryPlural} onChange={(v) => update(['destinationsLabels', 'countryPlural'], v)} />
+                </div>
+              </div>
               <InlineEditor update={update}>
                 <DestinationsPreview
                   groups={content.destinationGroups}
                   title={content.destinationsTitle}
                   subtitle={content.destinationsSubtitle}
+                  labels={content.destinationsLabels}
                   globeTitle={content.globeTitle}
                   globeSubtitle={content.globeSubtitle}
                   seeMoreLabel={content.destinationPages?.seeMoreLabel}
@@ -1080,7 +1093,7 @@ const PREVIEW_LEVELS = [
 // Prévia editável da aba Destinos. Precisa estar dentro de <InlineEditor> (que liga a edição direta).
 // Aqui NÃO se filtra por nome: os índices (gi/ci/ki) são sempre os da lista original em
 // content.destinationGroups, senão a edição cairia no item errado.
-function DestinationsPreview({ groups: rawGroups, initialLevel = 'home', title, subtitle, globeTitle, globeSubtitle, seeMoreLabel }) {
+function DestinationsPreview({ groups: rawGroups, initialLevel = 'home', title, subtitle, labels, globeTitle, globeSubtitle, seeMoreLabel }) {
   const groups = rawGroups || []
   const [level, setLevel] = useState(initialLevel)
   const [regionIdx, setRegionIdx] = useState(0)
@@ -1173,7 +1186,7 @@ function DestinationsPreview({ groups: rawGroups, initialLevel = 'home', title, 
         )}
       </div>
 
-      {shown === 'home' && <Destinations groups={groups} title={title} subtitle={subtitle} onOpenRegion={openRegion} />}
+      {shown === 'home' && <Destinations groups={groups} title={title} subtitle={subtitle} labels={labels} onOpenRegion={openRegion} />}
 
       {shown === 'regiao' && <PreviewRegionLevel gi={gi} group={region} seeMoreLabel={seeMoreLabel} onOpenCountry={openCountry} />}
 
