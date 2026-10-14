@@ -215,16 +215,19 @@ export default function AdminDashboard() {
           )}
 
           {activeTab === 'destinos' && (
-            <Panel title="Destinos (agrupados por região)">
-              <p className="-mt-2 mb-2 text-xs text-gray-400">
+            <Panel title="Destinos (agrupados por região ou continente)">
+              <p className="-mt-2 mb-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                <strong>Como organizar:</strong> o primeiro nível é a <strong>região ou continente</strong> (ex.: Europa, América do Sul, África). Dentro dele ficam os <strong>países</strong> (ex.: Reino Unido, Portugal) e dentro de cada país as <strong>cidades</strong> (ex.: Londres). Pra deixar o Reino Unido dentro da Europa, abra o país na prévia e use <strong>Mover para…</strong>, ou use <strong>Juntar em…</strong> no card de uma região inteira.
+              </p>
+              <p className="mb-2 text-xs text-gray-400">
                 Os botões que aparecem no topo do site (embaixo do título) são gerados automaticamente a partir do nome de cada região aqui embaixo — adicionar ou remover uma região adiciona ou remove o botão sozinho, sem precisar configurar em outro lugar.
                 Atenção: renomear uma região, país ou cidade também muda o endereço (URL) dela no site.
               </p>
               <div className="rounded-xl border border-gray-200 p-4">
-                <p className="mb-3 text-sm font-semibold text-navy-900">Textos dos cards de região</p>
+                <p className="mb-3 text-sm font-semibold text-navy-900">Textos dos cards de região / continente</p>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <TextField label="Texto do card sem países" value={content.destinationsLabels?.cardCta} onChange={(v) => update(['destinationsLabels', 'cardCta'], v)} />
-                  <TextField label="Mensagem quando não há nenhuma região" value={content.destinationsLabels?.empty} onChange={(v) => update(['destinationsLabels', 'empty'], v)} />
+                  <TextField label="Mensagem quando não há nenhuma região / continente" value={content.destinationsLabels?.empty} onChange={(v) => update(['destinationsLabels', 'empty'], v)} />
                   <TextField label="Palavra no singular (ex: 1 país)" value={content.destinationsLabels?.countrySingular} onChange={(v) => update(['destinationsLabels', 'countrySingular'], v)} />
                   <TextField label="Palavra no plural (ex: 5 países)" value={content.destinationsLabels?.countryPlural} onChange={(v) => update(['destinationsLabels', 'countryPlural'], v)} />
                 </div>
@@ -246,7 +249,7 @@ export default function AdminDashboard() {
                   Fotos, capas e coordenadas do globo (edição avançada)
                 </summary>
                 <p className="mb-4 mt-3 text-xs text-gray-400">
-                  É aqui que se sobem as fotos das cidades, as capas de região e país e as coordenadas (latitude/longitude) do globo 3D. Textos, ordem e o que existe (adicionar/remover) dá pra mudar direto na prévia acima; o que você mexer lá aparece aqui e vice-versa.
+                  É aqui que se sobem as fotos das cidades, as capas de região/continente e de país e as coordenadas (latitude/longitude) do globo 3D. Textos, ordem e o que existe (adicionar/remover) dá pra mudar direto na prévia acima; o que você mexer lá aparece aqui e vice-versa.
                 </p>
                 <DestinationGroupsEditor
                   groups={content.destinationGroups}
@@ -1074,7 +1077,7 @@ function CountriesEditor({ countries, onChange }) {
 
 const PREVIEW_LEVELS = [
   { key: 'home', label: 'Início' },
-  { key: 'regiao', label: 'Região' },
+  { key: 'regiao', label: 'Região / continente' },
   { key: 'pais', label: 'País' },
   { key: 'cidade', label: 'Cidade' },
   { key: 'globo', label: '🌐 Globo 3D' },
@@ -1321,7 +1324,7 @@ function DestinationGroupsEditor({ groups, onChange }) {
 
   return (
     <div>
-      <SectionHeader icon="🌐" title="Regiões" actionLabel="Adicionar região" onAction={addGroup} />
+      <SectionHeader icon="🌐" title="Regiões / continentes" actionLabel="Adicionar região ou continente" onAction={addGroup} />
       <div className="space-y-3">
         {groups.map((group, gi) => {
           const color = REGION_COLORS[gi % REGION_COLORS.length]
@@ -1341,21 +1344,21 @@ function DestinationGroupsEditor({ groups, onChange }) {
                 onMove={move}
                 onRemove={() => removeGroup(gi)}
                 prefix={<span className={`inline-block h-2.5 w-2.5 rounded-full ${color.badge}`} />}
-                label={`${group.region || 'Nova região (sem nome ainda)'} · ${countryCount} país${countryCount === 1 ? '' : 'es'}`}
+                label={`${group.region || 'Nova região / continente (sem nome ainda)'} · ${countryCount} país${countryCount === 1 ? '' : 'es'}`}
                 className={`py-2.5 ${color.header}`}
               />
               {open && (
                 <div className="space-y-3 bg-white p-4">
                   <div>
-                    <label className="label">Nome da região *</label>
+                    <label className="label">Nome da região ou continente * (ex.: Europa)</label>
                     <input className="input font-semibold" placeholder="Ex: América do Sul" value={group.region || ''} onChange={(e) => patchGroup(gi, { region: e.target.value })} />
                   </div>
                   <div>
-                    <label className="label">Descrição da região (opcional)</label>
+                    <label className="label">Descrição da região ou continente (opcional)</label>
                     <textarea className="input text-sm" rows={2} value={group.desc || ''} onChange={(e) => patchGroup(gi, { desc: e.target.value })} />
                   </div>
                   <ImageField
-                    label="Capa da região (opcional — aparece como banner atrás do título)"
+                    label="Capa da região ou continente (opcional — aparece como banner atrás do título)"
                     shape="banner"
                     value={group.coverUrl}
                     onChange={(v) => patchGroup(gi, { coverUrl: v })}

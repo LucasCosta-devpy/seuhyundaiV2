@@ -370,7 +370,7 @@ export function RegionSummaryCard({ group, preview = false, path, labels }) {
       <div className={editing ? 'relative flex min-h-[14rem] flex-col justify-end p-5' : 'absolute inset-0 flex flex-col justify-end p-5'}>
         {editing ? (
           <>
-            <EditableText as="h3" path={[...path, 'region']} value={group.region} placeholder="Nome da região" className="font-serif text-2xl font-bold text-white" />
+            <EditableText as="h3" path={[...path, 'region']} value={group.region} placeholder="Nome da região ou continente" className="font-serif text-2xl font-bold text-white" />
             <EditableText as="p" path={[...path, 'desc']} value={group.desc} placeholder="Descrição (opcional)" className="mt-1 text-sm text-navy-100" />
           </>
         ) : (
@@ -451,7 +451,7 @@ export function Destinations({ groups, title, subtitle, labels, onOpenRegion }) 
           <AddItemButton
             list={list}
             item={{ region: 'Nova região', desc: '', coverUrl: '', items: [] }}
-            label="Adicionar região"
+            label="Adicionar região ou continente"
             className="min-h-[14rem]"
           />
         </div>
