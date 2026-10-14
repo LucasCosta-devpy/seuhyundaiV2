@@ -435,11 +435,11 @@ export function Destinations({ groups, title, subtitle, labels, onOpenRegion }) 
                 <ItemControls list={removeList} index={gi} total={allGroups.length} />
                 {onOpenRegion && <OpenLevelButton onClick={() => onOpenRegion(gi)} />}
                 <MoveToSelect
-                  label="Juntar em…"
+                  label="Colocar dentro de…"
                   options={allGroups.map((g, i) => ({ value: String(i), label: g.region || 'Região sem nome' })).filter((o) => o.value !== String(gi))}
                   onPick={(value) => {
                     const toGi = Number(value)
-                    if (!window.confirm(`Passar todos os países de "${group.region || 'esta região'}" para "${allGroups[toGi]?.region || 'a região escolhida'}" e apagar "${group.region || 'esta região'}"?`)) return
+                    if (!window.confirm(`Colocar "${group.region || 'esta região'}" dentro de "${allGroups[toGi]?.region || 'a região escolhida'}" como um país (com a capa e a descrição dela)? Os países de hoje viram subpáginas dele.`)) return
                     editor.update(['destinationGroups'], mergeRegionInto(allGroups, gi, toGi))
                   }}
                 />

@@ -12,12 +12,27 @@ export function moveCountry(groups, fromGi, ci, toGi) {
   })
 }
 
-// Passa todos os países de uma região para outra e apaga a região que ficou vazia.
+// Coloca uma região INTEIRA dentro de outra como um país: ela vira um card de país (com nome,
+// descrição e capa dela) e os países que tinha viram subpáginas desse novo país.
+// Ex.: região "Reino Unido" (país Inglaterra) dentro de "Europa" -> Europa > Reino Unido > Inglaterra.
+// A região antiga some. Subpáginas que os países já tinham entram no mesmo nível (sem aninhar mais).
 export function mergeRegionInto(groups, fromGi, toGi) {
   if (fromGi === toGi || !groups[fromGi] || !groups[toGi]) return groups
-  const moved = groups[fromGi].items || []
+  const from = groups[fromGi]
+  const subpages = []
+  for (const c of from.items || []) {
+    subpages.push({ name: c.name, desc: c.desc, coverUrl: c.coverUrl, subregions: c.subregions || [] })
+    for (const sub of c.items || []) subpages.push(sub)
+  }
+  const asCountry = {
+    name: from.region,
+    desc: from.desc || '',
+    coverUrl: from.coverUrl || '',
+    subregions: [],
+    ...(subpages.length > 0 ? { items: subpages } : {}),
+  }
   return groups
-    .map((g, i) => (i === toGi ? { ...g, items: [...(g.items || []), ...moved] } : g))
+    .map((g, i) => (i === toGi ? { ...g, items: [...(g.items || []), asCountry] } : g))
     .filter((_, i) => i !== fromGi)
 }
 
