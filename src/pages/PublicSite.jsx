@@ -436,8 +436,9 @@ export function Destinations({ groups, title, subtitle, labels, onOpenRegion }) 
                 {onOpenRegion && <OpenLevelButton onClick={() => onOpenRegion(gi)} />}
                 <MoveToSelect
                   label="Juntar em…"
-                  options={allGroups.map((g, i) => ({ value: i, label: g.region || 'Região sem nome' })).filter((o) => o.value !== gi)}
-                  onPick={(toGi) => {
+                  options={allGroups.map((g, i) => ({ value: String(i), label: g.region || 'Região sem nome' })).filter((o) => o.value !== String(gi))}
+                  onPick={(value) => {
+                    const toGi = Number(value)
                     if (!window.confirm(`Passar todos os países de "${group.region || 'esta região'}" para "${allGroups[toGi]?.region || 'a região escolhida'}" e apagar "${group.region || 'esta região'}"?`)) return
                     editor.update(['destinationGroups'], mergeRegionInto(allGroups, gi, toGi))
                   }}

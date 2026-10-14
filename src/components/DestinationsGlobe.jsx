@@ -135,20 +135,29 @@ function buildPoints(groups) {
   for (const group of groups || []) {
     for (const country of group.items || []) {
       if (!country.name) continue
-      for (const city of country.subregions || []) {
-        if (!city.name) continue
-        const lat = Number(city.lat)
-        const lng = Number(city.lng)
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue
-        points.push({
-          lat,
-          lng,
-          name: city.name,
-          country: country.name,
-          region: group.region,
-          photoUrl: getCityPhoto(city),
-          to: `/destinos/${slugify(group.region)}/${slugify(country.name)}/${slugify(city.name)}`,
-        })
+      // O próprio país + as subpáginas dele (ex.: Inglaterra dentro do Reino Unido).
+      const pages = [
+        { page: country, label: country.name, slugs: [slugify(country.name)] },
+        ...(country.items || [])
+          .filter((sub) => sub.name)
+          .map((sub) => ({ page: sub, label: `${sub.name}, ${country.name}`, slugs: [slugify(country.name), slugify(sub.name)] })),
+      ]
+      for (const { page, label, slugs } of pages) {
+        for (const city of page.subregions || []) {
+          if (!city.name) continue
+          const lat = Number(city.lat)
+          const lng = Number(city.lng)
+          if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue
+          points.push({
+            lat,
+            lng,
+            name: city.name,
+            country: label,
+            region: group.region,
+            photoUrl: getCityPhoto(city),
+            to: `/destinos/${[slugify(group.region), ...slugs, slugify(city.name)].join('/')}`,
+          })
+        }
       }
     }
   }
