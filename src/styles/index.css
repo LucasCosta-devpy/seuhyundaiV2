@@ -95,3 +95,16 @@
 .edit-item:focus-within > .edit-item-controls {
   opacity: 1;
 }
+
+.edit-item-move {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 20;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.edit-item:hover > .edit-item-move,
+.edit-item:focus-within > .edit-item-move {
+  opacity: 1;
+}

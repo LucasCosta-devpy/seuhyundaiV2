@@ -21,10 +21,11 @@ import {
   CTA,
   Footer,
 } from './PublicSite.jsx'
-import { InlineEditor, useListEditing, ItemControls, AddItemButton } from '../components/Editable.jsx'
+import { InlineEditor, useListEditing, ItemControls, AddItemButton, MoveToSelect, useEditor } from '../components/Editable.jsx'
 import { Banner, ExploreCard } from './DestinationPages.jsx'
 import { getCountryFlag } from '../lib/flags.js'
 import { withConfirmRemove } from '../lib/confirmRemove.js'
+import { moveCountry } from '../lib/moveDestinations.js'
 import DestinationsGlobe from '../components/DestinationsGlobe.jsx'
 import { LandingView } from './LandingConsultoria.jsx'
 
@@ -1177,7 +1178,7 @@ function DestinationsPreview({ groups: rawGroups, initialLevel = 'home', title, 
 
       {shown === 'home' && <Destinations groups={groups} title={title} subtitle={subtitle} labels={labels} onOpenRegion={openRegion} />}
 
-      {shown === 'regiao' && <PreviewRegionLevel gi={gi} group={region} seeMoreLabel={seeMoreLabel} onOpenCountry={openCountry} />}
+      {shown === 'regiao' && <PreviewRegionLevel gi={gi} group={region} groups={groups} seeMoreLabel={seeMoreLabel} onOpenCountry={openCountry} />}
 
       {shown === 'pais' && <PreviewCountryLevel gi={gi} ci={ci} country={country} onOpenCity={openCity} />}
 
@@ -1207,8 +1208,10 @@ function DestinationsPreview({ groups: rawGroups, initialLevel = 'home', title, 
 }
 
 // Nível "Região" da prévia: banner da região + cards dos países (editar, mover, remover, adicionar).
-function PreviewRegionLevel({ gi, group, seeMoreLabel, onOpenCountry }) {
+function PreviewRegionLevel({ gi, group, groups, seeMoreLabel, onOpenCountry }) {
+  const editor = useEditor()
   const countries = group.items || []
+  const otherRegions = groups.map((g, i) => ({ value: i, label: g.region || 'Região sem nome' })).filter((o) => o.value !== gi)
   const list = useListEditing(['destinationGroups', gi, 'items'], countries)
   const removeList = withConfirmRemove(list, (i) => `Remover o país "${countries[i]?.name || 'sem nome'}" e todas as cidades dele?`)
   return (
@@ -1227,6 +1230,14 @@ function PreviewRegionLevel({ gi, group, seeMoreLabel, onOpenCountry }) {
             <div key={ci} className="edit-item">
               <ItemControls list={removeList} index={ci} total={countries.length} />
               <OpenLevelButton onClick={() => onOpenCountry(ci)} />
+              <MoveToSelect
+                label="Mover para…"
+                options={otherRegions}
+                onPick={(toGi) => {
+                  if (!window.confirm(`Mover "${c.name || 'este país'}" (com as cidades e fotos) para "${groups[toGi]?.region || 'a região escolhida'}"?`)) return
+                  editor.update(['destinationGroups'], moveCountry(groups, gi, ci, toGi))
+                }}
+              />
               <ExploreCard
                 name={c.name}
                 coverUrl={c.coverUrl}

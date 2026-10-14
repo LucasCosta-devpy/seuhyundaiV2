@@ -7,7 +7,8 @@ import { getLogoSize } from '../lib/logoSize.js'
 import { getPlatform } from '../components/SocialIcons.jsx'
 import { useSiteContent } from '../lib/useSiteContent.js'
 import DestinationsGlobe from '../components/DestinationsGlobe.jsx'
-import { EditableText, useEditor, useListEditing, ItemControls, AddItemButton } from '../components/Editable.jsx'
+import { EditableText, useEditor, useListEditing, ItemControls, AddItemButton, MoveToSelect } from '../components/Editable.jsx'
+import { mergeRegionInto } from '../lib/moveDestinations.js'
 
 export default function PublicSite() {
   const { content, loading } = useSiteContent()
@@ -407,7 +408,8 @@ export function OpenLevelButton({ onClick, label = 'Abrir' }) {
 
 // `onOpenRegion` só existe na prévia do admin (botão "Abrir" de cada região).
 export function Destinations({ groups, title, subtitle, labels, onOpenRegion }) {
-  const editing = !!useEditor()
+  const editor = useEditor()
+  const editing = !!editor
   const allGroups = groups || []
   const list = useListEditing(['destinationGroups'], allGroups)
   const removeList = withConfirmRemove(list, (i) => `Remover a região "${allGroups[i]?.region || 'sem nome'}" com todos os países e cidades dela?`)
@@ -432,6 +434,14 @@ export function Destinations({ groups, title, subtitle, labels, onOpenRegion }) 
               <div key={gi} className="edit-item">
                 <ItemControls list={removeList} index={gi} total={allGroups.length} />
                 {onOpenRegion && <OpenLevelButton onClick={() => onOpenRegion(gi)} />}
+                <MoveToSelect
+                  label="Juntar em…"
+                  options={allGroups.map((g, i) => ({ value: i, label: g.region || 'Região sem nome' })).filter((o) => o.value !== gi)}
+                  onPick={(toGi) => {
+                    if (!window.confirm(`Passar todos os países de "${group.region || 'esta região'}" para "${allGroups[toGi]?.region || 'a região escolhida'}" e apagar "${group.region || 'esta região'}"?`)) return
+                    editor.update(['destinationGroups'], mergeRegionInto(allGroups, gi, toGi))
+                  }}
+                />
                 <RegionSummaryCard group={group} path={['destinationGroups', gi]} labels={labels} />
               </div>
             ) : (

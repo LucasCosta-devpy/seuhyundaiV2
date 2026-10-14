@@ -138,3 +138,26 @@ export function InlineEditor({ update, hint = true, children }) {
     </EditContext.Provider>
   )
 }
+
+// Menu "Mover para…" que aparece ao passar o mouse num bloco (canto de baixo).
+export function MoveToSelect({ label, options, onPick }) {
+  const editor = useEditor()
+  if (!editor || options.length === 0) return null
+  return (
+    <div className="edit-item-move" onMouseDown={(e) => e.stopPropagation()}>
+      <select
+        value=""
+        title={label}
+        onChange={(e) => e.target.value !== '' && onPick(Number(e.target.value))}
+        className="max-w-[12rem] rounded-full bg-white px-2 py-1 text-xs text-navy-800 shadow ring-1 ring-black/10"
+      >
+        <option value="">{label}</option>
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  )
+}
