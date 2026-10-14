@@ -352,37 +352,40 @@ export function RegionSummaryCard({ group, preview = false, path, labels }) {
   // Dentro do admin nunca é link: clicar no texto edita (a navegação é pelo botão "Abrir").
   const Tag = preview || inEditor ? 'div' : Link
   const linkProps = Tag === 'div' ? {} : { to: `/destinos/${slugify(group.region)}` }
+  const countLabel =
+    countryCount > 0
+      ? `${countryCount} ${countryCount === 1 ? labels?.countrySingular || 'país' : labels?.countryPlural || 'países'}`
+      : labels?.cardCta || 'Explorar região'
+  // Foto em cima (sem texto por cima, então capa com várias fotos não polui) e texto numa faixa limpa embaixo.
   return (
     <Tag
       {...linkProps}
-      className={
-        editing
-          ? 'group relative block min-h-[14rem] overflow-hidden rounded-2xl bg-navy-900 shadow-md'
-          : 'group relative block h-56 overflow-hidden rounded-2xl bg-navy-900 shadow-md transition-transform hover:scale-[1.02]'
-      }
+      className="group block overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
     >
-      {group.coverUrl ? (
-        <img src={group.coverUrl} alt={group.region} className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-      ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-navy-800 to-navy-900" />
-      )}
-      <div className="absolute inset-0 bg-gradient-to-t from-navy-900/90 via-navy-900/40 to-navy-900/10" />
-      <div className={editing ? 'relative flex min-h-[14rem] flex-col justify-end p-5' : 'absolute inset-0 flex flex-col justify-end p-5'}>
+      <div className="relative h-44 overflow-hidden bg-navy-900">
+        {group.coverUrl ? (
+          <img src={group.coverUrl} alt={group.region} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        ) : (
+          <div className="h-full w-full bg-gradient-to-br from-navy-800 to-navy-900" />
+        )}
+        <span className="absolute bottom-3 left-3 rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-navy-900 shadow">
+          {countLabel}
+        </span>
+      </div>
+      <div className="border-t-4 border-gold-400 p-5">
         {editing ? (
           <>
-            <EditableText as="h3" path={[...path, 'region']} value={group.region} placeholder="Nome da região ou continente" className="font-serif text-2xl font-bold text-white" />
-            <EditableText as="p" path={[...path, 'desc']} value={group.desc} placeholder="Descrição (opcional)" className="mt-1 text-sm text-navy-100" />
+            <EditableText as="h3" path={[...path, 'region']} value={group.region} placeholder="Nome da região ou continente" className="block font-serif text-xl font-bold text-navy-900" />
+            <EditableText as="p" path={[...path, 'desc']} value={group.desc} placeholder="Descrição (opcional)" className="mt-1 text-sm text-gray-600" />
           </>
         ) : (
           <>
-            <h3 className="font-serif text-2xl font-bold text-white">{group.region}</h3>
-            {group.desc && <p className="mt-1 line-clamp-2 text-sm text-navy-100">{group.desc}</p>}
+            <h3 className="font-serif text-xl font-bold text-navy-900">{group.region}</h3>
+            {group.desc && <p className="mt-1 line-clamp-2 text-sm text-gray-600">{group.desc}</p>}
           </>
         )}
-        <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-gold-300">
-          {countryCount > 0
-            ? `${countryCount} ${countryCount === 1 ? labels?.countrySingular || 'país' : labels?.countryPlural || 'países'}`
-            : labels?.cardCta || 'Explorar região'}
+        <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-gold-600">
+          Explorar
           <span className="transition-transform group-hover:translate-x-1">→</span>
         </span>
       </div>
