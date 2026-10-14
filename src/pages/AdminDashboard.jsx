@@ -25,7 +25,7 @@ import { InlineEditor, useListEditing, ItemControls, AddItemButton, MoveToSelect
 import { Banner, ExploreCard } from './DestinationPages.jsx'
 import { getCountryFlag } from '../lib/flags.js'
 import { withConfirmRemove } from '../lib/confirmRemove.js'
-import { moveCountry } from '../lib/moveDestinations.js'
+import { moveCountry, moveCountryIntoCountry } from '../lib/moveDestinations.js'
 import DestinationsGlobe from '../components/DestinationsGlobe.jsx'
 import { LandingView } from './LandingConsultoria.jsx'
 
@@ -217,8 +217,8 @@ export default function AdminDashboard() {
           {activeTab === 'destinos' && (
             <Panel title="Destinos (agrupados por região ou continente)">
               <p className="-mt-2 mb-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">
-                <strong>Como organizar:</strong> o primeiro nível é a <strong>região ou continente</strong> (ex.: Europa, América do Sul, África). Dentro dele ficam os <strong>países</strong> (ex.: Reino Unido, Portugal) e dentro de cada país as <strong>cidades</strong> (ex.: Londres). Pra deixar o Reino Unido dentro da Europa, abra o país na prévia e use <strong>Mover para…</strong>, ou use <strong>Juntar em…</strong> no card de uma região inteira.
-              </p>
+                <strong>Como organizar:</strong> o primeiro nível é a <strong>região ou continente</strong> (ex.: Europa, América do Sul, África). Dentro dele ficam os <strong>países</strong> (ex.: Reino Unido, Portugal) e dentro de cada país as <strong>cidades</strong> (ex.: Londres). Se quiser, um país também pode ter <strong>subpáginas</strong> (ex.: Inglaterra e Escócia dentro do Reino Unido), cada uma com as suas cidades: abra o país na prévia e clique em <strong>Adicionar subpágina</strong>. Pra deixar o Reino Unido dentro da Europa, abra a região na prévia e use <strong>Mover para…</strong> no card do país, que também oferece <strong>dentro de (outro país)</strong>, transformando o país em subpágina dele; ou use <strong>Juntar em…</strong> no card de uma região inteira.
+</p>
               <p className="mb-2 text-xs text-gray-400">
                 Os botões que aparecem no topo do site (embaixo do título) são gerados automaticamente a partir do nome de cada região aqui embaixo — adicionar ou remover uma região adiciona ou remove o botão sozinho, sem precisar configurar em outro lugar.
                 Atenção: renomear uma região, país ou cidade também muda o endereço (URL) dela no site.
@@ -249,7 +249,7 @@ export default function AdminDashboard() {
                   Fotos, capas e coordenadas do globo (edição avançada)
                 </summary>
                 <p className="mb-4 mt-3 text-xs text-gray-400">
-                  É aqui que se sobem as fotos das cidades, as capas de região/continente e de país e as coordenadas (latitude/longitude) do globo 3D. Textos, ordem e o que existe (adicionar/remover) dá pra mudar direto na prévia acima; o que você mexer lá aparece aqui e vice-versa.
+                  É aqui que se sobem as fotos das cidades, as capas de região/continente, de país e de subpágina (ex.: Inglaterra dentro do Reino Unido) e as coordenadas (latitude/longitude) do globo 3D. Textos, ordem e o que existe (adicionar/remover) dá pra mudar direto na prévia acima; o que você mexer lá aparece aqui e vice-versa.
                 </p>
                 <DestinationGroupsEditor
                   groups={content.destinationGroups}
@@ -1005,7 +1005,9 @@ function CitiesEditor({ cities, onChange }) {
   )
 }
 
-function CountriesEditor({ countries, onChange }) {
+// Lista de países de uma região. Com `sub` é reaproveitado para as SUBPÁGINAS de um país
+// (ex.: Inglaterra dentro do Reino Unido): mesmos campos, mas sem subpáginas dentro de subpáginas.
+function CountriesEditor({ countries, onChange, sub = false }) {
   const { dragIndex, openIndex, setOpenIndex, move, dragProps } = useReorder(countries, onChange)
 
   function patchCountry(ci, patch) {
@@ -1019,19 +1021,29 @@ function CountriesEditor({ countries, onChange }) {
     setOpenIndex(next.length - 1)
   }
   function removeCountry(ci) {
-    if (!confirm(`Remover o país "${countries[ci].name || 'sem nome'}" e todas as cidades dele?`)) return
+    if (!confirm(`Remover ${sub ? 'a subpágina' : 'o país'} "${countries[ci].name || 'sem nome'}" e todas as cidades ${sub ? 'dela' : 'dele'}?`)) return
     onChange(countries.filter((_, i) => i !== ci))
     setOpenIndex(-1)
   }
 
   return (
-    <div className="mt-4">
-      <SectionHeader icon="🚩" title="Países" actionLabel="Adicionar país" onAction={addCountry} />
-      {countries.length === 0 && <p className="text-xs text-gray-400">Nenhum país nesta região ainda.</p>}
+    <div className={sub ? 'mt-4 rounded-lg border border-gray-200 bg-gray-50 p-3' : 'mt-4'}>
+      <SectionHeader
+        icon={sub ? '🗺️' : '🚩'}
+        title={sub ? 'Subpáginas' : 'Países'}
+        actionLabel={sub ? 'Adicionar subpágina' : 'Adicionar país'}
+        onAction={addCountry}
+      />
+      {countries.length === 0 && (
+        <p className="text-xs text-gray-400">
+          {sub ? 'Nenhuma subpágina (ex.: Inglaterra dentro do Reino Unido). Opcional.' : 'Nenhum país nesta região ainda.'}
+        </p>
+      )}
       <div className="space-y-2">
         {countries.map((country, ci) => {
           const open = openIndex === ci
           const cityCount = (country.subregions || []).length
+          const subCount = (country.items || []).length
           return (
             <div
               key={ci}
@@ -1045,25 +1057,26 @@ function CountriesEditor({ countries, onChange }) {
                 onToggle={() => setOpenIndex(open ? -1 : ci)}
                 onMove={move}
                 onRemove={() => removeCountry(ci)}
-                prefix={getCountryFlag(country.name)}
-                label={`${country.name || 'Novo país (sem nome ainda)'}${cityCount ? ` · ${cityCount} cidade${cityCount === 1 ? '' : 's'}` : ''}`}
+                prefix={sub ? undefined : getCountryFlag(country.name)}
+                label={`${country.name || (sub ? 'Nova subpágina (sem nome ainda)' : 'Novo país (sem nome ainda)')}${subCount ? ` · ${subCount} subpágina${subCount === 1 ? '' : 's'}` : ''}${cityCount ? ` · ${cityCount} cidade${cityCount === 1 ? '' : 's'}` : ''}`}
               />
               {open && (
                 <div className="space-y-3 border-t border-gray-200 p-3">
                   <div>
-                    <label className="label">Nome do país</label>
-                    <input className="input text-sm" placeholder="Ex: Brasil" value={country.name || ''} onChange={(e) => patchCountry(ci, { name: e.target.value })} />
+                    <label className="label">Nome {sub ? 'da subpágina' : 'do país'}</label>
+                    <input className="input text-sm" placeholder={sub ? 'Ex: Inglaterra (subpágina do Reino Unido)' : 'Ex: Brasil'} value={country.name || ''} onChange={(e) => patchCountry(ci, { name: e.target.value })} />
                   </div>
                   <div>
-                    <label className="label">Descrição do país (opcional)</label>
+                    <label className="label">Descrição {sub ? 'da subpágina' : 'do país'} (opcional)</label>
                     <textarea className="input text-sm" rows={2} value={country.desc || ''} onChange={(e) => patchCountry(ci, { desc: e.target.value })} />
                   </div>
                   <ImageField
-                    label="Capa do país (opcional, imagem única)"
+                    label={`Capa ${sub ? 'da subpágina' : 'do país'} (opcional, imagem única)`}
                     shape="banner"
                     value={country.coverUrl}
                     onChange={(v) => patchCountry(ci, { coverUrl: v })}
                   />
+                  {!sub && <CountriesEditor sub countries={country.items || []} onChange={(v) => patchCountry(ci, { items: v })} />}
                   <CitiesEditor cities={country.subregions || []} onChange={(v) => patchCountry(ci, { subregions: v })} />
                 </div>
               )}
@@ -1079,18 +1092,21 @@ const PREVIEW_LEVELS = [
   { key: 'home', label: 'Início' },
   { key: 'regiao', label: 'Região / continente' },
   { key: 'pais', label: 'País' },
+  { key: 'sub', label: 'Subpágina' },
   { key: 'cidade', label: 'Cidade' },
   { key: 'globo', label: '🌐 Globo 3D' },
 ]
 
 // Prévia editável da aba Destinos. Precisa estar dentro de <InlineEditor> (que liga a edição direta).
-// Aqui NÃO se filtra por nome: os índices (gi/ci/ki) são sempre os da lista original em
+// Aqui NÃO se filtra por nome: os índices (gi/ci/si/ki) são sempre os da lista original em
 // content.destinationGroups, senão a edição cairia no item errado.
+// Níveis: Região > País > (Subpágina, opcional) > Cidade. subIdx === null = a cidade é do próprio país.
 function DestinationsPreview({ groups: rawGroups, initialLevel = 'home', title, subtitle, labels, globeTitle, globeSubtitle, seeMoreLabel }) {
   const groups = rawGroups || []
   const [level, setLevel] = useState(initialLevel)
   const [regionIdx, setRegionIdx] = useState(0)
   const [countryIdx, setCountryIdx] = useState(0)
+  const [subIdx, setSubIdx] = useState(null)
   const [cityIdx, setCityIdx] = useState(0)
 
   const gi = Math.min(regionIdx, groups.length - 1)
@@ -1098,23 +1114,36 @@ function DestinationsPreview({ groups: rawGroups, initialLevel = 'home', title, 
   const countries = region ? region.items || [] : []
   const ci = Math.min(countryIdx, countries.length - 1)
   const country = countries[ci]
-  const cities = country ? country.subregions || [] : []
+  const subs = country ? country.items || [] : []
+  const si = subIdx === null ? -1 : Math.min(subIdx, subs.length - 1)
+  const sub = subs[si]
+  // A página dona das cidades mostradas: a subpágina aberta ou, sem ela, o país.
+  const cityPage = sub || country
+  const cityPath = sub ? ['destinationGroups', gi, 'items', ci, 'items', si] : ['destinationGroups', gi, 'items', ci]
+  const cities = cityPage ? cityPage.subregions || [] : []
   const ki = Math.min(cityIdx, cities.length - 1)
   const city = cities[ki]
 
   // Se o nível aberto deixou de existir (ex.: apagou o último país), cai pro nível de cima.
   let shown = level
-  if (shown === 'cidade' && !city) shown = 'pais'
+  if (shown === 'cidade' && !city) shown = sub ? 'sub' : 'pais'
+  if (shown === 'sub' && !sub) shown = 'pais'
   if (shown === 'pais' && !country) shown = 'regiao'
   if (shown === 'regiao' && !region) shown = 'home'
 
   function selectRegion(i) {
     setRegionIdx(i)
     setCountryIdx(0)
+    setSubIdx(null)
     setCityIdx(0)
   }
   function selectCountry(i) {
     setCountryIdx(i)
+    setSubIdx(null)
+    setCityIdx(0)
+  }
+  function selectSub(i) {
+    setSubIdx(i)
     setCityIdx(0)
   }
   function openRegion(i) {
@@ -1125,9 +1154,19 @@ function DestinationsPreview({ groups: rawGroups, initialLevel = 'home', title, 
     selectCountry(i)
     setLevel('pais')
   }
+  function openSub(i) {
+    selectSub(i)
+    setLevel('sub')
+  }
   function openCity(i) {
     setCityIdx(i)
     setLevel('cidade')
+  }
+  function pickLevel(key) {
+    if (key === 'pais') setSubIdx(null)
+    if (key === 'sub' && subIdx === null) setSubIdx(0)
+    if (key !== 'cidade') setCityIdx(0)
+    setLevel(key)
   }
 
   return (
@@ -1135,13 +1174,15 @@ function DestinationsPreview({ groups: rawGroups, initialLevel = 'home', title, 
       <div className="border-b border-gray-200 bg-gray-50 p-3">
         <div className="flex flex-wrap gap-1.5">
           {PREVIEW_LEVELS.map((l) => {
+            // A pílula "Subpágina" só aparece quando o país tem subpáginas.
+            if (l.key === 'sub' && subs.length === 0) return null
             const disabled = (l.key === 'regiao' && !region) || (l.key === 'pais' && !country) || (l.key === 'cidade' && !city)
             return (
               <button
                 key={l.key}
                 type="button"
                 disabled={disabled}
-                onClick={() => setLevel(l.key)}
+                onClick={() => pickLevel(l.key)}
                 className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
                   shown === l.key ? 'bg-navy-800 text-white' : disabled ? 'cursor-not-allowed bg-gray-100 text-gray-300' : 'bg-white text-gray-600 hover:bg-gray-200'
                 }`}
@@ -1161,10 +1202,17 @@ function DestinationsPreview({ groups: rawGroups, initialLevel = 'home', title, 
                 ))}
               </select>
             )}
-            {(shown === 'pais' || shown === 'cidade') && countries.length > 1 && (
+            {(shown === 'pais' || shown === 'sub' || shown === 'cidade') && countries.length > 1 && (
               <select className="input w-auto text-xs" value={ci} onChange={(e) => selectCountry(Number(e.target.value))}>
                 {countries.map((c, i) => (
                   <option key={i} value={i}>{c.name || 'Novo país (sem nome)'}</option>
+                ))}
+              </select>
+            )}
+            {(shown === 'sub' || (shown === 'cidade' && sub)) && subs.length > 1 && (
+              <select className="input w-auto text-xs" value={si} onChange={(e) => selectSub(Number(e.target.value))}>
+                {subs.map((c, i) => (
+                  <option key={i} value={i}>{c.name || 'Nova subpágina (sem nome)'}</option>
                 ))}
               </select>
             )}
@@ -1183,7 +1231,9 @@ function DestinationsPreview({ groups: rawGroups, initialLevel = 'home', title, 
 
       {shown === 'regiao' && <PreviewRegionLevel gi={gi} group={region} groups={groups} seeMoreLabel={seeMoreLabel} onOpenCountry={openCountry} />}
 
-      {shown === 'pais' && <PreviewCountryLevel gi={gi} ci={ci} country={country} onOpenCity={openCity} />}
+      {shown === 'pais' && <PreviewCountryLevel gi={gi} ci={ci} country={country} seeMoreLabel={seeMoreLabel} onOpenSub={openSub} onOpenCity={openCity} />}
+
+      {shown === 'sub' && <PreviewCountryLevel gi={gi} ci={ci} si={si} country={sub} parent={country} onOpenCity={openCity} />}
 
       {shown === 'cidade' && (
         <section className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
@@ -1195,12 +1245,12 @@ function DestinationsPreview({ groups: rawGroups, initialLevel = 'home', title, 
               imageMode={city.imageMode}
               images={city.images}
               photoCaption={city.photoCaption}
-              path={['destinationGroups', gi, 'items', ci, 'subregions', ki]}
+              path={[...cityPath, 'subregions', ki]}
               large
             />
           </div>
           <p className="mt-4 text-sm text-gray-500">
-            {getCountryFlag(country.name, '')} {country.name} · {region.region}
+            {getCountryFlag(country.name, '')} {sub ? `${sub.name}, ` : ''}{country.name} · {region.region}
           </p>
         </section>
       )}
@@ -1211,12 +1261,28 @@ function DestinationsPreview({ groups: rawGroups, initialLevel = 'home', title, 
 }
 
 // Nível "Região" da prévia: banner da região + cards dos países (editar, mover, remover, adicionar).
+// "Mover para…" usa valores string: 'r:<índice>' = outra região; 'p:<índice>' = virar subpágina de outro país da região.
 function PreviewRegionLevel({ gi, group, groups, seeMoreLabel, onOpenCountry }) {
   const editor = useEditor()
   const countries = group.items || []
-  const otherRegions = groups.map((g, i) => ({ value: i, label: g.region || 'Região sem nome' })).filter((o) => o.value !== gi)
   const list = useListEditing(['destinationGroups', gi, 'items'], countries)
   const removeList = withConfirmRemove(list, (i) => `Remover o país "${countries[i]?.name || 'sem nome'}" e todas as cidades dele?`)
+  function moveOptions(ci) {
+    const regions = groups.map((g, i) => ({ value: `r:${i}`, label: g.region || 'Região sem nome' })).filter((o) => o.value !== `r:${gi}`)
+    const inside = countries.map((c, i) => ({ value: `p:${i}`, label: `dentro de ${c.name || 'país sem nome'}` })).filter((o) => o.value !== `p:${ci}`)
+    return [...regions, ...inside]
+  }
+  function pickMove(ci, value) {
+    const name = countries[ci]?.name || 'este país'
+    const idx = Number(value.slice(2))
+    if (value.startsWith('r:')) {
+      if (!window.confirm(`Mover "${name}" (com as cidades e fotos) para "${groups[idx]?.region || 'a região escolhida'}"?`)) return
+      editor.update(['destinationGroups'], moveCountry(groups, gi, ci, idx))
+    } else if (value.startsWith('p:')) {
+      if (!window.confirm(`Passar "${name}" (com as cidades e fotos) para dentro de "${countries[idx]?.name || 'o país escolhido'}", como subpágina dele?`)) return
+      editor.update(['destinationGroups'], moveCountryIntoCountry(groups, gi, ci, idx))
+    }
+  }
   return (
     <div>
       <Banner
@@ -1233,14 +1299,7 @@ function PreviewRegionLevel({ gi, group, groups, seeMoreLabel, onOpenCountry }) 
             <div key={ci} className="edit-item">
               <ItemControls list={removeList} index={ci} total={countries.length} />
               <OpenLevelButton onClick={() => onOpenCountry(ci)} />
-              <MoveToSelect
-                label="Mover para…"
-                options={otherRegions}
-                onPick={(toGi) => {
-                  if (!window.confirm(`Mover "${c.name || 'este país'}" (com as cidades e fotos) para "${groups[toGi]?.region || 'a região escolhida'}"?`)) return
-                  editor.update(['destinationGroups'], moveCountry(groups, gi, ci, toGi))
-                }}
-              />
+              <MoveToSelect label="Mover para…" options={moveOptions(ci)} onPick={(value) => pickMove(ci, value)} />
               <ExploreCard
                 name={c.name}
                 coverUrl={c.coverUrl}
@@ -1258,23 +1317,59 @@ function PreviewRegionLevel({ gi, group, groups, seeMoreLabel, onOpenCountry }) 
   )
 }
 
-// Nível "País" da prévia: banner do país + cards das cidades (editar, mover, remover, adicionar).
-function PreviewCountryLevel({ gi, ci, country, onOpenCity }) {
+// Nível "País" da prévia (ou "Subpágina", quando `si` é passado): banner + cards das cidades
+// (editar, mover, remover, adicionar). No país também aparecem as subpáginas dele.
+// Subpágina (ex.: Inglaterra dentro do Reino Unido) tem o mesmo formato de país, sem subpáginas dentro.
+function PreviewCountryLevel({ gi, ci, si, country, parent, seeMoreLabel, onOpenSub, onOpenCity }) {
+  const isSub = si !== undefined
   const cities = country.subregions || []
-  const base = ['destinationGroups', gi, 'items', ci]
+  const subpages = isSub ? [] : country.items || []
+  const base = isSub ? ['destinationGroups', gi, 'items', ci, 'items', si] : ['destinationGroups', gi, 'items', ci]
   const list = useListEditing([...base, 'subregions'], cities)
   const removeList = withConfirmRemove(list, (i) => `Remover a cidade "${cities[i]?.name || 'sem nome'}"?`)
+  const subList = useListEditing([...base, 'items'], subpages)
+  const removeSubList = withConfirmRemove(subList, (i) => `Remover a subpágina "${subpages[i]?.name || 'sem nome'}" e todas as cidades dela?`)
   return (
     <div>
       <Banner
         title={country.name}
         desc={country.desc}
         coverUrl={country.coverUrl}
-        flag={getCountryFlag(country.name, '')}
+        flag={getCountryFlag((parent || country).name, '')}
         path={base}
       />
+      {!isSub && (
+        <section className="mx-auto max-w-6xl px-4 pt-10 sm:px-6">
+          <p className="text-sm font-semibold text-navy-900">Subpáginas de {country.name || 'este país'}</p>
+          <p className="mt-1 text-xs text-gray-400">
+            Opcional: divida o país em partes (ex.: Inglaterra dentro do Reino Unido). Cada subpágina tem as suas cidades.
+          </p>
+          <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {subpages.map((sp, i) => (
+              <div key={i} className="edit-item">
+                <ItemControls list={removeSubList} index={i} total={subpages.length} />
+                <OpenLevelButton onClick={() => onOpenSub(i)} />
+                <ExploreCard
+                  name={sp.name}
+                  coverUrl={sp.coverUrl}
+                  subtitle={sp.desc}
+                  seeMoreLabel={seeMoreLabel}
+                  namePlaceholder="Nome da subpágina"
+                  path={[...base, 'items', i]}
+                />
+              </div>
+            ))}
+            <AddItemButton
+              list={subList}
+              item={{ name: 'Nova subpágina', desc: '', subregions: [] }}
+              label="Adicionar subpágina (ex.: Inglaterra dentro do Reino Unido)"
+              className="min-h-[8rem]"
+            />
+          </div>
+        </section>
+      )}
       <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        <p className="text-sm font-semibold text-navy-900">Cidades de {country.name || 'este país'}</p>
+        <p className="text-sm font-semibold text-navy-900">Cidades de {country.name || (isSub ? 'esta subpágina' : 'este país')}</p>
         <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {cities.map((c, ki) => (
             <div key={ki} className="edit-item">

@@ -15,7 +15,8 @@ export default function App() {
           <Route path="/consultoria" element={<LandingConsultoria />} />
           <Route path="/destinos/:regionSlug" element={<RegionPage />} />
           <Route path="/destinos/:regionSlug/:countrySlug" element={<CountryPage />} />
-          <Route path="/destinos/:regionSlug/:countrySlug/:citySlug" element={<CityPage />} />
+          <Route path="/destinos/:regionSlug/:countrySlug/:thirdSlug" element={<CityPage />} />
+          <Route path="/destinos/:regionSlug/:countrySlug/:thirdSlug/:citySlug" element={<CityPage />} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/painel" element={<AdminDashboard />} />
         </Routes>

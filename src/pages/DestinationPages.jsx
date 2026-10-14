@@ -102,7 +102,7 @@ export function Banner({ title, desc, coverUrl, flag, height = 'h-72 sm:h-96', p
 }
 
 // Com `path` (prévia do admin na aba Destinos) nome e descrição do país viram editáveis.
-export function ExploreCard({ to, name, coverUrl, subtitle, flag, preview = false, seeMoreLabel = defaultContent.destinationPages.seeMoreLabel, path }) {
+export function ExploreCard({ to, name, coverUrl, subtitle, flag, preview = false, seeMoreLabel = defaultContent.destinationPages.seeMoreLabel, path, namePlaceholder = 'Nome do país' }) {
   const inEditor = !!useEditor()
   const editing = inEditor && !!path
   // Dentro do admin nunca é link: clicar no texto edita.
@@ -128,7 +128,7 @@ export function ExploreCard({ to, name, coverUrl, subtitle, flag, preview = fals
       <div className={editing ? 'relative flex min-h-[11rem] flex-col justify-end p-4' : 'absolute inset-0 flex flex-col justify-end p-4'}>
         <h3 className="flex items-center gap-1.5 font-serif text-lg font-bold text-white">
           {flag && <span>{flag}</span>}
-          {editing ? <EditableText path={[...path, 'name']} value={name} placeholder="Nome do país" className="min-w-0 flex-1" /> : name}
+          {editing ? <EditableText path={[...path, 'name']} value={name} placeholder={namePlaceholder} className="min-w-0 flex-1" /> : name}
         </h3>
         {editing ? (
           <EditableText as="p" path={[...path, 'desc']} value={subtitle} placeholder="Descrição (opcional)" className="mt-0.5 text-xs text-navy-100" />
@@ -220,75 +220,104 @@ export function RegionView({ group, dp, bannerHeight }) {
   )
 }
 
-// Miolo da página de país (sem Header/Footer).
-export function CountryView({ group, country, dp, bannerHeight }) {
+// Miolo da página de país (sem Header/Footer). Também serve pra SUBPÁGINA de um país
+// (ex.: Inglaterra dentro do Reino Unido): nesse caso `parent` é o país de cima e
+// `country` é a subpágina.
+export function CountryView({ group, country, parent, dp, bannerHeight }) {
   const editor = useEditor()
   const regionSlug = slugify(group.region)
-  const countrySlug = slugify(country.name)
+  const baseSlugs = parent ? [slugify(parent.name), slugify(country.name)] : [slugify(country.name)]
+  const basePath = `/destinos/${regionSlug}/${baseSlugs.join('/')}`
   const cities = (country.subregions || []).filter((c) => c.name)
+  // Subpáginas só existem no país (não aninha mais fundo).
+  const subpages = parent ? [] : (country.items || []).filter((c) => c.name)
+  const crumbs = [{ label: group.region, to: `/destinos/${regionSlug}` }]
+  if (parent) crumbs.push({ label: parent.name, to: `/destinos/${regionSlug}/${slugify(parent.name)}` })
+  crumbs.push({ label: country.name })
   return (
     <>
-      <Breadcrumbs dp={dp} items={[{ label: group.region, to: `/destinos/${regionSlug}` }, { label: country.name }]} />
+      <Breadcrumbs dp={dp} items={crumbs} />
       <Banner
         title={country.name}
         desc={country.desc}
         coverUrl={country.coverUrl}
-        flag={getCountryFlag(country.name, '')}
+        flag={getCountryFlag((parent || country).name, '')}
         height={bannerHeight}
       />
 
-      <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        <DpText dp={dp} field="countryTitle" vars={{ pais: country.name }} as="h2" className="font-serif text-xl font-bold text-navy-900" />
-        <TokenHint token="{pais}" what="do país" />
-        {(editor || dp.countrySubtitle) && (
-          <DpText dp={dp} field="countrySubtitle" as="p" className="mt-1 text-sm text-gray-500" />
-        )}
-        <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {cities.map((city, i) => {
-            const card = (
-              <DestinationCard
-                name={city.name}
-                desc={city.desc}
-                imageUrl={city.imageUrl}
-                imageMode={city.imageMode}
-                images={city.images}
-                photoCaption={city.photoCaption}
+      {subpages.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 pt-10 sm:px-6">
+          <h2 className="font-serif text-xl font-bold text-navy-900">Explore {country.name}</h2>
+          <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {subpages.map((sub, i) => (
+              <ExploreCard
+                key={i}
+                to={`${basePath}/${slugify(sub.name)}`}
+                name={sub.name}
+                coverUrl={sub.coverUrl}
+                subtitle={sub.desc}
+                seeMoreLabel={dp.seeMoreLabel}
+                preview={!!editor}
               />
-            )
-            return editor ? (
-              <div key={i}>{card}</div>
-            ) : (
-              <Link key={i} to={`/destinos/${regionSlug}/${countrySlug}/${slugify(city.name)}`} className="block">
-                {card}
-              </Link>
-            )
-          })}
-          <EmptyMessage
-            dp={dp}
-            field="countryEmpty"
-            isEmpty={cities.length === 0}
-            hint="Aparece só quando o país não tiver nenhuma cidade cadastrada:"
-          />
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {(subpages.length === 0 || cities.length > 0) && (
+        <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+          <DpText dp={dp} field="countryTitle" vars={{ pais: country.name }} as="h2" className="font-serif text-xl font-bold text-navy-900" />
+          <TokenHint token="{pais}" what="do país" />
+          {(editor || dp.countrySubtitle) && (
+            <DpText dp={dp} field="countrySubtitle" as="p" className="mt-1 text-sm text-gray-500" />
+          )}
+          <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {cities.map((city, i) => {
+              const card = (
+                <DestinationCard
+                  name={city.name}
+                  desc={city.desc}
+                  imageUrl={city.imageUrl}
+                  imageMode={city.imageMode}
+                  images={city.images}
+                  photoCaption={city.photoCaption}
+                />
+              )
+              return editor ? (
+                <div key={i}>{card}</div>
+              ) : (
+                <Link key={i} to={`${basePath}/${slugify(city.name)}`} className="block">
+                  {card}
+                </Link>
+              )
+            })}
+            <EmptyMessage
+              dp={dp}
+              field="countryEmpty"
+              isEmpty={cities.length === 0}
+              hint="Aparece só quando o país não tiver nenhuma cidade cadastrada:"
+            />
+          </div>
+        </section>
+      )}
+      {subpages.length > 0 && cities.length === 0 && <div className="pb-10" />}
     </>
   )
 }
 
-// Miolo da página de cidade (sem Header/Footer).
-export function CityView({ group, country, city, dp }) {
+// Miolo da página de cidade (sem Header/Footer). `sub` = subpágina do país onde a cidade está (opcional).
+export function CityView({ group, country, sub, city, dp }) {
   const regionSlug = slugify(group.region)
   const countrySlug = slugify(country.name)
+  const crumbs = [
+    { label: group.region, to: `/destinos/${regionSlug}` },
+    { label: country.name, to: `/destinos/${regionSlug}/${countrySlug}` },
+  ]
+  if (sub) crumbs.push({ label: sub.name, to: `/destinos/${regionSlug}/${countrySlug}/${slugify(sub.name)}` })
+  crumbs.push({ label: city.name })
   return (
     <>
-      <Breadcrumbs
-        dp={dp}
-        items={[
-          { label: group.region, to: `/destinos/${regionSlug}` },
-          { label: country.name, to: `/destinos/${regionSlug}/${countrySlug}` },
-          { label: city.name },
-        ]}
-      />
+      <Breadcrumbs dp={dp} items={crumbs} />
 
       <section className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
         <div className="overflow-hidden rounded-2xl shadow-sm">
@@ -303,7 +332,7 @@ export function CityView({ group, country, city, dp }) {
           />
         </div>
         <p className="mt-4 text-sm text-gray-500">
-          {getCountryFlag(country.name, '')} {country.name} · {group.region}
+          {getCountryFlag(country.name, '')} {sub ? `${sub.name}, ` : ''}{country.name} · {group.region}
         </p>
       </section>
     </>
@@ -357,8 +386,11 @@ export function CountryPage() {
   )
 }
 
+// Atende /destinos/:regiao/:pais/:terceiro e /destinos/:regiao/:pais/:terceiro/:cidade.
+// O terceiro nível é primeiro tentado como SUBPÁGINA do país (ex.: Inglaterra); se não houver,
+// é uma cidade do país (como sempre foi). Com 4 níveis, é a cidade dentro da subpágina.
 export function CityPage() {
-  const { regionSlug, countrySlug, citySlug } = useParams()
+  const { regionSlug, countrySlug, thirdSlug, citySlug } = useParams()
   const { content, loading } = useSiteContent()
   if (loading) return <Loading />
 
@@ -366,16 +398,24 @@ export function CityPage() {
   const dp = withDefaults(content.destinationPages)
   const group = (destinationGroups || []).find((g) => slugify(g.region) === regionSlug)
   const country = group && (group.items || []).find((c) => slugify(c.name) === countrySlug)
-  const city = country && (country.subregions || []).find((c) => slugify(c.name) === citySlug)
+  const sub = country && (country.items || []).find((c) => c.name && slugify(c.name) === thirdSlug)
+  const findCity = (page, slug) => page && (page.subregions || []).find((c) => slugify(c.name) === slug)
+
+  let body
+  if (citySlug) {
+    const city = findCity(sub, citySlug)
+    body = city ? <CityView group={group} country={country} sub={sub} city={city} dp={dp} /> : null
+  } else if (sub) {
+    body = <CountryView group={group} country={sub} parent={country} dp={dp} />
+  } else {
+    const city = findCity(country, thirdSlug)
+    body = city ? <CityView group={group} country={country} city={city} dp={dp} /> : null
+  }
 
   return (
     <div className="min-h-screen bg-white">
       <Header brand={brand} />
-      {!group || !country || !city ? (
-        <NotFoundBlock dp={dp} fields={['cityNotFound']} />
-      ) : (
-        <CityView group={group} country={country} city={city} dp={dp} />
-      )}
+      {body || <NotFoundBlock dp={dp} fields={['cityNotFound']} />}
       <Footer brand={brand} footer={footer} socialLinks={socialLinks} />
       <WhatsAppFloatButton whatsapp={brand.whatsapp} message={brand.whatsappMessage} />
     </div>

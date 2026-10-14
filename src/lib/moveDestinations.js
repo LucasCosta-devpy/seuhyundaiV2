@@ -20,3 +20,18 @@ export function mergeRegionInto(groups, fromGi, toGi) {
     .map((g, i) => (i === toGi ? { ...g, items: [...(g.items || []), ...moved] } : g))
     .filter((_, i) => i !== fromGi)
 }
+
+// Transforma um país em SUBPÁGINA de outro país da mesma região (ex.: Inglaterra vira
+// subpágina do Reino Unido). As cidades e fotos vão junto. Se o país movido já tinha
+// subpáginas, elas viram subpáginas do destino também (fica tudo no mesmo nível, sem
+// aninhar mais fundo): primeiro entra o país movido, depois as subpáginas dele.
+export function moveCountryIntoCountry(groups, gi, ci, targetCi) {
+  const countries = groups[gi] && groups[gi].items
+  if (!countries || ci === targetCi || !countries[ci] || !countries[targetCi]) return groups
+  const { items: ownSubs, ...asSub } = countries[ci]
+  const target = countries[targetCi]
+  const merged = { ...target, items: [...(target.items || []), asSub, ...(ownSubs || [])] }
+  return groups.map((g, i) =>
+    i === gi ? { ...g, items: countries.map((c, x) => (x === targetCi ? merged : c)).filter((_, x) => x !== ci) } : g,
+  )
+}
