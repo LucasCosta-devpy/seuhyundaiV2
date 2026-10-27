@@ -38,6 +38,61 @@ function useLogoSrc(brand) {
   return result.key === key ? result.src : null
 }
 
+// Globo do cabeçalho: a Terra dourada/azul girando sem parar com o avião orbitando, ao lado do nome.
+function HeaderGlobe() {
+  const W = 56
+  const H = 46
+  const cx = W / 2
+  const cy = H / 2
+  const rx = 26
+  const ry = 8.5
+  const rot = -20
+  const rad = (rot * Math.PI) / 180
+  const pt = (t) => [cx + rx * Math.cos(t) * Math.cos(rad) - ry * Math.sin(t) * Math.sin(rad), cy + rx * Math.cos(t) * Math.sin(rad) + ry * Math.sin(t) * Math.cos(rad)]
+  const [x0, y0] = pt(0)
+  const [x1, y1] = pt(Math.PI)
+  const f = (n) => n.toFixed(1)
+  const half = (a, b) => `M ${f(a[0])} ${f(a[1])} A ${rx} ${ry} ${rot} 0 1 ${f(b[0])} ${f(b[1])}`
+  const front = half([x0, y0], [x1, y1])
+  const back = half([x1, y1], [x0, y0])
+  const lap = `${front} A ${rx} ${ry} ${rot} 0 1 ${f(x0)} ${f(y0)}`
+  const DUR = 7
+  const layer = (isFront) => (
+    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} className={`pointer-events-none absolute inset-0 ${isFront ? 'z-[3]' : 'z-[1]'}`} aria-hidden="true">
+      <path d={isFront ? front : back} fill="none" stroke="#d4a53f" strokeOpacity="0.75" strokeWidth="1" strokeDasharray="2.5 3" strokeLinecap="round" />
+      <g opacity={isFront ? 1 : 0}>
+        <animate attributeName="opacity" values={isFront ? '1;0' : '0;1'} keyTimes="0;0.5" dur={`${DUR}s`} calcMode="discrete" repeatCount="indefinite" />
+        <g transform="scale(0.42) translate(-12 -12) rotate(90 12 12)">
+          <path d={PLANE_PATH} fill="#f2c94c" stroke="#14234f" strokeWidth="1.5" strokeLinejoin="round" paintOrder="stroke" />
+        </g>
+        <animateMotion dur={`${DUR}s`} rotate="auto" path={lap} repeatCount="indefinite" />
+      </g>
+    </svg>
+  )
+  return (
+    <div className="relative isolate flex-shrink-0" style={{ width: W, height: H }} aria-hidden="true">
+      {layer(false)}
+      <div className="absolute left-1/2 top-1/2 z-[2] h-[34px] w-[34px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full" style={{ boxShadow: '0 0 0 1.5px #d4a53f' }}>
+        <div
+          className="h-full"
+          style={{
+            width: '400%',
+            backgroundImage: 'url(/logo/earth-gold.png)',
+            backgroundSize: '50% 100%',
+            backgroundRepeat: 'repeat-x',
+            animation: 'logoGlobeSpin 14s linear infinite',
+          }}
+        />
+        <div
+          className="absolute inset-0 rounded-full"
+          style={{ background: 'radial-gradient(circle at 33% 28%, rgba(255,255,255,.4), transparent 45%), radial-gradient(circle at 50% 50%, transparent 55%, rgba(5,12,40,.45) 100%)' }}
+        />
+      </div>
+      {layer(true)}
+    </div>
+  )
+}
+
 function HeaderLogo({ brand }) {
   const src = useLogoSrc(brand)
   if (!src) return <div className="h-10 w-10" />
@@ -60,7 +115,7 @@ function CircleLogo({ brand, className }) {
 
 // Logo "livre" (sem bola): mostra a imagem como ela é, com a área do @ clicável (Instagram)
 // e uma animação curta — Terra girando e avião dando uma volta — que roda ao passar o mouse e
-// toda vez que a logo entra na tela. As áreas (globo e @) são em % da imagem e dá pra calibrar no admin.
+// toda vez que a logo entra na tela. A área do globo é em % da imagem e dá pra calibrar no admin.
 function AnimatedLogo({ brand, className }) {
   const editing = !!useEditor()
   const logoSrc = useLogoSrc(brand)
@@ -73,7 +128,6 @@ function AnimatedLogo({ brand, className }) {
 
   const animated = brand.logoAnimation !== false
   const reduced = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-  const link = brand.logoInstagramLink !== false ? instagramUrl(brand) : ''
 
   const play = useCallback(() => {
     if (!animated || reduced || playingRef.current) return
@@ -108,10 +162,6 @@ function AnimatedLogo({ brand, className }) {
   const gx = num(brand.logoGlobeX, 47.5)
   const gy = num(brand.logoGlobeY, 52)
   const gr = num(brand.logoGlobeR, 21.5)
-  const lx = num(brand.logoLinkX, 20)
-  const ly = num(brand.logoLinkY, 72.5)
-  const lw = num(brand.logoLinkW, 56)
-  const lh = num(brand.logoLinkH, 10)
 
   // Geometria da órbita do avião (em px, a partir do tamanho real da logo na tela).
   const { w, h } = box
@@ -159,8 +209,6 @@ function AnimatedLogo({ brand, className }) {
       </svg>
     )
   }
-
-  const linkStyle = { left: `${lx}%`, top: `${ly}%`, width: `${lw}%`, height: `${lh}%` }
 
   return (
     <div
@@ -215,27 +263,6 @@ function AnimatedLogo({ brand, className }) {
         </>
       )}
 
-      {link &&
-        (editing ? (
-          <span
-            className="absolute z-[4] flex items-center justify-center rounded-full border border-dashed border-blue-500 bg-blue-500/15 text-[10px] font-semibold text-blue-700"
-            style={linkStyle}
-            title="Área clicável do Instagram (ajuste em Logo e contatos)"
-          >
-            Instagram
-          </span>
-        ) : (
-          <a
-            href={link}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Abrir o Instagram ${brand.instagram || ''}`}
-            title="Abrir o Instagram"
-            className="absolute z-[4] rounded-full transition-all hover:bg-gold-400/15 hover:ring-2 hover:ring-gold-400/70"
-            style={linkStyle}
-          />
-        ))}
-
       {editing && animated && (
         <span
           className="pointer-events-none absolute z-[4] rounded-full border border-dashed border-blue-500/70"
@@ -251,7 +278,10 @@ function AnimatedLogo({ brand, className }) {
 // spacing = classes de margem; circleClassName = extras só da moldura redonda.
 export function LogoMark({ brand, variant = 'hero', spacing = 'mb-8', circleClassName = '' }) {
   const circle = brand.logoFrame === 'circle'
-  if (variant === 'header') return circle ? <CircleLogo brand={brand} className="h-10 w-10" /> : <HeaderLogo brand={brand} />
+  if (variant === 'header') {
+    if (brand.headerStyle !== 'logo') return <HeaderGlobe />
+    return circle ? <CircleLogo brand={brand} className="h-10 w-10" /> : <HeaderLogo brand={brand} />
+  }
   const size = getLogoSize(brand.logoSize)
   if (circle) return <CircleLogo brand={brand} className={`mx-auto ${spacing} ${circleClassName} ${size.hero}`} />
   return <AnimatedLogo brand={brand} className={`mx-auto ${spacing} ${size.free}`} />

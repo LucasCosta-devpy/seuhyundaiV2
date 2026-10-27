@@ -492,11 +492,31 @@ function LogoLookField({ brand, update }) {
   const set = (key) => (v) => update(['brand', key], v)
   const frame = brand.logoFrame === 'circle' ? 'circle' : 'free'
   const animated = brand.logoAnimation !== false
-  const linked = brand.logoInstagramLink !== false
   const n = (v, d) => (typeof v === 'number' ? v : d)
   return (
     <div className="space-y-4 rounded-xl border border-gray-200 p-4">
       <p className="text-sm font-semibold text-navy-900">Aparência da logo</p>
+
+      <div>
+        <p className="label !mb-2">Ícone no canto do cabeçalho (ao lado do nome)</p>
+        <div className="flex flex-wrap gap-2">
+          {[
+            ['globe', 'Terra girando (animado)'],
+            ['logo', 'Miniatura da logo'],
+          ].map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => set('headerStyle')(key)}
+              className={`rounded-lg border px-3 py-2 text-sm font-semibold transition-colors ${
+                (brand.headerStyle === 'logo' ? 'logo' : 'globe') === key ? 'border-navy-800 bg-navy-800 text-white' : 'border-gray-300 text-gray-600 hover:border-navy-400'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div>
         <p className="label !mb-2">Moldura</p>
@@ -543,19 +563,7 @@ function LogoLookField({ brand, update }) {
             </div>
           )}
 
-          <label className="flex items-center gap-2 text-sm text-navy-900">
-            <input type="checkbox" checked={linked} onChange={(e) => set('logoInstagramLink')(e.target.checked)} />
-            Tornar o @ do Instagram da imagem clicável (abre o Instagram cadastrado abaixo)
-          </label>
-          {linked && (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <RangeField label="Área do @: esquerda %" value={n(brand.logoLinkX, 20)} onChange={set('logoLinkX')} />
-              <RangeField label="Área do @: topo %" value={n(brand.logoLinkY, 72.5)} onChange={set('logoLinkY')} />
-              <RangeField label="Área do @: largura %" value={n(brand.logoLinkW, 56)} onChange={set('logoLinkW')} />
-              <RangeField label="Área do @: altura %" value={n(brand.logoLinkH, 10)} min={2} max={30} onChange={set('logoLinkH')} />
-            </div>
-          )}
-          <p className="text-xs text-gray-400">Ajuste as barras até o contorno azul tracejado cobrir exatamente o globo e o @ da sua imagem.</p>
+          <p className="text-xs text-gray-400">Ajuste as barras até o contorno azul tracejado cobrir exatamente o globo da sua imagem.</p>
         </>
       )}
     </div>
