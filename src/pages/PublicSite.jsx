@@ -100,11 +100,7 @@ export function Header({ brand }) {
     <header className="border-b border-gray-100 bg-white/90 backdrop-blur sticky top-0 z-40">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <div className="flex items-center gap-3">
-          {brand.logoUrl ? (
-            <LogoMark brand={brand} variant="header" />
-          ) : (
-            <div className="h-10 w-10 rounded-full border-2 border-gold-400 flex items-center justify-center text-gold-600 font-serif font-bold">R</div>
-          )}
+          <LogoMark brand={brand} variant="header" />
           <span className="font-serif font-semibold text-navy-900">{brand.name}</span>
         </div>
 

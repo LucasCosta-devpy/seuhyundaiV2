@@ -22,7 +22,7 @@ import {
   Footer,
 } from './PublicSite.jsx'
 import { LogoMark } from '../components/AnimatedLogo.jsx'
-import { InlineEditor, useListEditing, ItemControls, AddItemButton, MoveToSelect, useEditor, EditContext } from '../components/Editable.jsx'
+import { InlineEditor, useListEditing, ItemControls, AddItemButton, MoveToSelect, useEditor } from '../components/Editable.jsx'
 import { Banner, ExploreCard } from './DestinationPages.jsx'
 import { getCountryFlag } from '../lib/flags.js'
 import { withConfirmRemove } from '../lib/confirmRemove.js'
@@ -487,37 +487,14 @@ function RangeField({ label, value, min = 0, max = 100, step = 0.5, onChange }) 
   )
 }
 
-// Moldura, animação e link do Instagram sobre a logo. As áreas são em % da imagem.
+// Moldura da logo grande e remoção do fundo.
 function LogoLookField({ brand, update }) {
   const set = (key) => (v) => update(['brand', key], v)
   const frame = brand.logoFrame === 'circle' ? 'circle' : 'free'
-  const animated = brand.logoAnimation !== false
   const n = (v, d) => (typeof v === 'number' ? v : d)
   return (
     <div className="space-y-4 rounded-xl border border-gray-200 p-4">
       <p className="text-sm font-semibold text-navy-900">Aparência da logo</p>
-
-      <div>
-        <p className="label !mb-2">Ícone no canto do cabeçalho (ao lado do nome)</p>
-        <div className="flex flex-wrap gap-2">
-          {[
-            ['both', 'Logo + Terra girando'],
-            ['globe', 'Só a Terra girando'],
-            ['logo', 'Só a miniatura da logo'],
-          ].map(([key, label]) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => set('headerStyle')(key)}
-              className={`rounded-lg border px-3 py-2 text-sm font-semibold transition-colors ${
-                (brand.headerStyle === 'logo' || brand.headerStyle === 'globe' ? brand.headerStyle : 'both') === key ? 'border-navy-800 bg-navy-800 text-white' : 'border-gray-300 text-gray-600 hover:border-navy-400'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
 
       <div>
         <p className="label !mb-2">Moldura</p>
@@ -552,19 +529,6 @@ function LogoLookField({ brand, update }) {
           {brand.logoRemoveBg !== false && (
             <RangeField label="Sensibilidade da remoção do fundo (aumente se sobrar fundo, diminua se comer a logo)" value={n(brand.logoBgTolerance, 28)} min={4} max={80} onChange={set('logoBgTolerance')} />
           )}
-          <label className="flex items-center gap-2 text-sm text-navy-900">
-            <input type="checkbox" checked={animated} onChange={(e) => set('logoAnimation')(e.target.checked)} />
-            Animação: Terra girando e avião dando uma volta (ao passar o mouse e quando a logo aparece na tela)
-          </label>
-          {animated && (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <RangeField label="Globo: posição horizontal %" value={n(brand.logoGlobeX, 47.5)} onChange={set('logoGlobeX')} />
-              <RangeField label="Globo: posição vertical %" value={n(brand.logoGlobeY, 52)} onChange={set('logoGlobeY')} />
-              <RangeField label="Globo: tamanho %" value={n(brand.logoGlobeR, 21.5)} min={8} max={45} onChange={set('logoGlobeR')} />
-            </div>
-          )}
-
-          <p className="text-xs text-gray-400">Ajuste as barras até o contorno azul tracejado cobrir exatamente o globo da sua imagem.</p>
         </>
       )}
     </div>
@@ -583,10 +547,7 @@ function LogoSizeField({ brand, logoUrl, value, onChange, scale, onScaleChange, 
 
       <div className="mb-3 flex items-center justify-center rounded-xl bg-navy-900 py-10">
         {logoUrl ? (
-          // Previa com contorno das areas (globo e @) e clique pra testar a animacao.
-          <EditContext.Provider value={{ update: () => {} }}>
-            <LogoMark brand={brand} spacing="" circleClassName="p-1 shadow-2xl shadow-black/30" />
-          </EditContext.Provider>
+          <LogoMark brand={brand} spacing="" circleClassName="p-1 shadow-2xl shadow-black/30" />
         ) : (
           <div className={`rounded-full border-4 border-gold-400 flex items-center justify-center text-gold-400 font-serif font-bold ${current.hero}`}>
             R
@@ -594,7 +555,7 @@ function LogoSizeField({ brand, logoUrl, value, onChange, scale, onScaleChange, 
         )}
       </div>
       <p className="mb-4 text-xs text-gray-400">
-        Assim fica no topo da página (passe o mouse ou clique na logo pra ver a animação). Os contornos azuis tracejados só aparecem aqui no admin.
+        Assim fica no topo da página. A Terra girando fica no canto do cabeçalho, ao lado do nome.
       </p>
 
       <p className="label !mb-2">Tamanho da logo</p>
