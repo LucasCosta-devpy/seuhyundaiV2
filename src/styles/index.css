@@ -108,3 +108,12 @@
 .edit-item:focus-within > .edit-item-move {
   opacity: 1;
 }
+
+/* Terra da logo girando (a faixa tem 2 mapas lado a lado: andar 50% = uma volta completa) */
+@keyframes logoGlobeSpin {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [style*="logoGlobeSpin"] { animation: none !important; }
+}

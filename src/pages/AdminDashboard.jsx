@@ -21,7 +21,8 @@ import {
   CTA,
   Footer,
 } from './PublicSite.jsx'
-import { InlineEditor, useListEditing, ItemControls, AddItemButton, MoveToSelect, useEditor } from '../components/Editable.jsx'
+import { LogoMark } from '../components/AnimatedLogo.jsx'
+import { InlineEditor, useListEditing, ItemControls, AddItemButton, MoveToSelect, useEditor, EditContext } from '../components/Editable.jsx'
 import { Banner, ExploreCard } from './DestinationPages.jsx'
 import { getCountryFlag } from '../lib/flags.js'
 import { withConfirmRemove } from '../lib/confirmRemove.js'
@@ -223,6 +224,7 @@ export default function AdminDashboard() {
                 <div className="space-y-4">
                   <ImageField label="Logo" shape="logo" value={content.brand.logoUrl} onChange={(v) => update(['brand', 'logoUrl'], v)} />
                   <LogoSizeField
+                    brand={content.brand}
                     logoUrl={content.brand.logoUrl}
                     value={content.brand.logoSize}
                     onChange={(v) => update(['brand', 'logoSize'], v)}
@@ -233,6 +235,7 @@ export default function AdminDashboard() {
                     onOffsetXChange={(v) => update(['brand', 'logoOffsetX'], v)}
                     onOffsetYChange={(v) => update(['brand', 'logoOffsetY'], v)}
                   />
+                  <LogoLookField brand={content.brand} update={update} />
                   <TextField label="Instagram (ex: @seuinstagram)" value={content.brand.instagram} onChange={(v) => update(['brand', 'instagram'], v)} />
                   <TextField
                     label="WhatsApp (com DDI e DDD, só números, ex: 5551987654321)"
@@ -473,7 +476,93 @@ function TextArea({ label, value, onChange }) {
   )
 }
 
-function LogoSizeField({ logoUrl, value, onChange, scale, onScaleChange, offsetX, offsetY, onOffsetXChange, onOffsetYChange }) {
+function RangeField({ label, value, min = 0, max = 100, step = 0.5, onChange }) {
+  return (
+    <div>
+      <p className="label !mb-1">
+        {label} ({value})
+      </p>
+      <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} className="w-full" />
+    </div>
+  )
+}
+
+// Moldura, animação e link do Instagram sobre a logo. As áreas são em % da imagem.
+function LogoLookField({ brand, update }) {
+  const set = (key) => (v) => update(['brand', key], v)
+  const frame = brand.logoFrame === 'circle' ? 'circle' : 'free'
+  const animated = brand.logoAnimation !== false
+  const linked = brand.logoInstagramLink !== false
+  const n = (v, d) => (typeof v === 'number' ? v : d)
+  return (
+    <div className="space-y-4 rounded-xl border border-gray-200 p-4">
+      <p className="text-sm font-semibold text-navy-900">Aparência da logo</p>
+
+      <div>
+        <p className="label !mb-2">Moldura</p>
+        <div className="flex flex-wrap gap-2">
+          {[
+            ['free', 'Livre (sem bola branca)'],
+            ['circle', 'Redonda branca (antiga)'],
+          ].map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => set('logoFrame')(key)}
+              className={`rounded-lg border px-3 py-2 text-sm font-semibold transition-colors ${
+                frame === key ? 'border-navy-800 bg-navy-800 text-white' : 'border-gray-300 text-gray-600 hover:border-navy-400'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <p className="mt-1 text-xs text-gray-400">
+          A moldura livre mostra a imagem como ela é: funciona melhor com PNG de fundo transparente. Se a sua logo tiver fundo branco quadrado, use a redonda.
+        </p>
+      </div>
+
+      {frame === 'free' && (
+        <>
+          <label className="flex items-center gap-2 text-sm text-navy-900">
+            <input type="checkbox" checked={brand.logoRemoveBg !== false} onChange={(e) => set('logoRemoveBg')(e.target.checked)} />
+            Tirar automaticamente o fundo claro/quadrado da imagem (deixa transparente)
+          </label>
+          {brand.logoRemoveBg !== false && (
+            <RangeField label="Sensibilidade da remoção do fundo (aumente se sobrar fundo, diminua se comer a logo)" value={n(brand.logoBgTolerance, 28)} min={4} max={80} onChange={set('logoBgTolerance')} />
+          )}
+          <label className="flex items-center gap-2 text-sm text-navy-900">
+            <input type="checkbox" checked={animated} onChange={(e) => set('logoAnimation')(e.target.checked)} />
+            Animação: Terra girando e avião dando uma volta (ao passar o mouse e quando a logo aparece na tela)
+          </label>
+          {animated && (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <RangeField label="Globo: posição horizontal %" value={n(brand.logoGlobeX, 47.5)} onChange={set('logoGlobeX')} />
+              <RangeField label="Globo: posição vertical %" value={n(brand.logoGlobeY, 52)} onChange={set('logoGlobeY')} />
+              <RangeField label="Globo: tamanho %" value={n(brand.logoGlobeR, 21.5)} min={8} max={45} onChange={set('logoGlobeR')} />
+            </div>
+          )}
+
+          <label className="flex items-center gap-2 text-sm text-navy-900">
+            <input type="checkbox" checked={linked} onChange={(e) => set('logoInstagramLink')(e.target.checked)} />
+            Tornar o @ do Instagram da imagem clicável (abre o Instagram cadastrado abaixo)
+          </label>
+          {linked && (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <RangeField label="Área do @: esquerda %" value={n(brand.logoLinkX, 20)} onChange={set('logoLinkX')} />
+              <RangeField label="Área do @: topo %" value={n(brand.logoLinkY, 72.5)} onChange={set('logoLinkY')} />
+              <RangeField label="Área do @: largura %" value={n(brand.logoLinkW, 56)} onChange={set('logoLinkW')} />
+              <RangeField label="Área do @: altura %" value={n(brand.logoLinkH, 10)} min={2} max={30} onChange={set('logoLinkH')} />
+            </div>
+          )}
+          <p className="text-xs text-gray-400">Ajuste as barras até o contorno azul tracejado cobrir exatamente o globo e o @ da sua imagem.</p>
+        </>
+      )}
+    </div>
+  )
+}
+
+function LogoSizeField({ brand, logoUrl, value, onChange, scale, onScaleChange, offsetX, offsetY, onOffsetXChange, onOffsetYChange }) {
   const current = getLogoSize(value)
   const scaleValue = scale || 100
   const offsetXValue = offsetX || 0
@@ -485,14 +574,10 @@ function LogoSizeField({ logoUrl, value, onChange, scale, onScaleChange, offsetX
 
       <div className="mb-3 flex items-center justify-center rounded-xl bg-navy-900 py-10">
         {logoUrl ? (
-          <div className={`overflow-hidden rounded-full bg-white p-1 shadow-2xl transition-all duration-200 ${current.hero}`}>
-            <img
-              src={logoUrl}
-              alt="Prévia da logo no site"
-              className="h-full w-full object-contain"
-              style={{ transform: `translate(${offsetXValue}%, ${offsetYValue}%) scale(${scaleValue / 100})` }}
-            />
-          </div>
+          // Previa com contorno das areas (globo e @) e clique pra testar a animacao.
+          <EditContext.Provider value={{ update: () => {} }}>
+            <LogoMark brand={brand} spacing="" circleClassName="p-1 shadow-2xl shadow-black/30" />
+          </EditContext.Provider>
         ) : (
           <div className={`rounded-full border-4 border-gold-400 flex items-center justify-center text-gold-400 font-serif font-bold ${current.hero}`}>
             R
@@ -500,10 +585,10 @@ function LogoSizeField({ logoUrl, value, onChange, scale, onScaleChange, offsetX
         )}
       </div>
       <p className="mb-4 text-xs text-gray-400">
-        Assim fica no topo da página. Se o desenho da sua logo não estiver bem no meio do círculo, use os controles de posição abaixo pra empurrar ele.
+        Assim fica no topo da página (passe o mouse ou clique na logo pra ver a animação). Os contornos azuis tracejados só aparecem aqui no admin.
       </p>
 
-      <p className="label !mb-2">Tamanho do círculo</p>
+      <p className="label !mb-2">Tamanho da logo</p>
       <div className="flex flex-wrap gap-2">
         {Object.entries(LOGO_SIZES).map(([key, size]) => (
           <button
@@ -524,7 +609,7 @@ function LogoSizeField({ logoUrl, value, onChange, scale, onScaleChange, offsetX
       {logoUrl && (
         <div className="mt-4 space-y-4">
           <div>
-            <p className="label !mb-2">Zoom da imagem dentro do círculo ({scaleValue}%)</p>
+            <p className="label !mb-2">Zoom da imagem ({scaleValue}%)</p>
             <input
               type="range"
               min={60}

@@ -1,22 +1,9 @@
 import { Fragment } from 'react'
+import { LogoMark } from '../components/AnimatedLogo.jsx'
 import { WhatsAppLink } from '../components/WhatsAppButton.jsx'
 import { EditableText, useEditor } from '../components/Editable.jsx'
 import { useSiteContent } from '../lib/useSiteContent.js'
 import { defaultContent } from '../lib/defaultContent.js'
-import { getLogoSize } from '../lib/logoSize.js'
-
-function LogoImage({ url, name, scale, offsetX, offsetY, className }) {
-  return (
-    <div className={`overflow-hidden rounded-full bg-white ${className || ''}`}>
-      <img
-        src={url}
-        alt={name}
-        className="h-full w-full object-contain"
-        style={{ transform: `translate(${offsetX || 0}%, ${offsetY || 0}%) scale(${(scale || 100) / 100})` }}
-      />
-    </div>
-  )
-}
 
 function CtaButton({ whatsapp, message, label, className = '' }) {
   return (
@@ -65,7 +52,6 @@ export function LandingView({ content }) {
   // useSiteContent faz merge raso: subcampos novos de um `landing` já salvo viriam undefined.
   const landing = { ...defaultContent.landing, ...content.landing }
   const footerText = content.footer?.text ?? defaultContent.footer.text
-  const logoSize = getLogoSize(brand.logoSize)
   const message = brand.whatsappMessage || `Olá! Conheci a ${brand.name} pelo site e gostaria de conversar sobre a minha próxima viagem.`
   const parsedCount = Number.parseInt(landing.reasonsCount, 10)
   const reasonsCount = Number.isNaN(parsedCount) ? 4 : Math.max(0, parsedCount)
@@ -83,14 +69,7 @@ export function LandingView({ content }) {
         />
         <div className="relative mx-auto max-w-2xl px-4 text-center sm:px-6">
           {brand.logoUrl && (
-            <LogoImage
-              url={brand.logoUrl}
-              name={brand.name}
-              scale={brand.logoScale}
-              offsetX={brand.logoOffsetX}
-              offsetY={brand.logoOffsetY}
-              className={`mx-auto mb-6 shadow-2xl shadow-black/30 ${logoSize.hero}`}
-            />
+            <LogoMark brand={brand} spacing="mb-6" circleClassName="shadow-2xl shadow-black/30" />
           )}
           <EditableText
             as="h1"

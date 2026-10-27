@@ -8,6 +8,7 @@ import { getPlatform } from '../components/SocialIcons.jsx'
 import { useSiteContent } from '../lib/useSiteContent.js'
 import DestinationsGlobe from '../components/DestinationsGlobe.jsx'
 import { EditableText, visibleItems, useEditor, useListEditing, ItemControls, AddItemButton, MoveToSelect } from '../components/Editable.jsx'
+import { LogoMark, instagramUrl } from '../components/AnimatedLogo.jsx'
 import { mergeRegionInto } from '../lib/moveDestinations.js'
 
 export default function PublicSite() {
@@ -67,19 +68,6 @@ export default function PublicSite() {
   )
 }
 
-function LogoImage({ url, name, scale, offsetX, offsetY, className }) {
-  return (
-    <div className={`overflow-hidden rounded-full bg-white ${className || ''}`}>
-      <img
-        src={url}
-        alt={name}
-        className="h-full w-full object-contain"
-        style={{ transform: `translate(${offsetX || 0}%, ${offsetY || 0}%) scale(${(scale || 100) / 100})` }}
-      />
-    </div>
-  )
-}
-
 const NAV_LINKS = [
   { href: '#sobre', label: 'Sobre' },
   { href: '#destinos', label: 'Destinos' },
@@ -113,14 +101,7 @@ export function Header({ brand }) {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <div className="flex items-center gap-3">
           {brand.logoUrl ? (
-            <LogoImage
-              url={brand.logoUrl}
-              name={brand.name}
-              scale={brand.logoScale}
-              offsetX={brand.logoOffsetX}
-              offsetY={brand.logoOffsetY}
-              className="h-10 w-10"
-            />
+            <LogoMark brand={brand} variant="header" />
           ) : (
             <div className="h-10 w-10 rounded-full border-2 border-gold-400 flex items-center justify-center text-gold-600 font-serif font-bold">R</div>
           )}
@@ -191,14 +172,7 @@ export function Hero({ brand, hero, destinationGroups }) {
       />
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
         {brand.logoUrl ? (
-          <LogoImage
-            url={brand.logoUrl}
-            name={brand.name}
-            scale={brand.logoScale}
-            offsetX={brand.logoOffsetX}
-            offsetY={brand.logoOffsetY}
-            className={`mx-auto mb-8 p-1 shadow-2xl shadow-black/30 ${logoSize.hero}`}
-          />
+          <LogoMark brand={brand} spacing="mb-8" circleClassName="p-1 shadow-2xl shadow-black/30" />
         ) : (
           <div className={`mx-auto mb-8 rounded-full border-4 border-gold-400 flex items-center justify-center text-5xl font-serif font-bold text-gold-400 shadow-2xl sm:text-7xl ${logoSize.hero}`}>R</div>
         )}
@@ -701,7 +675,11 @@ export function Footer({ brand, footer, socialLinks }) {
         © {new Date().getFullYear()} {brand.name}. <EditableText path={['footer', 'text']} value={footer.text} />
       </p>
       <p className="mt-2">
-        {brand.instagram && <span>{brand.instagram}</span>}
+        {brand.instagram && (
+          <a href={instagramUrl(brand)} target="_blank" rel="noopener noreferrer" className="hover:text-gold-600 hover:underline">
+            {brand.instagram}
+          </a>
+        )}
         {brand.instagram && brand.whatsapp && <span className="mx-2">|</span>}
         {brand.whatsapp && <span>{formatPhoneDisplay(brand.whatsapp)}</span>}
       </p>
