@@ -7,7 +7,7 @@ import { getLogoSize } from '../lib/logoSize.js'
 import { getPlatform } from '../components/SocialIcons.jsx'
 import { useSiteContent } from '../lib/useSiteContent.js'
 import DestinationsGlobe from '../components/DestinationsGlobe.jsx'
-import { EditableText, useEditor, useListEditing, ItemControls, AddItemButton, MoveToSelect } from '../components/Editable.jsx'
+import { EditableText, visibleItems, useEditor, useListEditing, ItemControls, AddItemButton, MoveToSelect } from '../components/Editable.jsx'
 import { mergeRegionInto } from '../lib/moveDestinations.js'
 
 export default function PublicSite() {
@@ -95,7 +95,7 @@ export function Header({ brand }) {
   const navigate = useNavigate()
   const editing = !!useEditor()
   const NavItem = editing ? 'span' : 'a'
-  const whatsappLabel = brand.whatsappLabel || 'Falar no WhatsApp'
+  const whatsappLabel = brand.whatsappLabel ?? 'Falar no WhatsApp'
 
   function goToSection(e, hash) {
     e.preventDefault()
@@ -244,7 +244,7 @@ export function About({ about }) {
     <section id="sobre" className="mx-auto max-w-3xl scroll-mt-20 px-4 py-14 text-center sm:px-6">
       <EditableText as="h2" path={['about', 'title']} value={about.title} className="section-title" />
       <div className="mt-6 space-y-4 text-gray-600">
-        {paragraphs.map((p, i) => (
+        {visibleItems(paragraphs, !!list).map((p, i) => (
           <div key={i} className="edit-item">
             <ItemControls list={list} index={i} total={paragraphs.length} />
             <EditableText as="p" path={['about', 'paragraphs', i]} value={p} />
@@ -354,8 +354,8 @@ export function RegionSummaryCard({ group, preview = false, path, labels }) {
   const linkProps = Tag === 'div' ? {} : { to: `/destinos/${slugify(group.region)}` }
   const countLabel =
     countryCount > 0
-      ? `${countryCount} ${countryCount === 1 ? labels?.countrySingular || 'país' : labels?.countryPlural || 'países'}`
-      : labels?.cardCta || 'Explorar região'
+      ? `${countryCount} ${countryCount === 1 ? labels?.countrySingular ?? 'país' : labels?.countryPlural ?? 'países'}`
+      : labels?.cardCta ?? 'Explorar região'
   // Foto em cima (sem texto por cima, então capa com várias fotos não polui) e texto numa faixa limpa embaixo.
   return (
     <Tag
@@ -422,11 +422,11 @@ export function Destinations({ groups, title, subtitle, labels, onOpenRegion }) 
   return (
     <section id="destinos" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-14 sm:px-6">
       <div className="text-center">
-        <EditableText as="h2" path={['destinationsTitle']} value={title || 'Nossos Destinos'} className="section-title" />
+        <EditableText as="h2" path={['destinationsTitle']} value={title ?? 'Nossos Destinos'} className="section-title" />
         <EditableText
           as="p"
           path={['destinationsSubtitle']}
-          value={subtitle || 'Explore o mundo e encontre seu próximo destino.'}
+          value={subtitle ?? 'Explore o mundo e encontre seu próximo destino.'}
           className="mx-auto mt-3 max-w-xl text-gray-600"
         />
       </div>
@@ -460,7 +460,7 @@ export function Destinations({ groups, title, subtitle, labels, onOpenRegion }) 
           />
         </div>
       ) : (
-        <p className="mt-10 text-center text-gray-400">{labels?.empty || 'Nenhuma região cadastrada ainda.'}</p>
+        <p className="mt-10 text-center text-gray-400">{labels?.empty ?? 'Nenhuma região cadastrada ainda.'}</p>
       )}
     </section>
   )
@@ -472,9 +472,9 @@ export function Services({ services, title }) {
   return (
     <section id="servicos" className="scroll-mt-20 bg-navy-50 py-14">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <EditableText as="h2" path={['servicesTitle']} value={title || 'O Que Nós Ajudamos a Organizar'} className="section-title" />
+        <EditableText as="h2" path={['servicesTitle']} value={title ?? 'O Que Nós Ajudamos a Organizar'} className="section-title" />
         <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {items.map((s, i) => (
+          {visibleItems(items, !!list).map((s, i) => (
             <div key={i} className="card edit-item p-6">
               <ItemControls list={list} index={i} total={items.length} />
               <EditableText as="h4" path={['services', i, 'title']} value={s.title} className="block font-serif text-lg font-bold text-navy-900" />
@@ -493,9 +493,9 @@ export function Reasons({ reasons, title }) {
   const list = useListEditing(['reasons'], items)
   return (
     <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-      <EditableText as="h2" path={['reasonsTitle']} value={title || 'Motivos para Você Contratar a Consultoria'} className="section-title" />
+      <EditableText as="h2" path={['reasonsTitle']} value={title ?? 'Motivos para Você Contratar a Consultoria'} className="section-title" />
       <div className="mt-10 space-y-5">
-        {items.map((r, i) => (
+        {visibleItems(items, !!list).map((r, i) => (
           <div key={i} className="card edit-item p-6">
             <ItemControls list={list} index={i} total={items.length} />
             <EditableText as="h4" path={['reasons', i, 'title']} value={r.title} className="block font-serif text-lg font-bold text-navy-900" />
@@ -514,9 +514,9 @@ export function Process({ process, title }) {
   return (
     <section className="bg-navy-50 py-16">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <EditableText as="h2" path={['processTitle']} value={title || 'Como Funciona a Nossa Consultoria'} className="section-title" />
+        <EditableText as="h2" path={['processTitle']} value={title ?? 'Como Funciona a Nossa Consultoria'} className="section-title" />
         <div className="mt-10 space-y-5">
-          {items.map((step, i) => (
+          {visibleItems(items, !!list).map((step, i) => (
             <div key={i} className="card edit-item relative p-6">
               <ItemControls list={list} index={i} total={items.length} className="!right-16" />
               <span className="absolute -top-3 right-4 rounded-full bg-gold-500 px-2.5 py-1 text-xs font-bold text-white">
@@ -539,16 +539,16 @@ export function Pricing({ pricing, brand }) {
   const planList = useListEditing(['pricing', 'plans'], plans)
   return (
     <section id="preco" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-16 text-center sm:px-6">
-      <EditableText as="h2" path={['pricing', 'title']} value={pricing.title || 'Investimento na Consultoria'} className="section-title" />
+      <EditableText as="h2" path={['pricing', 'title']} value={pricing.title ?? 'Investimento na Consultoria'} className="section-title" />
       <EditableText
         as="p"
         path={['pricing', 'intro']}
-        value={pricing.intro || 'Trabalhamos com um valor justo e acessível para entregar um planejamento completo, seguro e detalhado para a sua viagem dos sonhos.'}
+        value={pricing.intro ?? 'Trabalhamos com um valor justo e acessível para entregar um planejamento completo, seguro e detalhado para a sua viagem dos sonhos.'}
         className="mx-auto mt-4 max-w-xl text-gray-600"
       />
 
       <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
-        {plans.map((plan, pi) => (
+        {visibleItems(plans, !!planList).map((plan, pi) => (
           <PricingPlanCard key={pi} plan={plan} index={pi} total={plans.length} planList={planList} editing={editing} />
         ))}
         <AddItemButton
@@ -561,12 +561,12 @@ export function Pricing({ pricing, brand }) {
 
       <div className="mx-auto mt-8 max-w-xl border-l-4 border-gold-400 bg-gold-50 p-4 text-left text-sm text-navy-800">
         <strong>
-          <EditableText path={['pricing', 'paymentLabel']} value={pricing.paymentLabel || 'Forma de pagamento:'} />
+          <EditableText path={['pricing', 'paymentLabel']} value={pricing.paymentLabel ?? 'Forma de pagamento:'} />
         </strong>{' '}
         <EditableText path={['pricing', 'paymentInfo']} value={pricing.paymentInfo?.replace('Forma de pagamento:', '').trim()} />
       </div>
       <WhatsAppLink whatsapp={brand.whatsapp} message={brand.whatsappMessage} className="btn-gold mt-8">
-        <EditableText path={['brand', 'whatsappLabel']} value={brand.whatsappLabel || 'Falar no WhatsApp'} />
+        <EditableText path={['brand', 'whatsappLabel']} value={brand.whatsappLabel ?? 'Falar no WhatsApp'} />
       </WhatsAppLink>
     </section>
   )
@@ -592,7 +592,7 @@ function PricingPlanCard({ plan, index, total, planList, editing }) {
       )}
       <EditableText as="p" path={[...base, 'tagline']} value={plan.tagline} className="mt-4 text-sm leading-relaxed text-gray-600" />
       <ul className="mt-5 flex-1 space-y-3 text-sm text-navy-800">
-        {bullets.map((bullet, i) => (
+        {visibleItems(bullets, !!bulletList).map((bullet, i) => (
           <li key={i} className="edit-item flex gap-2 leading-relaxed">
             <span className="mt-0.5 flex-shrink-0 text-gold-500">✓</span>
             <EditableText path={[...base, 'bullets', i]} value={bullet} className="min-w-0 flex-1" />
@@ -630,7 +630,7 @@ export function Consultant({ consultant }) {
   return (
     <section id="consultora" className="scroll-mt-20 bg-navy-50 py-16">
       <div className="mx-auto max-w-2xl px-4 text-center sm:px-6">
-        <EditableText as="h2" path={['consultant', 'sectionTitle']} value={consultant.sectionTitle || 'Conheça a Consultora'} className="section-title" />
+        <EditableText as="h2" path={['consultant', 'sectionTitle']} value={consultant.sectionTitle ?? 'Conheça a Consultora'} className="section-title" />
         <div className="mt-8">
           {consultant.photoUrl ? (
             <img
@@ -663,7 +663,7 @@ export function CTA({ cta, brand }) {
         <EditableText as="h2" path={['cta', 'title']} value={cta.title} className="section-title" />
         <EditableText as="p" path={['cta', 'desc']} value={cta.desc} className="mx-auto mt-4 max-w-xl text-gray-600" />
         <WhatsAppLink whatsapp={brand.whatsapp} message={brand.whatsappMessage} className="btn-gold mt-8">
-          <EditableText path={['brand', 'whatsappLabel']} value={brand.whatsappLabel || 'Falar no WhatsApp'} />
+          <EditableText path={['brand', 'whatsappLabel']} value={brand.whatsappLabel ?? 'Falar no WhatsApp'} />
         </WhatsAppLink>
       </div>
     </section>

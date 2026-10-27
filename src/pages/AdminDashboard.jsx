@@ -70,22 +70,71 @@ const REGION_COLORS = [
   { border: 'border-l-indigo-400', header: 'bg-indigo-50', badge: 'bg-indigo-400' },
 ]
 
+// JSON com chaves em ordem fixa (o banco reordena as chaves), pra comparar conteúdo.
+function stableStringify(value) {
+  if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`
+  if (value && typeof value === 'object') {
+    return `{${Object.keys(value)
+      .sort()
+      .filter((k) => value[k] !== undefined)
+      .map((k) => `${JSON.stringify(k)}:${stableStringify(value[k])}`)
+      .join(',')}}`
+  }
+  return JSON.stringify(value)
+}
+
 export default function AdminDashboard() {
   const navigate = useNavigate()
   const [content, setContent] = useState(null)
-  const [status, setStatus] = useState('')
+  const [loadError, setLoadError] = useState('')
+  const [savedJson, setSavedJson] = useState(null)
+  const [status, setStatus] = useState(null) // { type: 'ok' | 'error', text }
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState('marca')
+
+  function loadContent() {
+    setLoadError('')
+    getContent()
+      .then((data) => {
+        const merged = mergeContent(defaultContent, data)
+        setContent(merged)
+        setSavedJson(stableStringify(JSON.parse(JSON.stringify(merged))))
+      })
+      // Se não conseguir ler o que está salvo, NÃO abre com os textos padrão (salvar sobrescreveria o site).
+      .catch((err) => setLoadError(err.message || 'Falha de conexão'))
+  }
 
   useEffect(() => {
     if (!getToken()) {
       navigate('/admin', { replace: true })
       return
     }
-    getContent()
-      .then((data) => setContent(mergeContent(defaultContent, data)))
-      .catch(() => setContent(defaultContent))
+    loadContent()
   }, [])
+
+  const dirty = content !== null && savedJson !== null && stableStringify(JSON.parse(JSON.stringify(content))) !== savedJson
+
+  useEffect(() => {
+    if (!dirty) return
+    const warn = (e) => {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [dirty])
+
+  if (loadError) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 px-4 text-center">
+        <p className="font-semibold text-red-600">Não consegui carregar o conteúdo salvo do site.</p>
+        <p className="max-w-md text-sm text-gray-600">
+          Por segurança o editor não abre com os textos padrão (se você salvasse, sobrescreveria o que está no ar). {loadError}
+        </p>
+        <button onClick={loadContent} className="btn-navy">Tentar de novo</button>
+      </div>
+    )
+  }
 
   if (!content) {
     return <div className="flex min-h-screen items-center justify-center">Carregando…</div>
@@ -97,15 +146,28 @@ export default function AdminDashboard() {
 
   async function handleSave() {
     setSaving(true)
-    setStatus('')
+    setStatus(null)
     try {
+      const sent = stableStringify(JSON.parse(JSON.stringify(content)))
       await saveContent(content)
-      setStatus('Salvo com sucesso!')
+      // Confere no servidor se o que ficou salvo é o que foi enviado.
+      const back = mergeContent(defaultContent, await getContent())
+      const same = stableStringify(JSON.parse(JSON.stringify(back))) === stableStringify(JSON.parse(sent))
+      setSavedJson(sent)
+      setStatus(
+        same
+          ? { type: 'ok', text: 'Salvo e conferido no servidor ✔' }
+          : { type: 'error', text: 'Salvou, mas ao conferir o servidor devolveu algo diferente. Recarregue a página e confira.' },
+      )
     } catch (err) {
-      setStatus('Erro ao salvar: ' + err.message)
+      if (/não autorizado/i.test(err.message)) {
+        clearToken()
+        setStatus({ type: 'error', text: 'Sua sessão expirou — as alterações NÃO foram salvas. Entre de novo no /admin (copie o que digitou antes).' })
+      } else {
+        setStatus({ type: 'error', text: 'NÃO salvou: ' + err.message })
+      }
     } finally {
       setSaving(false)
-      setTimeout(() => setStatus(''), 4000)
     }
   }
 
@@ -125,10 +187,6 @@ export default function AdminDashboard() {
       </header>
 
       <main className="mx-auto max-w-screen-2xl px-4 py-6 sm:px-6">
-        {status && (
-          <div className="mb-4 rounded-lg bg-navy-800 px-4 py-2 text-sm text-white">{status}</div>
-        )}
-
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
           <aside className="flex gap-2 overflow-x-auto rounded-2xl bg-navy-900 p-3 sm:sticky sm:top-20 sm:w-60 sm:flex-shrink-0 sm:flex-col sm:overflow-visible sm:p-4">
             {TABS.map((tab) => {
@@ -361,7 +419,16 @@ export default function AdminDashboard() {
       </main>
 
       <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
-        <div className="mx-auto flex max-w-screen-2xl justify-end">
+        <div className="mx-auto flex max-w-screen-2xl items-center justify-end gap-4">
+          {status?.type === 'error' ? (
+            <span className="text-sm font-semibold text-red-600">{status.text}</span>
+          ) : dirty ? (
+            <span className="text-sm font-semibold text-amber-600">● Alterações ainda não salvas</span>
+          ) : status ? (
+            <span className="text-sm font-semibold text-emerald-600">{status.text}</span>
+          ) : (
+            <span className="text-sm text-gray-400">Tudo salvo</span>
+          )}
           <button onClick={handleSave} disabled={saving} className="btn-navy">
             {saving ? 'Salvando…' : 'Salvar alterações'}
           </button>

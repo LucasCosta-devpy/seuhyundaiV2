@@ -5,6 +5,7 @@ export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       const data = await readContent()
+      res.setHeader('Cache-Control', 'no-store')
       return res.status(200).json(data)
     }
 

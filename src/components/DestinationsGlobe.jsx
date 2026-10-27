@@ -308,18 +308,18 @@ export default function DestinationsGlobe({ groups, compact = false, title, subt
         <CompassDivider />
         {editing ? (
           <h2 className="section-title !text-white">
-            <EditableText path={['globeTitle']} value={title || 'Lugares Que Já Conhecemos'} />
+            <EditableText path={['globeTitle']} value={title ?? 'Lugares Que Já Conhecemos'} />
             <span className="mt-1 block text-xs font-normal normal-case tracking-normal text-navy-200">
               (a última palavra do título aparece em dourado no site)
             </span>
           </h2>
         ) : (
-          <h2 className="section-title !text-white">{renderGoldTitle(title || 'Lugares Que Já Conhecemos')}</h2>
+          <h2 className="section-title !text-white">{renderGoldTitle(title ?? 'Lugares Que Já Conhecemos')}</h2>
         )}
         <EditableText
           as="p"
           path={['globeSubtitle']}
-          value={subtitle || 'Gire o globo e clique em um ponto para conhecer o destino.'}
+          value={subtitle ?? 'Gire o globo e clique em um ponto para conhecer o destino.'}
           className="mx-auto mt-3 max-w-xl text-navy-200"
         />
       </div>
@@ -338,6 +338,7 @@ export default function DestinationsGlobe({ groups, compact = false, title, subt
 // vira "Lugares Que Já" branco + "Conhecemos" dourado), pra manter o visual
 // mesmo quando o texto é editado no admin.
 function renderGoldTitle(title) {
+  if (!title.trim()) return null
   const words = title.trim().split(/\s+/)
   const lastWord = words.pop()
   const rest = words.join(' ')

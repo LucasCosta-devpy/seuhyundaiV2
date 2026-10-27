@@ -9,6 +9,20 @@ export function useEditor() {
   return useContext(EditContext)
 }
 
+// true se o item (texto, objeto ou lista) tem pelo menos um texto não vazio.
+export function isFilled(item) {
+  if (typeof item === 'string') return item.trim() !== ''
+  if (Array.isArray(item)) return item.some(isFilled)
+  if (item && typeof item === 'object') return Object.values(item).some(isFilled)
+  return false
+}
+
+// No site, esconde blocos que ficaram totalmente em branco; no admin mostra todos (pra dar pra preencher).
+export function visibleItems(items, editing) {
+  const list = items || []
+  return editing ? list : list.filter(isFilled)
+}
+
 export function moveItem(list, from, to) {
   if (to < 0 || to >= list.length) return list
   const next = [...list]
@@ -30,6 +44,8 @@ export function EditableText({ path, value, as: Tag = 'span', className = '', pl
   }, [value, editor])
 
   if (!editor) {
+    // No site, campo apagado no admin simplesmente some (sem tag vazia sobrando).
+    if (value === '' || value == null) return null
     return (
       <Tag className={className} {...rest}>
         {value}
