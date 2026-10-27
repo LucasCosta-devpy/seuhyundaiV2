@@ -501,15 +501,16 @@ function LogoLookField({ brand, update }) {
         <p className="label !mb-2">Ícone no canto do cabeçalho (ao lado do nome)</p>
         <div className="flex flex-wrap gap-2">
           {[
-            ['globe', 'Terra girando (animado)'],
-            ['logo', 'Miniatura da logo'],
+            ['both', 'Logo + Terra girando'],
+            ['globe', 'Só a Terra girando'],
+            ['logo', 'Só a miniatura da logo'],
           ].map(([key, label]) => (
             <button
               key={key}
               type="button"
               onClick={() => set('headerStyle')(key)}
               className={`rounded-lg border px-3 py-2 text-sm font-semibold transition-colors ${
-                (brand.headerStyle === 'logo' ? 'logo' : 'globe') === key ? 'border-navy-800 bg-navy-800 text-white' : 'border-gray-300 text-gray-600 hover:border-navy-400'
+                (brand.headerStyle === 'logo' || brand.headerStyle === 'globe' ? brand.headerStyle : 'both') === key ? 'border-navy-800 bg-navy-800 text-white' : 'border-gray-300 text-gray-600 hover:border-navy-400'
               }`}
             >
               {label}

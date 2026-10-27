@@ -8,7 +8,7 @@ export const defaultContent = {
     logoScale: 100,
     logoOffsetX: 0,
     logoOffsetY: 0,
-    headerStyle: 'globe',
+    headerStyle: 'both',
     logoFrame: 'free',
     logoRemoveBg: true,
     logoBgTolerance: 28,

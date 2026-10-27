@@ -279,8 +279,17 @@ function AnimatedLogo({ brand, className }) {
 export function LogoMark({ brand, variant = 'hero', spacing = 'mb-8', circleClassName = '' }) {
   const circle = brand.logoFrame === 'circle'
   if (variant === 'header') {
-    if (brand.headerStyle !== 'logo') return <HeaderGlobe />
-    return circle ? <CircleLogo brand={brand} className="h-10 w-10" /> : <HeaderLogo brand={brand} />
+    // 'both' (padrão): miniatura da logo + Terra girando ao lado. Também dá pra mostrar só um dos dois.
+    const mode = brand.headerStyle === 'logo' || brand.headerStyle === 'globe' ? brand.headerStyle : 'both'
+    const thumb = circle ? <CircleLogo brand={brand} className="h-10 w-10" /> : <HeaderLogo brand={brand} />
+    if (mode === 'globe') return <HeaderGlobe />
+    if (mode === 'logo') return thumb
+    return (
+      <div className="flex items-center gap-1">
+        {thumb}
+        <HeaderGlobe />
+      </div>
+    )
   }
   const size = getLogoSize(brand.logoSize)
   if (circle) return <CircleLogo brand={brand} className={`mx-auto ${spacing} ${circleClassName} ${size.hero}`} />
