@@ -14,6 +14,7 @@ export const defaultContent = {
     instagram: '@rumomaisumarota',
     whatsapp: '5551982710564',
     whatsappLabel: 'Falar no WhatsApp',
+    clientAreaLabel: 'Sua rota',
     navLabels: ['Sobre', 'Destinos', 'Serviços', 'Preço', 'Consultora', 'Redes Sociais'],
     whatsappMessage: 'Olá! Conheci a Rumo Mais Uma Rota pelo site e gostaria de conversar sobre a minha próxima viagem.',
   },
