@@ -42,6 +42,19 @@ export function saveContent(content) {
   return request('content', { method: 'PUT', body: JSON.stringify(content) })
 }
 
+// Rotas dos clientes (admin)
+export function rotasList() {
+  return request('rotas')
+}
+
+export function rotaGet(id) {
+  return request(`rotas?id=${encodeURIComponent(id)}`)
+}
+
+export function rotaAction(payload) {
+  return request('rotas', { method: 'POST', body: JSON.stringify(payload) })
+}
+
 export async function uploadImage(file) {
   const dataUrl = await fileToDataUrl(file)
   const result = await request('upload', {

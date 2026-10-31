@@ -29,6 +29,7 @@ import { withConfirmRemove } from '../lib/confirmRemove.js'
 import { moveCountry, moveCountryIntoCountry } from '../lib/moveDestinations.js'
 import DestinationsGlobe from '../components/DestinationsGlobe.jsx'
 import { LandingView } from './LandingConsultoria.jsx'
+import AdminClientRoutes from '../components/AdminClientRoutes.jsx'
 
 const TABS = [
   { key: 'marca', label: 'Marca e Contato', color: 'amber' },
@@ -43,6 +44,7 @@ const TABS = [
   { key: 'consultora', label: 'Consultora', color: 'fuchsia' },
   { key: 'final', label: 'Chamada final', color: 'cyan' },
   { key: 'landing', label: 'Página de anúncios', color: 'emerald' },
+  { key: 'rotas', label: 'Rotas dos clientes', color: 'orange' },
 ]
 
 const TAB_STYLES = {
@@ -209,6 +211,7 @@ export default function AdminDashboard() {
           </aside>
 
           <div className={`min-w-0 flex-1 rounded-2xl border-t-4 bg-white p-6 shadow-sm ${TAB_STYLES[TABS.find((t) => t.key === activeTab).color].top}`}>
+          {activeTab === 'rotas' && <AdminClientRoutes />}
           {activeTab === 'marca' && (
             <Panel title="Marca e Contato">
               <p className="-mt-2 text-xs text-gray-400">
@@ -421,6 +424,7 @@ export default function AdminDashboard() {
         </div>
       </main>
 
+      {activeTab !== 'rotas' && (
       <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
         <div className="mx-auto flex max-w-screen-2xl items-center justify-end gap-4">
           {status?.type === 'error' ? (
@@ -437,6 +441,7 @@ export default function AdminDashboard() {
           </button>
         </div>
       </div>
+      )}
     </div>
   )
 }

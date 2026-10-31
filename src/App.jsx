@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import PublicSite from './pages/PublicSite.jsx'
 import { RegionPage, CountryPage, CityPage } from './pages/DestinationPages.jsx'
 import LandingConsultoria from './pages/LandingConsultoria.jsx'
+import SuaRota from './pages/SuaRota.jsx'
 import AdminLogin from './pages/AdminLogin.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
@@ -13,6 +14,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<PublicSite />} />
           <Route path="/consultoria" element={<LandingConsultoria />} />
+          <Route path="/sua-rota" element={<SuaRota />} />
           <Route path="/destinos/:regionSlug" element={<RegionPage />} />
           <Route path="/destinos/:regionSlug/:countrySlug" element={<CountryPage />} />
           <Route path="/destinos/:regionSlug/:countrySlug/:thirdSlug" element={<CityPage />} />

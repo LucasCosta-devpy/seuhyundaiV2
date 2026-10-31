@@ -40,3 +40,40 @@ export function requireAuth(req) {
   const token = header.replace(/^Bearer\s+/i, '')
   return verifyToken(token)
 }
+
+// ---- Acesso dos clientes (área "Sua rota") ----
+// Token próprio: id da rota + versão + validade, assinado com prefixo "cliente:" (nunca vale como token do admin).
+// Trocar a senha, revogar ou excluir muda a versão/estado no banco e derruba os tokens antigos.
+const CLIENT_TOKEN_MS = 90 * 24 * 60 * 60 * 1000
+
+function signClient(payload) {
+  return createHmac('sha256', getSecret()).update(`cliente:${payload}`).digest('hex')
+}
+
+export function createClientToken(routeId, version) {
+  const payload = `${routeId}.${version}.${Date.now() + CLIENT_TOKEN_MS}`
+  return `${payload}.${signClient(payload)}`
+}
+
+// Devolve { routeId, version } se a assinatura e a validade estiverem corretas; senão null.
+export function readClientToken(token) {
+  if (!token || typeof token !== 'string') return null
+  const parts = token.split('.')
+  if (parts.length !== 4) return null
+  const [routeId, version, exp, signature] = parts
+  let expected
+  try {
+    expected = signClient(`${routeId}.${version}.${exp}`)
+  } catch {
+    return null
+  }
+  const a = Buffer.from(signature)
+  const b = Buffer.from(expected)
+  if (a.length !== b.length || !timingSafeEqual(a, b)) return null
+  if (!(Number(exp) > Date.now())) return null
+  return { routeId, version: Number(version) }
+}
+
+export function bearerToken(req) {
+  return (req.headers.authorization || '').replace(/^Bearer\s+/i, '')
+}

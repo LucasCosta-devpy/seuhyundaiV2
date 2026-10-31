@@ -84,6 +84,7 @@ export function Header({ brand }) {
   const editing = !!useEditor()
   const NavItem = editing ? 'span' : 'a'
   const whatsappLabel = brand.whatsappLabel ?? 'Falar no WhatsApp'
+  const clientAreaLabel = brand.clientAreaLabel ?? 'Sua rota'
 
   function goToSection(e, hash) {
     e.preventDefault()
@@ -117,6 +118,13 @@ export function Header({ brand }) {
         </nav>
 
         <div className="flex items-center gap-2">
+          <NavItem
+            {...(editing ? {} : { href: '/sua-rota' })}
+            className="hidden items-center gap-1.5 rounded-lg border border-gold-400 px-3 py-2 text-sm font-semibold text-gold-700 transition-colors hover:bg-gold-50 sm:inline-flex"
+          >
+            <span aria-hidden="true">🔒</span>
+            <EditableText path={['brand', 'clientAreaLabel']} value={clientAreaLabel} />
+          </NavItem>
           <WhatsAppLink whatsapp={brand.whatsapp} message={brand.whatsappMessage} className="btn-navy !py-2 !px-4 text-sm hidden sm:inline-flex">
             <EditableText path={['brand', 'whatsappLabel']} value={whatsappLabel} />
           </WhatsAppLink>
@@ -144,7 +152,10 @@ export function Header({ brand }) {
                 {brand.navLabels?.[i] || link.label}
               </a>
             ))}
-            <WhatsAppLink whatsapp={brand.whatsapp} message={brand.whatsappMessage} className="btn-navy mt-2 !py-2 !px-4 text-center text-sm">
+            <a href="/sua-rota" className="mt-2 rounded-lg border border-gold-400 px-3 py-2 text-center text-sm font-semibold text-gold-700 hover:bg-gold-50">
+              🔒 {clientAreaLabel}
+            </a>
+            <WhatsAppLink whatsapp={brand.whatsapp} message={brand.whatsappMessage} className="btn-navy !py-2 !px-4 text-center text-sm">
               {whatsappLabel}
             </WhatsAppLink>
           </div>
