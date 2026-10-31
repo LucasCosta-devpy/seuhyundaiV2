@@ -13,6 +13,7 @@ import {
   limparCopia,
   prepararOffline,
 } from '../lib/rotaClient.js'
+import { fixAnchors } from '../lib/frameAnchors.js'
 
 const formatSize = (n) => (n >= 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`)
 const formatDate = (ms) => new Date(ms).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
@@ -223,6 +224,7 @@ function RouteView({ data, offline, onLogout }) {
         ref={frameRef}
         title={data.routeName}
         srcDoc={data.html}
+        onLoad={(e) => fixAnchors(e.currentTarget)}
         sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-modals"
         className="min-h-0 w-full flex-1 border-0 bg-white"
       />

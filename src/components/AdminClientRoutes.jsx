@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { rotasList, rotaGet, rotaAction } from '../lib/api.js'
+import { fixAnchors } from '../lib/frameAnchors.js'
 
 const formatSize = (n) => (n >= 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`)
 const formatDateTime = (ms) =>
@@ -108,6 +109,7 @@ function Preview({ id, onClose }) {
           <iframe
             title="Prévia da rota"
             srcDoc={route.html}
+            onLoad={(e) => fixAnchors(e.currentTarget)}
             sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
             className="min-h-0 w-full flex-1 border-0"
           />
